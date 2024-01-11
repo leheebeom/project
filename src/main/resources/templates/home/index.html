@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>DRIPSODA :: 혼자여도 괜찮은 여행, 드립소다</title>
+    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css"/>
+    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+    <th:block th:insert="~{fragments/head.html :: content}"></th:block>
+</head>
+<body class="_layout-hmf">
+<th:block th:replace="~{fragments/header.html :: content}"></th:block>
+<main class="_main">
+    <nav class="category">
+        <div class="_sliding-view">
+            <ul class="_sliding-image-container">
+                <li>
+                    <img alt="함께라면 못갈 곳은 없어" class="_slide-first" th:src="@{/resources/images/_image-first.webp}">
+                </li>
+                <li>
+
+                </li>
+                <li>
+
+                </li>
+            </ul>
+        </div>
+        <div class="_travel_view">
+            <button class="_travel_button_01 tBtn1">
+                <img alt="동행" class="_menu_accompany_image mImg" th:src="@{/resources/images/main_web_menu01.webp}">
+                <div class="_menu_accompany">
+                    <h1>동행</h1>
+                    <span></span>
+                    "의 여행 동행
+                </div>
+            </button>
+            <button class="_travel_button_02 tBtn2">
+                <img alt="일정" class="_menu_schedule_image mImg" th:src="@{/resources/images/main_web_menu02.webp}">
+                <div class="_menu_schedule">
+                    <h1>일정</h1>
+                    <span></span>
+                    "의 여행 일정
+                </div>
+            </button>
+            <button class="_travel_button_03 tBtn3">
+                <img alt="상품" class="_menu_goods_image mImg" th:src="@{/resources/images/main_web_menu03.webp}">
+                <div class="_menu_goods">
+                    <h1>여행 상품</h1>
+                    <span></span>
+                    "의 여행 상품
+                </div>
+            </button>
+            <div class="_right_top">
+                <div class="_right_top_left">
+                    <div class="_my_profile_container">
+                        <div class="_my_profile_img_container">
+                            <img class="_my_profile_img" th:src="@{/resources/images/vector_profile_default.svg}"
+                                 alt="profile">
+                        </div>
+                        <div class="_greetings">
+                            <p class="_hi gP">안녕하세요 :)</p>
+                            <p class="_nickname gP">dejj339님!</p>
+                            <!-- 타임 리프-->
+                        </div>
+                    </div>
+                    <button class="_my_button mBtn" id="loginButton">로그인하기
+                        <div th:hidden="${session.memberUser == null}" class="_my_img_button">마이페이지
+                            <!--타임리프 -->
+                            <svg width="9" height="14" viewBox="0 0 9 14" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                 style="cursor: pointer;">
+                                <path d="M2 2L7 7L2 12" stroke="#00CE7C" stroke-width="2"
+                                      stroke-linecap="square"></path>
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+                <div class="_right_top_right">
+                    <div class="rtrF">
+                        <div class="rtrS">
+                            <div class="_trip_schedule">
+                                <p class="tsT1">예정된 여행 일정이 없어요.</p>
+                                <p class="tsT2">먼저, 여행 일정을 만들어볼까요?</p></div>
+                            <button class="_trip_schedule_button">
+                                <svg width="17" height="17" viewBox="0 0 17 17" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8.5 1V16" stroke="#00CE7C" stroke-width="2" stroke-linecap="round"
+                                          stroke-linejoin="round"></path>
+                                    <path d="M16 8.5L1 8.5" stroke="#00CE7C" stroke-width="2" stroke-linecap="round"
+                                          stroke-linejoin="round"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="_right_bottom">
+                <div class="rbF">
+                    <div class="rbFT">
+                        <div class="_traveler_container">
+                            <div class="_traveler_icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="12" fill="url(#paint0_radial_1114_139929)"></circle>
+                                    <circle cx="12" cy="12" r="4" fill="#FF0000"></circle>
+                                    <defs>
+                                        <radialGradient id="paint0_radial_1114_139929" cx="0" cy="0" r="1"
+                                                        gradientUnits="userSpaceOnUse"
+                                                        gradientTransform="translate(12 12) rotate(90) scale(12)">
+                                            <stop stop-color="#FF4949"></stop>
+                                            <stop offset="1" stop-color="#F3F6F9" stop-opacity="0"></stop>
+                                        </radialGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <p class="_traveler_greeting">트립소다와 함께 하는 여행자들</p>
+                        </div>
+                        <div class="_traveler_number_container">
+                            <p class="_traveler_number">현재 20,917명이 함께하고 있어요!</p>
+                            <!-- 타임리프 총 인구 찍기 -->
+                        </div>
+                    </div>
+                    <div class="_accompany_users_container">
+                        <div class="aucF">
+                            <div class="swiper swiper-container">
+                                <div class="swiper-wrapper">
+                                    <div class="swiper-slide">Slide 1</div>
+                                    <div class="swiper-slide">Slide 2</div>
+                                    <div class="swiper-slide">Slide 3</div>
+                                    <div class="swiper-slide">Slide 4</div>
+                                    <div class="swiper-slide">Slide 5</div>
+                                    <div class="swiper-slide">Slide 6</div>
+                                    <div class="swiper-slide">Slide 7</div>
+                                    <div class="swiper-slide">Slide 8</div>
+                                    <div class="swiper-slide">Slide 9</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="_best_travel_container">
+            <div class="_best_travel_top">
+                <div class="_travel_icon_container">
+                    <div class="_travel_icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                  d="M9.98467 12.9873L5.99951 12.9873L13.9883 0.999878L14.0141 11.0106L17.9993 11.0107L10.0105 22.9981L9.98467 12.9873Z"
+                                  fill="#FFBB00"></path>
+                        </svg>
+                    </div>
+                    <p class="_best_travel_greeting">트립소다 인기 여행지
+                    </p>
+                </div>
+                <div class="_best_travel_bottom">
+                    <p>여행자들이 많이 보고 있는 여행지에요!</p>
+                </div>
+                <div class="_best_travel_category">
+                    <div class="btC">
+                        <div class="swiper travel-swiper-container">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide swiper-slide-active">Slide 1</div>
+                                <div class="swiper-slide swiper-slide-active">Slide 2</div>
+                                <div class="swiper-slide swiper-slide-active">Slide 3</div>
+                                <div class="swiper-slide swiper-slide-active">Slide 4</div>
+                                <div class="swiper-slide swiper-slide-active">Slide 5</div>
+                                <div class="swiper-slide swiper-slide-active">Slide 6</div>
+                                <div class="swiper-slide swiper-slide-active">Slide 7</div>
+                                <div class="swiper-slide swiper-slide-active">Slide 8</div>
+                                <div class="swiper-slide swiper-slide-active">Slide 9</div>
+                            </div>
+                            <button class="swiper-button-prev ">
+                                <img class="left_button" alt="left button"
+                                     th:src="@{/resources/images/arrow_narrow_right.svg}">
+                            </button>
+                            <button class="swiper-button-next">
+                                <img class="right_button" alt="right button"
+                                     th:src="@{/resources/images/arrow_narrow_right.svg}">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="_recent_best_travel_container">
+            <div class="_recent_best_travel_top">
+                <div class="_recent_best_travel_icon_container">
+                    <div class="_recent_best_travel_icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                  d="M17.7699 14.0002C20.149 14.0002 22.0776 12.0715 22.0776 9.69246C22.0776 7.31339 20.149 5.38477 17.7699 5.38477C15.3909 5.38477 13.4623 7.31339 13.4623 9.69246C13.4623 12.0715 15.3909 14.0002 17.7699 14.0002ZM27.4623 22.0771C27.4623 22.2582 27.4527 22.4377 27.434 22.6154H8.10587C8.08716 22.4377 8.07764 22.2582 8.07764 22.0771C8.07764 18.2111 12.417 15.0771 17.7699 15.0771C23.1229 15.0771 27.4623 18.2111 27.4623 22.0771Z"
+                                  fill="#008FF6"></path>
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                  d="M12.653 12.0945C11.913 12.9329 10.8303 13.4617 9.62414 13.4617C7.39376 13.4617 5.58567 11.6536 5.58567 9.42323C5.58567 7.19285 7.39376 5.38477 9.62414 5.38477C10.8303 5.38477 11.913 5.91356 12.653 6.75196C12.0246 7.46388 11.6434 8.39903 11.6434 9.42323C11.6434 10.4474 12.0246 11.3826 12.653 12.0945ZM12.653 14.8447C9.1238 15.7456 6.59529 18.1765 6.59529 21.0338C6.59529 21.2036 6.60422 21.3719 6.62176 21.5385H0.564072C0.546529 21.3719 0.537598 21.2036 0.537598 21.0338C0.537598 17.4094 4.60578 14.4713 9.62414 14.4713C10.6862 14.4713 11.7056 14.6029 12.653 14.8447Z"
+                                  fill="#A0D5FB"></path>
+                        </svg>
+                    </div>
+                    <p class="_recent_best_travel_greeting">최근 인기 동행 게시글</p>
+                </div>
+                <div class="_recent_best_travel_bottom">
+                    <p>최근 인기 동행글을 확인해보세요</p>
+                    <div class="_recent_best_travel_more">
+                        <p>여행 동행 더 보러가기</p>
+                        <div class="_recent_best_travel_more_icon">
+                            <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                 style="cursor: pointer;">
+                                <path d="M1 1L7 7L1 13" stroke="#00CE7C" stroke-width="1"
+                                      stroke-linecap="square"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="_recent_best_travel_menu_container" id="recentBestTravelMenuContainer">
+
+
+            </div>
+        </div>
+    </nav>
+</main>
+<th:block th:replace="~{fragments/footer.html :: content}"></th:block>
+</body>
+</html>
+
