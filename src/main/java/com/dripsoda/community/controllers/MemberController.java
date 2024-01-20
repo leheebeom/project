@@ -1,28 +1,41 @@
 package com.dripsoda.community.controllers;
 
-import com.dripsoda.community.entities.member.ContactAuthEntity;
-import com.dripsoda.community.entities.member.ContactCountryEntity;
-import com.dripsoda.community.entities.member.EmailAuthEntity;
-import com.dripsoda.community.entities.member.UserEntity;
+import com.dripsoda.community.entities.member.*;
 import com.dripsoda.community.enums.CommonResult;
 import com.dripsoda.community.exceptions.RollbackException;
 import com.dripsoda.community.interfaces.IResult;
 import com.dripsoda.community.regex.MemberRegex;
 import com.dripsoda.community.services.MemberService;
 import com.dripsoda.community.utils.CryptoUtils;
+import com.dripsoda.community.utils.FileUtil;
+import com.dripsoda.community.vos.member.LoginVo;
+import org.apache.catalina.User;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.mail.MessagingException;
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
@@ -196,8 +209,11 @@ public class MemberController {
     @RequestMapping(value = "userLogin", method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
     public String postUserLogin(@RequestParam(value = "autosign", required = false) Optional<Boolean> autosignOptional,
+                                HttpServletRequest request,
+                                HttpServletResponse response,
                                 HttpSession session,
-                                UserEntity user) {
+                                UserEntity user,
+                                LoginVo loginVo) {
         boolean autosign = autosignOptional.orElse(false);
         user.setName(null)
                 .setContactCountryValue(null)
@@ -213,7 +229,11 @@ public class MemberController {
         if (result == CommonResult.SUCCESS) {
             session.setAttribute(UserEntity.ATTRIBUTE_NAME, user);
             if (autosign) {
-                // TODO : Implement auto sign feature.
+                Cookie autoLoginCookie = new Cookie("autoLoginCookie", session.getId());
+                autoLoginCookie.setPath("/");
+                long limitTime = 60 * 60 * 24 * 90;
+                autoLoginCookie.setMaxAge((int) limitTime);
+                response.addCookie(autoLoginCookie);
             }
         }
         JSONObject responseJson = new JSONObject();
@@ -237,7 +257,11 @@ public class MemberController {
     @ResponseBody
     public String postUserRegister(@RequestParam(value = "policyMarketing", required = true) boolean policyMarketing,
                                    ContactAuthEntity contactAuth,
-                                   UserEntity user) {
+                                   UserEntity user) throws IOException {
+        //프로필은 없으니 기본값 설정.
+        String resourcePath = "static/resources/images/vector_profile_default.svg";
+        byte[] readyByte = FileUtil.getBytes(resourcePath);
+
         contactAuth.setIndex(-1)
                 .setCreatedAt(null)
                 .setExpiresAt(null)
@@ -247,10 +271,13 @@ public class MemberController {
                 .setPolicyMarketingAt(policyMarketing ? new Date() : null)
                 .setStatusValue("OKY")
                 .setRegisteredAt(new Date())
-                .setAdmin(false);
+                .setAdmin(false)
+                .setProfileId(null)
+                .setProfileData(readyByte);
         IResult result;
         try {
             result = this.memberService.createUser(contactAuth, user);
+
         } catch (RollbackException ex) {
             result = ex.result;
         }
@@ -328,6 +355,7 @@ public class MemberController {
         if (tab == null || tab.equals("info") || (!tab.equals("trip") && !tab.equals("book") && !tab.equals("comment") && !tab.equals("accompany") && !tab.equals("truncate"))) {
             modelAndView.addObject(ContactCountryEntity.ATTRIBUTE_NAME_PLURAL, this.memberService.getContactCountries());
         }
+        modelAndView.addObject(UserEntity.ATTRIBUTE_NAME, this.memberService.getUser(user.getEmail()));
 
         modelAndView.setViewName("member/userMy");
         return modelAndView;
@@ -342,7 +370,7 @@ public class MemberController {
                                  @RequestParam(value = "newPassword", required = false, defaultValue = "") String newPassword,
                                  @RequestParam(value = "newContact", required = false, defaultValue = "") String newContact,
                                  @RequestParam(value = "newContactAuthCode", required = false, defaultValue = "") String newContactAuthCode,
-                                 @RequestParam(value = "newContactAuthSalt", required = false, defaultValue = "") String newContactAuthSalt) {
+                                 @RequestParam(value = "newContactAuthSalt", required = false, defaultValue = "") String newContactAuthSalt) throws MessagingException, IOException {
         UserEntity newUser = UserEntity.build();
         if (changePasswordOptional.orElse(false)) {
             newUser.setPassword(newPassword);
@@ -350,6 +378,7 @@ public class MemberController {
         if (changeContactOptional.orElse(false)) {
             newUser.setContact(newContact);
         }
+
         ContactAuthEntity contactAuth = ContactAuthEntity.build()
                 .setContact(newContact)
                 .setCode(newContactAuthCode)
@@ -364,6 +393,33 @@ public class MemberController {
         responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
         return responseJson.toString();
     }
+
+
+    @RequestMapping(value = "userMyInfoProfileImage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String postUserMyInfoProfileImage(@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+                                             @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user) throws IOException {
+
+        String resourcePath = "static/resources/images/vector_profile_default.svg";
+        byte[] readyByte = FileUtil.getBytes(resourcePath);
+
+        if (profileImage == null) {
+            user.setProfileData(readyByte);
+            user.setProfileId("no");
+        } else {
+            String profileId = String.format("%s%f%f", new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()),
+                    Math.random(),
+                    Math.random());
+            profileId = CryptoUtils.hashSha512(profileId);
+            user.setProfileData(profileImage.getBytes());
+            user.setProfileId(profileId);
+        }
+        IResult result = this.memberService.modifyUserProfileImage(user);
+        JSONObject responseJson = new JSONObject();
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
+
 
     @RequestMapping(value = "userMyInfoAuth", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
@@ -399,6 +455,63 @@ public class MemberController {
         IResult result = this.memberService.checkContactAuth(contactAuth);
         JSONObject responseJson = new JSONObject();
         responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
+
+    @RequestMapping(value = "profile-id", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getProfileId(@RequestParam(value = "profileId", required = true) String profileId,
+                                               HttpServletResponse response) {
+        UserEntity profileUser = this.memberService.getProfileImage(profileId);
+
+
+        if (profileUser.getProfileId() == null) {
+            response.setStatus(404);
+            return null;
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpStatus status = HttpStatus.OK;
+        headers.add("Content-Length", String.valueOf(profileUser.getProfileData().length));
+        headers.add("Content-Type", "image/png");
+        return new ResponseEntity<>(profileUser.getProfileData(), headers, status);
+    }
+
+
+    @RequestMapping(value = "userMyInfoDelete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String deleteUserMyInfoDelete(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+                                         @RequestParam(value = "findAccompany", required = false) Optional<Boolean> findAccompanyOptional,
+                                         @RequestParam(value = "tripEnds", required = false) Optional<Boolean> tripEndsOptional,
+                                         @RequestParam(value = "travelProducts", required = false) Optional<Boolean> travelProductsOptional,
+                                         @RequestParam(value = "badManners", required = false) Optional<Boolean> badMannersOptional,
+                                         @RequestParam(value = "inconvenience", required = false) Optional<Boolean> inconvenienceOptional,
+                                         @RequestParam(value = "new", required = false) Optional<Boolean> newOptional,
+                                         @RequestParam(value = "useful", required = false) Optional<Boolean> usefulOptional,
+                                         @RequestParam(value = "content") String content,
+                                         HttpSession session) {
+
+        JSONObject responseJson = new JSONObject();
+        FeedbackEntity feedback = FeedbackEntity.build()
+                .setUserEmail(user.getEmail())
+                .setCreatedAt(new Date())
+                .setContent(content);
+
+        feedback.setFind(findAccompanyOptional.orElse(false));
+        feedback.setTrip(tripEndsOptional.orElse(false));
+        feedback.setProduct(travelProductsOptional.orElse(false));
+        feedback.setManner(badMannersOptional.orElse(false));
+        feedback.setConvenience(inconvenienceOptional.orElse(false));
+        feedback.setNew(newOptional.orElse(false));
+        feedback.setUseful(usefulOptional.orElse(false));
+        this.memberService.createFeedback(feedback);
+        IResult result;
+        try {
+            result = this.memberService.deleteUser(user);
+        } catch (RollbackException ex) {
+            result = ex.result;
+        }
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        session.removeAttribute(UserEntity.ATTRIBUTE_NAME);
         return responseJson.toString();
     }
 }

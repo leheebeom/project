@@ -2,10 +2,8 @@ package com.dripsoda.community.services;
 
 import com.dripsoda.community.components.MailComponent;
 import com.dripsoda.community.components.SmsComponent;
-import com.dripsoda.community.entities.member.ContactAuthEntity;
-import com.dripsoda.community.entities.member.ContactCountryEntity;
-import com.dripsoda.community.entities.member.EmailAuthEntity;
-import com.dripsoda.community.entities.member.UserEntity;
+import com.dripsoda.community.dtos.accompany.ArticleSearchDto;
+import com.dripsoda.community.entities.member.*;
 import com.dripsoda.community.enums.CommonResult;
 import com.dripsoda.community.enums.member.UserLoginResult;
 import com.dripsoda.community.exceptions.RollbackException;
@@ -13,6 +11,7 @@ import com.dripsoda.community.interfaces.IResult;
 import com.dripsoda.community.mappers.IMemberMapper;
 import com.dripsoda.community.regex.MemberRegex;
 import com.dripsoda.community.utils.CryptoUtils;
+import org.apache.catalina.User;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,9 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 @Service(value = "com.dripsoda.community.services.MemberService")
 public class MemberService {
@@ -73,6 +74,7 @@ public class MemberService {
         }
         return CommonResult.SUCCESS;
     }
+
 
     @Transactional
     public IResult checkContactAuth(ContactAuthEntity contactAuth) throws
@@ -124,7 +126,10 @@ public class MemberService {
                 !user.getContact().matches(MemberRegex.USER_CONTACT)) {
             return CommonResult.FAILURE;
         }
+        //닉네임 기본값 스플릿
         user.setNickname(user.getEmail().split("@")[0]);
+        //프로필 기본 설정 없으니 유효성 검증뒤 no 값
+        user.setProfileId("no");
         user.setPassword(CryptoUtils.hashSha512(user.getPassword()));
         if (this.memberMapper.insertUser(user) == 0) {
             throw new RollbackException();
@@ -310,6 +315,10 @@ public class MemberService {
         return CommonResult.SUCCESS;
     }
 
+    public UserEntity getProfileImage(String profileId) {
+        return this.memberMapper.selectProfileImage(profileId);
+    }
+
     @Transactional
     public IResult modifyUser(UserEntity currentUser, UserEntity newUser, String oldPassword, ContactAuthEntity contactAuth) throws
             RollbackException {
@@ -325,17 +334,29 @@ public class MemberService {
             return CommonResult.FAILURE; // 신규 연락처 정규화 실패 혹은 인증 실패
         }
         String oldCurrentPassword = currentUser.getPassword(); // Update 실패시 세션에 있는 객체가 가진 원래 값으로 되돌려 놓기 위해 백업 해놓아야함.
-        String oldCurrentContact = currentUser.getContact(); // 상동
+        String oldCurrentContact = currentUser.getContact();
+        String oldCurrentProfileId = currentUser.getProfileId();
+        byte[] oldCurrentProfileData = currentUser.getProfileData();
+
         if (newUser.getPassword() != null) {
             currentUser.setPassword(CryptoUtils.hashSha512(newUser.getPassword()));
         }
         if (newUser.getContact() != null) {
             currentUser.setContact(newUser.getContact());
         }
+        if (newUser.getProfileId() != null) {
+            currentUser.setProfileId(newUser.getProfileId());
+        }
+        if (newUser.getProfileData() != null) {
+            currentUser.setProfileData(newUser.getProfileData());
+        }
+        //0이랑 비교
         int record = this.memberMapper.updateUser(currentUser);
         if (record == 0) {
             currentUser.setPassword(oldCurrentPassword);
             currentUser.setContact(oldCurrentContact);
+            currentUser.setProfileId(oldCurrentProfileId);
+            currentUser.setProfileData(oldCurrentProfileData);
             throw new RollbackException();
         }
         return CommonResult.SUCCESS;
@@ -355,9 +376,35 @@ public class MemberService {
         }
         return this.createContactAuth(contactAuth);
     }
+
+    public IResult modifyUserProfileImage(UserEntity user) {
+        if (user.getProfileId() == null || user.getProfileData() == null) {
+            return CommonResult.FAILURE;
+        }
+        return this.memberMapper.updateUser(user) > 0
+                ? CommonResult.SUCCESS
+                : CommonResult.FAILURE;
+
+    }
+
     public UserEntity getUser(String email) {
-        return this.memberMapper.selectUserByEmail(
-                UserEntity.build().setEmail(email));
+        return this.memberMapper.selectUserByEmail(UserEntity.build().setEmail(email));
+    }
+
+    public List<UserEntity> getUsers() {
+        return this.memberMapper.selectUsersForHome();
+    }
+
+    public IResult createFeedback(FeedbackEntity feedback) {
+        return this.memberMapper.insertFeedback(feedback) > 0
+                ? CommonResult.SUCCESS
+                : CommonResult.FAILURE;
+    }
+
+    public IResult deleteUser(UserEntity user) throws RollbackException {
+        return this.memberMapper.deleteUser(user) > 0
+                ? CommonResult.SUCCESS
+                : CommonResult.FAILURE;
     }
 
 }

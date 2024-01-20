@@ -33,19 +33,6 @@
                 <div class="view-count" id="viewCount"></div>
                 <button class="report-button">신고하기</button>
             </div>
-            <!--            <div class="comment-list" id="commentList">-->
-            <!--                <table class="comment-table" id="commentTable">-->
-            <!--                    <tr th:each="comment : ${comments}" th:object="${comment}" th:data-index="*{index}">-->
-            <!--                        <th th:text="${index}">댓글번호</th>-->
-            <!--                        <th th:text="${userEamil}">작성자</th>-->
-            <!--                        <th th:text="${content}">내용</th>-->
-            <!--                        <th th:text="${createdAt}">작성시간</th>-->
-            <!--                        <td>-->
-            <!--                            <button rel="delete">삭제</button>-->
-            <!--                        </td>-->
-            <!--                    </tr>-->
-            <!--                </table>-->
-            <!--            </div>-->
 
             <div>
                 <p>댓글</p>
@@ -83,7 +70,7 @@
                             </div>
                             <div class="comment-user">
                                 <span class="nickname">닉네임</span>
-                                <span class="created" th:text="${accompanyComment.getCreatedAt()}">작성일시</span>
+                                <span class="created" th:text="${#dates.format(accompanyComment.getCreatedAt(),('yyyy-MM-dd'))}">작성일시</span>
                             </div>
                         </div>
                         <p class="comment" th:text="${accompanyComment.getContent()}">
@@ -91,7 +78,7 @@
                         </p>
                         <div class="feedback-container">
                             <div class="reply-container">
-                                <button class="reply-button" th:data-index="${accompanyComment.getIndex()}">답글 달기
+                                <button class="reply-button" id="replyButton" th:data-index="${accompanyComment.getIndex()}">답글 달기
                                 </button>
                             </div>
                             <div class="great-container">

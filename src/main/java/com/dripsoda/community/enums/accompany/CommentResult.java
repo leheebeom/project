@@ -4,6 +4,6 @@ import com.dripsoda.community.interfaces.IResult;
 
 public enum CommentResult implements IResult {
     NOT_FOUND,
-    NOT_SIGNED
+    NOT_SIGNED;
 
 }

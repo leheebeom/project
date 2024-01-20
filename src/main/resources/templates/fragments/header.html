@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <header class="_header _content-wrapper" th:fragment="content">
-    <div class="_content-container content-container">
+    <div id="contentContainer" class="_content-container content-container">
         <ul class="write-menu" id="_writeMenu">
             <li class="item">
                 <a class="link" th:href="@{/accompany/write}">
@@ -32,13 +32,16 @@
                 <a class="link" th:href="@{/qna/}">Q&A</a>
             </li>
         </ul>
-        <form class="search-form" method="get">
-            <label class="input-container">
-                <span hidden>여행 qna을 검색해보세요!</span>
-                <i class="icon fa-solid fa-magnifying-glass"></i>
-                <input class="input" maxlength="50" name="keyword" placeholder="여행 qna을 검색해보세요!" type="text">
-            </label>
-        </form>
+        <div id="searchFormContainer" class="search-form-container">
+            <form class="search-form" method="get" id="searchForm">
+                <label class="input-container">
+                    <span hidden>여행 qna을 검색해보세요!</span>
+                    <i class="icon fa-solid fa-magnifying-glass"></i>
+                    <input class="input" maxlength="50" name="keyword" placeholder="여행 qna을 검색해보세요!" type="text">
+                </label>
+            </form>
+        </div>
+
         <ul class="side-menu">
             <li class="item" th:if="${session.memberUser == null}">
                 <a class="link" th:href="@{/member/userLogin}">로그인</a>

@@ -1,11 +1,11 @@
 package com.dripsoda.community.mappers;
 
-import com.dripsoda.community.entities.member.ContactAuthEntity;
-import com.dripsoda.community.entities.member.ContactCountryEntity;
-import com.dripsoda.community.entities.member.EmailAuthEntity;
-import com.dripsoda.community.entities.member.UserEntity;
+import com.dripsoda.community.entities.member.*;
 import org.apache.catalina.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface IMemberMapper {
@@ -15,6 +15,8 @@ public interface IMemberMapper {
 
     int insertUser(UserEntity user);
 
+//    String updateUserProfileImage(UserEntity newUser);
+
     ContactAuthEntity selectContactAuthByContactCodeSalt(ContactAuthEntity contactAuth);
 
     ContactCountryEntity[] selectContactCountries();
@@ -23,6 +25,7 @@ public interface IMemberMapper {
 
     UserEntity selectUserByEmail(UserEntity user);
 
+    int insertFeedback(FeedbackEntity feedback);
     UserEntity selectUserByPassword(UserEntity user);
 
     UserEntity selectUserByEmailPassword(UserEntity user);
@@ -37,4 +40,9 @@ public interface IMemberMapper {
 
     int updateUser(UserEntity user);
 
+    int deleteUser(UserEntity user);
+
+    UserEntity selectProfileImage(@Param(value = "profileId")String profileId);
+
+    List<UserEntity> selectUsersForHome();
 }

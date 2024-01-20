@@ -136,6 +136,24 @@ body > .main > .content.info > .form > .table > .body > .row > .cell > .label {
     flex-direction: row;
     justify-content: flex-start;
 }
+body > .main > .content.info > .form > .table > .body > .row > .cell > .profile {
+    position: relative;
+    width: fit-content;
+    height: auto;
+    margin: 0px auto;
+}
+body > .main > .content.info > .form > .table > .body > .row > .cell > .label  >.profile-image {
+    position: relative;
+    width: fit-content;
+    margin: 0px auto;
+}
+body > .main > .content.info > .form > .table > .body > .row > .cell > .label >.profile-image > .camera-image {
+    position: absolute;
+    right: -5px;
+    bottom: 2px;
+    width: 24px;
+    height: 24px;
+}
 
 body > .main > .content.info > .form > .table > .body > .row > .cell > .label > * {
     margin-right: 0.625rem;
@@ -154,5 +172,73 @@ body > .main > .content.info > .form > .table > .body > .row > .cell > .warning.
     display: inline-block;
 }
 
+body > .main > .content.truncate > .truncate-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+body > .main > .content.truncate > .truncate-form > .title {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.4px;
+    margin: 0.25rem 0 ;
+}
 
+body > .main > .content.truncate > .truncate-form  > .sub-title {
+    font-size: 13px;
+    font-weight: 400;
+    color: rgb(106, 106, 106);
+    letter-spacing: -0.26px;
+    margin: 0.25rem 0 ;
+}
+body > .main > .content.truncate > .truncate-form > ._object-check-container {
+    cursor: pointer;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+    width: 80%;
+    height: 22px;
+    margin: 0.4rem 0 ;
+}
 
+body > .main > .content.truncate > .truncate-form > ._object-check-container > .text {
+    font-size: 14px;
+    letter-spacing: -0.28px;
+    color: rgb(0,0,0);
+}
+
+body > .main > .content.truncate > .truncate-form > .text-container {
+    width: 80%;
+    margin: 0.25rem 0 ;
+}
+
+body > .main > .content.truncate > .truncate-form > .text-container > .text {
+    font-size: 14px;
+    letter-spacing: -0.28px;
+}
+
+body > .main > .content.truncate > .truncate-form > .button-container {
+    margin: 0.625rem 0 ;
+    width: 80%;
+}
+
+body > .main > .content.truncate > .truncate-form > .button-container > ._object-button {
+    width: 18.375rem;
+}
+
+body > .main > .content.truncate > .truncate-form > .button-container > ._object-button:first-child {
+    background-color: rgb(248, 248, 248);
+    color: rgb(0,0,0);
+}
+body > .main > .content.truncate > .truncate-form > .button-container > ._object-button:last-child{
+    background-color: rgb(219, 219, 219);
+    cursor: default;
+}
+
+body > .main > .content.truncate > .truncate-form > .button-container > ._object-button:last-child.visible {
+    cursor: pointer;
+    background-color: rgb(252, 112, 112);
+}

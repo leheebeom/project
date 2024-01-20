@@ -1,4 +1,5 @@
 const id = parseInt(window.location.href.split('/').at(-1).split('?')[0]);
+
 const coverImage = window.document.getElementById('coverImage');
 const title = window.document.getElementById('title');
 const region = window.document.getElementById('region');
@@ -13,9 +14,17 @@ const retractButton = window.document.getElementById('retractButton');
 const deleteButton = window.document.getElementById('deleteButton');
 const modifyButton = window.document.getElementById('modifyButton');
 const viewCount = window.document.getElementById('viewCount');
-// const commentTable = window.document.getElementById('commentTable');
-// const rows = Array.from(commentTable.querySelectorAll('.comment-list > table > tr'));
-const form = window.document.getElementById('contentForm');
+const contentForm = window.document.getElementById('contentForm');
+const replyForm = window.document.getElementById('replyForm');
+const replyButtonAll  = window.document.querySelectorAll('.reply-button');
+const parentIndex = window.document.getElementById('number');
+
+const showForm = form => form.classList.add('visible');
+const hideForm = form => form.classList.remove('visible');
+// 초기 상태 설정
+showForm(contentForm);
+hideForm(replyForm);
+
 const checkRequest = () => {
     cover.show('서버와 통신 중입니다.\n\n잠시만 기다려 주세요.');
     const xhr = new XMLHttpRequest();
@@ -123,6 +132,7 @@ modifyButton.addEventListener('click', () => {
     window.location.href = `../modify/${id}`;
 });
 
+
 requestButton.addEventListener('click', () => {
     if (requestButton.dataset.sigend === 'false') {
         window.location.href = '../../member/userLogin';
@@ -171,16 +181,18 @@ const warning = {
     }
 };
 
-form.onsubmit = e => {
+
+
+contentForm.onsubmit = e => {
     e.preventDefault();
-    if (form['content'].value === '') {
-        form['content'].focus();
+    if (contentForm['content'].value === '') {
+        contentForm['content'].focus();
         alert('댓글을 작성해주세요.');
         return false;
     }
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
-    formData.append('content', form['content'].value);
+    formData.append('content', contentForm['content'].value);
     xhr.open('POST', `../read/${id}/comments`);
     xhr.onreadystatechange = () => {
         if (xhr.readyState === XMLHttpRequest.DONE) {
@@ -191,7 +203,6 @@ form.onsubmit = e => {
                         const id = responseJson['articleId'];
                         window.location.reload();
                         break
-
                     case 'not_found' :
                         alert('더 이상 존재하지 않는 동행 정보입니다.');
                         window.location.href = '../';
@@ -210,4 +221,52 @@ form.onsubmit = e => {
     xhr.send(formData);
 };
 
+let commentId
+replyButtonAll.forEach((reply) => {
+    // Adding a click event listener to each reply button
+    reply.addEventListener('click', () => {
+        showForm(replyForm);
+        hideForm(contentForm);
+        replyForm['content'].focus();
+        commentId = reply.dataset.index;
+        console.log(commentId);
+    });
+});
 
+
+replyForm.onsubmit = e => {
+    e.preventDefault();
+    if (replyForm['content'].value === '') {
+        alert('댓글을 작성해주세요.');
+        return false;
+    }
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+    formData.append('content', replyForm['content'].value);
+    xhr.open('POST', `./${id}/reply/${commentId}`);
+    xhr.onreadystatechange = () => {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                const responseJson = JSON.parse(xhr.responseText);
+                switch (responseJson['result']) {
+                    case 'success' :
+                        const id = responseJson['articleId'];
+                        window.location.reload();
+                        break
+                    case 'not_found' :
+                        alert('더 이상 존재하지 않는 동행 정보입니다.');
+                        window.location.href = '../';
+                        break;
+                    case 'not_signed' :
+                        alert('로그인정보가 유효하지 않습니다.');
+                        break
+                    default:
+                        warning.show('알 수 없는 이유로 댓글을 작성하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
+                }
+            } else {
+                warning.show('서버와 통신하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
+            }
+        }
+    };
+    xhr.send(formData);
+};

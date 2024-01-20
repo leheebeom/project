@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css"/>
     <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
     <th:block th:insert="~{fragments/head.html :: content}"></th:block>
+    <script defer th:src="@{/resources/scripts/home.js}"></script>
 </head>
 <body class="_layout-hmf">
 <th:block th:replace="~{fragments/header.html :: content}"></th:block>
@@ -58,19 +59,27 @@
                         </div>
                         <div class="_greetings">
                             <p class="_hi gP">안녕하세요 :)</p>
-                            <p class="_nickname gP">dejj339님!</p>
+                            <p class="_nickname gP" th:if="${session.memberUser == null}">여행자님</p>
+                            <p class="_nickname gP" th:if="${session.memberUser != null}"
+                               th:text="|${session.memberUser.getNickname()}님|"></p>
                             <!-- 타임 리프-->
                         </div>
                     </div>
-                    <button class="_my_button mBtn" id="loginButton">로그인하기
-                        <div th:hidden="${session.memberUser == null}" class="_my_img_button">마이페이지
-                            <!--타임리프 -->
-                            <svg width="9" height="14" viewBox="0 0 9 14" fill="none" xmlns="http://www.w3.org/2000/svg"
-                                 style="cursor: pointer;">
-                                <path d="M2 2L7 7L2 12" stroke="#00CE7C" stroke-width="2"
-                                      stroke-linecap="square"></path>
-                            </svg>
-                        </div>
+                    <button class="_my_button mBtn" id="loginButton" th:hidden="${session.memberUser != null}">로그인하기
+                        <!--타임리프 -->
+                        <svg width="9" height="14" viewBox="0 0 9 14" fill="none" xmlns="http://www.w3.org/2000/svg"
+                             style="cursor: pointer;">
+                            <path d="M2 2L7 7L2 12" stroke="#00CE7C" stroke-width="2"
+                                  stroke-linecap="square"></path>
+                        </svg>
+                    </button>
+                    <button class="_my_button mBtn" id="myButton" th:hidden="${session.memberUser == null}">마이페이지
+                        <!--타임리프 -->
+                        <svg width="9" height="14" viewBox="0 0 9 14" fill="none" xmlns="http://www.w3.org/2000/svg"
+                             style="cursor: pointer;">
+                            <path d="M2 2L7 7L2 12" stroke="#00CE7C" stroke-width="2"
+                                  stroke-linecap="square"></path>
+                        </svg>
                     </button>
                 </div>
                 <div class="_right_top_right">
@@ -135,6 +144,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -199,7 +209,9 @@
                 <div class="_recent_best_travel_bottom">
                     <p>최근 인기 동행글을 확인해보세요</p>
                     <div class="_recent_best_travel_more">
-                        <p>여행 동행 더 보러가기</p>
+                        <a th:href="@{./accompany/}">
+                            <p>여행 동행 더 보러가기</p>
+                        </a>
                         <div class="_recent_best_travel_more_icon">
                             <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg"
                                  style="cursor: pointer;">
@@ -210,14 +222,35 @@
                     </div>
                 </div>
             </div>
-            <div class="_recent_best_travel_menu_container" id="recentBestTravelMenuContainer">
-
+            <div class="_recent_best_travel_menu_container" id="recentBestTravelMenuContainer"
+                 th:each="articleRecentListDto : ${accompanyArticles}">
+                <a class="accompany" th:data-index="${articleRecentListDto.getIndex()}"
+                   th:href="'./accompany/read/' + ${articleRecentListDto.getIndex()}">
+                    <img class="cover-image" alt="" src="./cover-image/1"
+                         th:src="'./accompany/cover-image/' + ${articleRecentListDto.getIndex()}">
+                    <span class="location-container" id="locationContainer">
+                        <span class="icon-container"></span>
+                        <span class="text" th:text="${articleRecentListDto.getRegionText()+ '&nbsp;'}"></span>
+                        <span class="duration date-From"
+                              th:text="${#dates.format(articleRecentListDto.getDateFrom(), 'MM-dd')}"></span>
+                        <span class="duration">&nbsp;~&nbsp;</span>
+                        <span class="duration date-to"
+                              th:text="${#dates.format(articleRecentListDto.getDateTo(), 'MM-dd')}"></span>
+                    </span>
+                    <span class="title-container">
+<!--                        <span class="status">모집중</span>-->
+                        <span class="title" th:text="${articleRecentListDto.getTitle()}">홍콩으로 가는 그브</span>
+                    </span>
+                    <span class="content" th:text="${articleRecentListDto.getContent()}">그레이브즈</span>
+                    <span class="nickname" th:text="${articleRecentListDto.getUserNickname()}">dejj339</span>
+                </a>
 
             </div>
+
+        </div>
         </div>
     </nav>
 </main>
 <th:block th:replace="~{fragments/footer.html :: content}"></th:block>
 </body>
 </html>
-

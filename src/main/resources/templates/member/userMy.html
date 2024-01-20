@@ -15,7 +15,8 @@
             <div class="profile-image"></div>
             <div class="nickname" th:text="${session.memberUser.getNickname()}"></div>
         </li>
-        <li class="item" th:selected="${tab == null || tab.equals('info') || (!tab.equals('trip') && !tab.equals('book') && !tab.equals('comment') && !tab.equals('accompany') && !tab.equals('truncate'))}">
+        <li class="item"
+            th:selected="${tab == null || tab.equals('info') || (!tab.equals('trip') && !tab.equals('book') && !tab.equals('comment') && !tab.equals('accompany') && !tab.equals('truncate'))}">
             <a class="link" th:href="@{./userMy (tab=info)}">
                 <span class="text">회원정보 관리</span>
             </a>
@@ -61,12 +62,104 @@
         </section>
         <section class="content box truncate" th:case="'truncate'">
             <h2 class="title">회원탈퇴</h2>
+            <form class="truncate-form" id="truncateForm">
+                <h2 class="title">트립소다를 탈퇴하시나요?</h2>
+                <p class="sub-title">탈퇴하려는 이유를 알려주세요.(최대 40자)</p>
+                <label class="_object-check-container first">
+                    <span hidden="동행찾기"></span>
+                    <span class="text">동행을 찾을 수 없어요.</span>
+                    <input hidden name="findAccompany" type="checkbox" data-index="0">
+                    <span class="_object-check">
+                        <i class="_object-check-icon fa-solid fa-check"></i>
+                    </span>
+                </label>
+                <label class="_object-check-container">
+                    <span hidden="여행종료"></span>
+                    <span class="text">여행이 종료되었어요.</span>
+                    <input hidden name="tripEnds" type="checkbox" data-index="1">
+                    <span class="_object-check">
+                <i class="_object-check-icon fa-solid fa-check"></i>
+            </span>
+                </label>
+                <label class="_object-check-container">
+                    <span hidden="여행상품"></span>
+                    <span class="text">사고싶은 여행상품이 없어요.</span>
+                    <input hidden name="travelProducts" type="checkbox" data-index="2">
+                    <span class="_object-check">
+                <i class="_object-check-icon fa-solid fa-check"></i>
+            </span>
+                </label>
+                <label class="_object-check-container">
+                    <span hidden="비매너"></span>
+                    <span class="text">비매너 여행자를 만났어요.</span>
+                    <input hidden name="badManners" type="checkbox" data-index="3">
+                    <span class="_object-check">
+                <i class="_object-check-icon fa-solid fa-check"></i>
+            </span>
+                </label>
+                <label class="_object-check-container">
+                    <span hidden="이용불편"></span>
+                    <span class="text">이용이 불편해요.</span>
+                    <input hidden name="inconvenience" type="checkbox" data-index="4">
+                    <span class="_object-check">
+                <i class="_object-check-icon fa-solid fa-check"></i>
+            </span>
+                </label>
+                <label class="_object-check-container">
+                    <span hidden="새계정"></span>
+                    <span class="text">새계정을 만들고 싶어요.</span>
+                    <input hidden name="new" type="checkbox" data-index="5">
+                    <span class="_object-check">
+                <i class="_object-check-icon fa-solid fa-check"></i>
+            </span>
+                </label>
+                <label class="_object-check-container">
+                    <span hidden="유용"></span>
+                    <span class="text">여행에 유용하지 않아요.</span>
+                    <input hidden name="useful" type="checkbox" data-index="6">
+                    <span class="_object-check">
+                <i class="_object-check-icon fa-solid fa-check"></i>
+            </span>
+                </label>
+                <label class="text-container">
+                    <span hidden="기타"></span>
+                    <span class="text">기타</span>
+                    <input autofocus class="_object-input input" maxlength="40" name="content" type="text">
+                </label>
+                <div class="button-container">
+                    <input class="_object-button" type="button" value="취소">
+                    <input class="_object-button" id="truncateButton" name="truncateButton" type="submit" value="회원탈퇴">
+                </div>
+            </form>
         </section>
         <section class="content box info" th:case="*">
             <h2 class="title">회원정보 관리</h2>
-            <form class="form" id="infoForm">
+            <form class="form" id="infoForm" enctype="multipart/form-data">
                 <table class="table">
                     <tbody class="body">
+                    <tr class="row">
+                        <th class="caption">이미지</th>
+                        <td class="cell">
+                            <label class="_object-label label profile">
+                                <div height="70px" width="70px" class="profile-image">
+                                    <img th:if="${memberUser.getProfileId() == 'no' or memberUser.getProfileId() == null}"
+                                         th:src="@{/resources/images/vector_profile_default.svg}" alt="디폴트"
+                                         height="70px" width="70px" class="profile-image">
+
+                                    <img th:if="${memberUser.getProfileId() != 'no' && memberUser.getProfileId() != ''}"
+                                         th:src="@{'/member/profile-id?profileId=' + ${memberUser.getProfileId()}}"
+                                         alt="미리보기" height="70px"
+                                         width="70px" class="profile-image">
+                                    <!--                                    <img th:src="${session.memberUser.getProfileData()}" alt="디폴트" height="70px" width="70px" class="profile-image">-->
+                                </div>
+
+                                <span hidden>프로필 사진</span>
+                                <input hidden type="text" name="profileId">
+                                <input class="_object-input input" id="profileUploadInput" name="profileImage"
+                                       type="file" accept="image/png, image/jpeg, image/jpg, image/gif">
+                            </label>
+                        </td>
+                    </tr>
                     <tr class="row">
                         <th class="caption">이메일</th>
                         <td class="cell">
@@ -81,7 +174,8 @@
                         <td class="cell">
                             <label class="_object-label label">
                                 <span hidden>현재 비밀번호</span>
-                                <input autofocus class="_object-input input" maxlength="50" name="oldPassword" type="password">
+                                <input autofocus class="_object-input input" maxlength="50" name="oldPassword"
+                                       type="password">
 
                                 <span class="message">회원정보를 변경하기 위해 현재 비밀번호를 입력해 주세요.</span>
                             </label>
@@ -99,12 +193,14 @@
                         <td class="cell">
                             <label class="_object-label label">
                                 <span hidden>새로운 비밀번호</span>
-                                <input autofocus class="_object-input input" maxlength="50" name="newPassword" type="password">
+                                <input autofocus class="_object-input input" maxlength="50" name="newPassword"
+                                       type="password">
                                 <span class="message">비밀번호를 변경하려면 새로운 비밀번호를 입력해 주세요.</span>
                             </label>
                             <label class="_object-label label">
                                 <span hidden>새로운 비밀번호 재입력</span>
-                                <input autofocus class="_object-input input" maxlength="50" name="newPasswordCheck" type="password">
+                                <input autofocus class="_object-input input" maxlength="50" name="newPasswordCheck"
+                                       type="password">
                                 <span class="message">한 번 더 입력해 주세요.</span>
                             </label>
                         </td>
@@ -127,7 +223,8 @@
                             </label>
                             <label class="_object-label label">
                                 <span hidden>연락처</span>
-                                <input class="_object-input input" maxlength="12" disabled type="text" th:value="${session.memberUser.getContact()}">
+                                <input class="_object-input input" maxlength="12" disabled type="text"
+                                       th:value="${session.memberUser.getContact()}">
                             </label>
                             <label class="_object-check-container">
                                 <input hidden name="changeContact" type="checkbox">
@@ -155,12 +252,15 @@
                             <label class="_object-label label">
                                 <span hidden>연락처</span>
                                 <input class="_object-input input" maxlength="12" name="newContact" type="text">
-                                <input class="_object-button button" name="newContactAuthRequestButton" type="button" value="인증번호 요청">
+                                <input class="_object-button button" name="newContactAuthRequestButton" type="button"
+                                       value="인증번호 요청">
                             </label>
                             <label class="_object-label label">
                                 <span hidden>인증번호</span>
-                                <input class="_object-input input" disabled maxlength="6" name="newContactAuthCode" type="text">
-                                <input class="_object-button button" disabled name="newContactAuthCheckButton" type="button" value="인증번호 확인">
+                                <input class="_object-input input" disabled maxlength="6" name="newContactAuthCode"
+                                       type="text">
+                                <input class="_object-button button" disabled name="newContactAuthCheckButton"
+                                       type="button" value="인증번호 확인">
                             </label>
                         </td>
                     </tr>

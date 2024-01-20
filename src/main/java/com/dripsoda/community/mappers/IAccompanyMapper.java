@@ -1,5 +1,6 @@
 package com.dripsoda.community.mappers;
 
+import com.dripsoda.community.dtos.accompany.ArticleRecentListDto;
 import com.dripsoda.community.dtos.accompany.ArticleSearchDto;
 import com.dripsoda.community.entities.accompany.*;
 import org.apache.ibatis.annotations.Mapper;
@@ -28,6 +29,9 @@ public interface IAccompanyMapper {
     CountryEntity[] selectCountries();
 
     RegionEntity[] selectRegions();
+
+    List<ArticleEntity> selectArticles();
+    List<ArticleRecentListDto> selectArticlesForHome();
 
     ImageEntity selectImageByIndex(@Param(value = "index") int index);
 

@@ -1,4 +1,5 @@
 const infoForm = window.document.getElementById('infoForm');
+const truncateForm = window.document.getElementById('truncateForm');
 const warning = {
     getElement: () => window.document.getElementById('warning'),
     hide: () => warning.getElement().classList.remove('visible'),
@@ -7,6 +8,42 @@ const warning = {
         warning.getElement().classList.add('visible');
     }
 };
+const checkboxes = document.querySelectorAll('.truncate-form input[type="checkbox"]');
+
+
+const truncateButtonController = {
+    getElement: () => window.document.getElementById('truncateButton'),
+    hide: () => truncateButtonController.getElement().classList.remove('visible'),
+    show: () => truncateButtonController.getElement().classList.add('visible')
+}
+
+const contentInput = document.querySelector('#truncateForm input[name="content"]');
+if (contentInput) {
+    contentInput.addEventListener('input', () => {
+        const inputValue = contentInput.value.trim();
+        inputValue !== '' ? truncateButtonController.show() : truncateButtonController.hide();
+    });
+}
+const handleCheckboxChange = (clickedCheckbox) => {
+    const index = parseInt(clickedCheckbox.getAttribute('data-index'));
+    checkboxes.forEach((checkbox, i) => {
+        if (i !== index) {
+            checkbox.checked = false;
+        }
+    });
+    // 하나 이상의 체크박스가 선택되었는지 확인
+    const atLeastOneChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
+    // 버튼을 표시 또는 숨김
+    if (atLeastOneChecked) {
+        truncateButtonController.show();
+    } else {
+        truncateButtonController.hide();
+    }
+};
+checkboxes?.forEach((checkbox) => {
+    checkbox.addEventListener('change', () => handleCheckboxChange(checkbox));
+});
+
 
 infoForm?.changePassword?.addEventListener('input', () => {
     infoForm.querySelectorAll('[rel="row-change-password"]').forEach(x => {
@@ -87,6 +124,35 @@ infoForm?.newContactAuthRequestButton?.addEventListener('click', () => {
     xhr.send();
 });
 
+const profileImageInput =  document.querySelector('#infoForm input[name="profileImage"]');
+if (profileImageInput){
+    profileImageInput.addEventListener('input', () => {
+        const xhr = new XMLHttpRequest();
+        const formData = new FormData();
+        if ((infoForm['profileImage'].files?.length ?? 0) > 0) {
+            formData.append('profileImage', infoForm['profileImage'].files[0]);
+        }
+        xhr.open('POST', './userMyInfoProfileImage');
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    const responseJson = JSON.parse(xhr.responseText);
+                    switch (responseJson['result']) {
+                        case 'success':
+                            alert('성공적으로 이미지를 변경했습니다.');
+                            window.location.reload();
+                            break;
+                        default:
+                            warning.show('알 수 없는 이유로 이미지를 변경 할 수 없습니다. 다시 확인해 주세요.');
+                    }
+                } else {
+                    warning.show('서버와 통신하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
+                }
+            }
+        };
+        xhr.send(formData);
+    });
+}
 infoForm?.newContactAuthCheckButton?.addEventListener('click', () => {
     warning.hide();
     if (infoForm['newContactAuthCode'].value === '') {
@@ -194,6 +260,7 @@ if (infoForm !== null) {
         formData.append('oldPassword', infoForm['oldPassword'].value);
         formData.append('changePassword', infoForm['changePassword'].checked);
         formData.append('changeContact', infoForm['changeContact'].checked);
+
         if (infoForm['changePassword'].checked) {
             formData.append('newPassword', infoForm['newPassword'].value);
         }
@@ -223,21 +290,52 @@ if (infoForm !== null) {
             }
         };
         xhr.send(formData);
-
-        // 값을 넘겨 받은 서버는 :
-        //      - 비밀번호 변경하기가 체크되어 있었다면
-        //          - 로그인한 사용자의 비밀번호와 해싱한 'oldPassword'가 같은지 확인한 뒤 다르다면 FAILURE를 반환한다.
-        //          - 로그인한 사용자의 비밀번호를 해싱한 'newPassword'로 지정한다.
-        //      - 연락처 변경하기가 체크되어 있다면
-        //          - 넘겨받은 'newContact', 'newContactAuthCode', 'newContactAuthSalt'를 통해 ContactAuth 레코드가 있는지 조회한 뒤 없다면 FAILURE를 반환한다.
-        //          - 로그인한 사용자의 연락처를 넘겨 받은 'newContact'로 지정한다.
-        //          - 사용자 정보를 업데이트 한다.
-        //          - SUCCESS 를 반환한다.
     };
 }
 
 
+if (truncateForm !== null) {
+    truncateForm.onsubmit = e => {
+        e.preventDefault();
+        if(truncateForm['content'].value === '') {
+            alert('탈퇴하려는 이유를 알려주세요.');
+            truncateForm['content'].focus();
+            return;
+        }
+        const xhr = new XMLHttpRequest();
+        const formData = new FormData();
+        formData.append('findAccompany', truncateForm['findAccompany'].checked);
+        formData.append('tripEnds', truncateForm['tripEnds'].checked);
+        formData.append('travelProducts', truncateForm['travelProducts'].checked);
+        formData.append('badManners', truncateForm['badManners'].checked);
+        formData.append('inconvenience', truncateForm['inconvenience'].checked);
+        formData.append('new', truncateForm['new'].checked);
+        formData.append('useful', truncateForm['useful'].checked);
+        formData.append('content', truncateForm['content'].value);
+        xhr.open('DELETE', './userMyInfoDelete');
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                cover.hide();
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    const responseJson = JSON.parse(xhr.responseText);
+                    switch (responseJson['result']) {
+                        case 'success':
 
+                            window.location.href = `/`
+                            break
+                        default:
+                            alert('회원탈퇴에 실패 하셨습니다. 다시 시도해주세요.');
+                            break
+                    }
+                } else {
+                    warning.show('서버와 통신하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
+                    infoForm['newContact'].focusAndSelect();
+                }
+            }
+        };
+        xhr.send(formData);
+    }
+};
 
 
 

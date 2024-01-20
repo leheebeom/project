@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>드립소다 qna페이지</title>
+    <th:block th:insert="~{fragments/head.html :: content}"></th:block>
+    <link rel="stylesheet" th:href="@{/qna/resources/stylesheets/qna.css}">
+    <link rel="stylesheet" th:href="@{/qna/resources/stylesheets/notice.css}">
+    <script defer th:src="@{/qna/resources/scripts/qna.js}"></script>
+</head>
+<body class="_layout-hmf">
+<th:block th:replace="~{fragments/header.html :: content}"></th:block>
+<main class="_main main">
+    <ul class="nav box" th:with="tab = ${#request.getParameter('tab')}">
+        <li class="item"
+            th:selected="${tab == null || tab.equals('help') || (!tab.equals('event') && !tab.equals('qna') && !tab.equals('question'))}">
+            <a class="link" th:href="@{./ (tab=help)}">
+                <span class="text">공지사항</span>
+            </a>
+        </li>
+        <li class="item" th:selected="${tab != null && tab.equals('event')}">
+            <a class="link" th:href="@{./ (tab=event)}">
+                <span class="text">이벤트</span>
+            </a>
+        </li>
+        <li class="item" th:selected="${tab != null && tab.equals('qna')}">
+            <a class="link" th:href="@{./ (tab=qna)}">
+                <span class="text">qna</span>
+            </a>
+        </li>
+        <li class="item" th:selected="${tab != null && tab.equals('question')}">
+            <a class="link" th:href="@{./ (tab=question)}">
+                <span class="text">문의하기</span>
+            </a>
+        </li>
+    </ul>
+    <th:block th:switch="${#request.getParameter('tab')}">
+        <section class="content box help" th:case="'help'">
+            <h2 class="title">공지사항</h2>
+            <th:block th:replace="~{fragments/qna/help.html :: content}"></th:block>
+        </section>
+        <section class="content box event" th:case="'event'">
+            <h2 class="title">이벤트</h2>
+            <th:block th:replace="~{fragments/qna/event.html :: content}"></th:block>
+        </section>
+        <section class="content box qna" th:case="'qna'">
+            <h2 class="title">qna</h2>
+            <th:block th:replace="~{fragments/qna/help.html :: content}"></th:block>
+        </section>
+        <section class="content box question" th:case="'question'">
+            <h2 class="title">문의하기</h2>
+        </section>
+    </th:block>
+</main>
+<th:block th:replace="~{fragments/footer.html :: content}"></th:block>
+</body>
+</html>

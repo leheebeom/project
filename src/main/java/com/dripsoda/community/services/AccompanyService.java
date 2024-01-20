@@ -1,5 +1,6 @@
 package com.dripsoda.community.services;
 
+import com.dripsoda.community.dtos.accompany.ArticleRecentListDto;
 import com.dripsoda.community.dtos.accompany.ArticleSearchDto;
 import com.dripsoda.community.entities.accompany.*;
 import com.dripsoda.community.entities.member.UserEntity;
@@ -69,6 +70,7 @@ public class AccompanyService {
     public ArticleSearchDto[] searchArticles(RegionEntity region, int lastArticleIndex) {
         return this.accompanyMapper.selectArticlesForSearch(region, lastArticleIndex);
     }
+
 
 
     public IResult putArticle(ArticleEntity article) {
@@ -208,6 +210,24 @@ public class AccompanyService {
 
 
     }
+
+//    모든 게시판 게시글 불러오기
+//    public List<ArticleSearchDto> getArticlesForAll() {
+//
+//    }
+
+    public List<ArticleEntity> getArticlesForAll() {
+      return this.accompanyMapper.selectArticles();
+    }
+
+
+    public List<ArticleRecentListDto> getArticles() {
+        return this.accompanyMapper.selectArticlesForHome();
+    }
+    //모든 게시판 최신 게시글 8개 불러오
+//    public  List<ArticleSearchDto> getNewArticlesForAll() {
+//
+//    }
 }
 
 

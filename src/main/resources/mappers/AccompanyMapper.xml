@@ -108,6 +108,31 @@
         LIMIT 8
         ]]></select>
 
+    <select id="selectArticlesForHome"
+            resultType="com.dripsoda.community.dtos.accompany.ArticleRecentListDto"><![CDATA[
+        SELECT `article`.`index`              AS `index`,
+               `article`.`user_email`         AS `userEmail`,
+               `article`.`created_at`         AS `createdAt`,
+               `article`.`continent_value`    AS `continentValue`,
+               `article`.`country_value`      AS `countryValue`,
+               `article`.`region_value`       AS `regionValue`,
+               `article`.`capacity`           AS `capacity`,
+               `article`.`date_from`          AS `dateFrom`,
+               `article`.`date_to`            AS `dateTo`,
+               `article`.`title`              AS `title`,
+               LEFT(`article`.`content`, 100) AS `content`,
+               `article`.`view_count`         AS `viewCount`,
+               `user`.`name`                  AS `userName`,
+               `user`.`nickname`              AS `userNickname`,
+               `region`.`text`                as `regionText`
+        FROM `dripsoda_accompany`.`articles` AS `article`
+                 LEFT JOIN
+             `dripsoda_member`.`users` AS `user` ON `article`.`user_email` = `user`.`email`
+                 LEFT JOIN `dripsoda_accompany`.`regions` AS `region` ON `article`.`region_value` = `region`.`value`
+        ORDER BY `article`.`created_at` DESC,
+                 `article`.`view_count` DESC
+        LIMIT 8;
+        ]]></select>
     <select id="selectContinents"
             resultType="com.dripsoda.community.entities.accompany.ContinentEntity">
         SELECT `value` AS `value`,
@@ -116,6 +141,26 @@
         ORDER BY `text`
     </select>
 
+    <select id="selectArticles"
+    resultType="com.dripsoda.community.entities.accompany.ArticleEntity">
+        SELECT `index`            as `index`,
+               `user_email`       as `userEmail`,
+               `created_at`       as `createdAt`,
+               `continent_value`  as `continentValue`,
+               `country_value`    as countryValue,
+               `region_value`     as `regionValue`,
+               `capacity`         as `capacity`,
+               `date_from`        as `dateFrom`,
+               `date_to`          as `dateTo`,
+               `cover_image`      as `coverImage`,
+               `cover_image_mime` as `coverImageMime`,
+               `title`            as `title`,
+               `content`          as `content`,
+               `view_count`       as `viewCount`
+        FROM `dripsoda_accompany`.`articles`
+        ORDER BY  `created_at` ,`view_count` DESC
+        LIMIT 8
+    </select>
     <select id="selectCountries"
             resultType="com.dripsoda.community.entities.accompany.CountryEntity">
         SELECT `continent_value` AS `continentValue`,

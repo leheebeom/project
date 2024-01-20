@@ -62,59 +62,8 @@ _writeButton?.addEventListener('click', () => {
 _writeMenu?.addEventListener('mouseleave', () => {
     _writeMenu?.classList.remove('visible');
 });
-
-
-document.addEventListener('DOMContentLoaded', function () {
-    const swiper = new Swiper(".swiper-container", {
-        slidesPerView: 7,
-        spaceBetween: 10,
-        centeredSlides: false,
-        autoplay: {
-            delay: 0,
-            disableOnInteraction: false,
-        },
-        speed:5000,
-        loop:true,
-        loopAdditionalSlides:1,
-
-    });
-    const travelSwiper = new Swiper(".travel-swiper-container", {
-        slidesPerGroup: 2,
-        slidesPerView: 4,
-        observer: true,
-        observeParents: true,
-        spaceBetween: 15,
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-    });
-    if(travelSwiper.isBeginning) {
-        document.querySelector('.swiper-button-prev').style.visibility = 'hidden';
-    }
-    if(travelSwiper.isEnd) {
-        document.querySelector('.swiper-button-next').style.visibility = 'hidden';
-    }
-    travelSwiper.on('slideChange', function () {
-        if(travelSwiper.isBeginning) {
-            document.querySelector('.swiper-button-prev').style.visibility = 'hidden';
-        } else {
-            document.querySelector('.swiper-button-prev').style.visibility = 'visible';
-        }
-        if (travelSwiper.isEnd) {
-            document.querySelector('.swiper-button-next').style.visibility = 'hidden';
-        } else {
-            document.querySelector('.swiper-button-next').style.visibility = 'visible';
-        }
-    });
-});
-
-const recentBestTravelMenuContainer = window.document.getElementById('recentBestTravelMenuContainer');
-
-
-
-
-
+const loginButton = window.document.getElementById('loginButton');
+const myButton = window.document.getElementById('myButton');
 
 
 

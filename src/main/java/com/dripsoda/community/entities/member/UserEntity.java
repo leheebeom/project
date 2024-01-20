@@ -1,15 +1,18 @@
 package com.dripsoda.community.entities.member;
 
+import com.dripsoda.community.interfaces.IEntity;
+
 import java.util.Date;
 import java.util.Objects;
 
-public class UserEntity {
+public class UserEntity implements IEntity<UserEntity> {
     public static final String ATTRIBUTE_NAME = "memberUser";
     public static final String ATTRIBUTE_NAME_PLURAL = "memberUsers";
 
     public static UserEntity build() {
         return new UserEntity();
     }
+
     private String email;
     private String password;
     private String name;
@@ -22,11 +25,11 @@ public class UserEntity {
     private String statusValue;
     private Date registeredAt = new Date();
     private boolean isAdmin = false;
+    private String profileId;
+    private byte[] profileData;
 
-    public UserEntity() {
-    }
 
-    public UserEntity(String email, String password, String name, String nickname, String contactCountryValue, String contact, Date policyTermsAt, Date policyPrivacyAt, Date policyMarketingAt, String statusValue, Date registeredAt, boolean isAdmin) {
+    public UserEntity(String email, String password, String name, String nickname, String contactCountryValue, String contact, Date policyTermsAt, Date policyPrivacyAt, Date policyMarketingAt, String statusValue, Date registeredAt, boolean isAdmin, String profileId, byte[] profileData) {
         this.email = email;
         this.password = password;
         this.name = name;
@@ -39,7 +42,32 @@ public class UserEntity {
         this.statusValue = statusValue;
         this.registeredAt = registeredAt;
         this.isAdmin = isAdmin;
+        this.profileId = profileId;
+        this.profileData = profileData;
     }
+
+    public String getProfileId() {
+        return profileId;
+    }
+
+    public UserEntity setProfileId(String profileId) {
+        this.profileId = profileId;
+        return this;
+    }
+
+    public byte[] getProfileData() {
+        return profileData;
+    }
+
+    public UserEntity setProfileData(byte[] profileData) {
+        this.profileData = profileData;
+        return this;
+    }
+
+    public UserEntity() {
+    }
+
+
 
     public String getEmail() {
         return email;
@@ -76,6 +104,7 @@ public class UserEntity {
         this.nickname = nickname;
         return this;
     }
+
     public String getContactCountryValue() {
         return contactCountryValue;
     }
@@ -159,5 +188,43 @@ public class UserEntity {
     @Override
     public int hashCode() {
         return Objects.hash(email);
+    }
+
+    @Override
+    public UserEntity clone() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.email = this.email;
+        userEntity.password = this.password;
+        userEntity.name = this.name;
+        userEntity.nickname = this.nickname;
+        userEntity.contactCountryValue = this.contactCountryValue;
+        userEntity.contact = this.contact;
+        userEntity.policyTermsAt = this.policyTermsAt;
+        userEntity.policyPrivacyAt = this.policyPrivacyAt;
+        userEntity.policyMarketingAt = this.policyMarketingAt;
+        userEntity.statusValue = this.statusValue;
+        userEntity.registeredAt = this.registeredAt;
+        userEntity.isAdmin = this.isAdmin;
+        userEntity.profileId = this.profileId;
+        userEntity.profileData = this.profileData;
+        return userEntity;
+    }
+
+    @Override
+    public void copyValuesOf(UserEntity userEntity) {
+        this.email = userEntity.email;
+        this.password = userEntity.password;
+        this.name = userEntity.name;
+        this.nickname =  userEntity.nickname;
+        this.contactCountryValue =  userEntity.contactCountryValue;
+        this.contact = userEntity.contact;
+        this.policyTermsAt =  userEntity.policyTermsAt;
+        this.policyPrivacyAt = userEntity.policyPrivacyAt;
+        this.policyMarketingAt = userEntity.policyMarketingAt;
+        this.statusValue = userEntity.statusValue;
+        this.registeredAt = userEntity.registeredAt;
+        this.isAdmin =  userEntity.isAdmin;
+        this.profileId = userEntity.profileId;
+        this.profileData = userEntity.profileData;
     }
 }

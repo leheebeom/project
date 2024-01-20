@@ -4,6 +4,7 @@ import com.dripsoda.community.dtos.accompany.ArticleSearchDto;
 import com.dripsoda.community.entities.accompany.*;
 import com.dripsoda.community.entities.member.UserEntity;
 import com.dripsoda.community.enums.CommonResult;
+import com.dripsoda.community.enums.accompany.CommentResult;
 import com.dripsoda.community.interfaces.IResult;
 import com.dripsoda.community.services.AccompanyService;
 import com.dripsoda.community.services.MemberService;
@@ -12,6 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,6 +33,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@SpringBootApplication(exclude={SecurityAutoConfiguration.class})
 @Controller(value = "com.dripsoda.community.controllers.AccompanyController")
 @RequestMapping(value = "/accompany")
 public class AccompanyController {
