@@ -1,0 +1,29 @@
+body > .main > .error {
+    display: flex;
+    flex-direction: column;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    min-height: 100%;
+    padding: 6% 0px 7.5%;
+}
+.error > h1 {
+    font-size: 60px;
+    font-weight: normal;
+    line-height: 89px;
+    color: rgb(0, 206, 124);
+}
+
+.error > p{
+    font-size: 24px;
+    font-weight: 350;
+    line-height: 36px;
+    color: rgb(154, 154, 154);
+}
+
+.error > img {
+    width: 64.5%;
+    height: auto;
+    margin: 6% 0px 7.6%;
+}

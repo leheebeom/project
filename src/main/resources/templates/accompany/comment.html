@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>드립소다 여행친구찾기</title>
+    <th:block th:insert="~{fragments/head.html :: content}"></th:block>
+    <link rel="stylesheet" th:href="@{/accompany/resources/stylesheets/index.css}">
+    <link rel="stylesheet" th:href="@{/accompany/resources/stylesheets/comment.css}">
+    <script defer th:src="@{/accompany/resources/scripts/index.js}"></script>
+</head>
+<body class="_layout-hmf">
+<th:block th:replace="~{fragments/header.html :: content}"></th:block>
+<div class="banner">
+    <span class="small-text">나와 맞는 여행동행과 이야기를 나누어 보아요!</span>
+    <span class="big-text">여행친구찾기</span>
+</div>
+<main class="_main main">
+    <div class="error">
+        <h1>죄송해요, 길을 잃었어요!</h1>
+        <p>Looks like you got off at the wrong stop!</p><img th:src="@{/resources/images/error_illustration.png}" alt="이미지">
+        <button class="_object-button" type="button">메인페이지로 돌아가기</button>
+    </div>
+</main>
+<th:block th:replace="~{fragments/footer.html :: content}"></th:block>
+</body>
+</html>

@@ -9,6 +9,13 @@
         LIMIT 1
     </delete>
 
+    <delete id="deleteComment">
+        DELETE
+        FROM `dripsoda_accompany`.`comment`
+        WHERE `article_index` = #{id}
+          and `index` = #{commentIndex}
+    </delete>
+
     <insert id="insertImage"
             parameterType="com.dripsoda.community.entities.accompany.ImageEntity"
             useGeneratedKeys="true"
@@ -25,9 +32,18 @@
             parameterType="com.dripsoda.community.entities.accompany.ArticleEntity">
         insert into `dripsoda_accompany`.`articles` (`user_email`, `created_at`, `continent_value`, `country_value`,
                                                      `region_value`, `capacity`, `date_from`, `date_to`, `cover_image`,
-                                                     `cover_image_mime`, `title`, `content`,view_count)
+                                                     `cover_image_mime`, `title`, `content`, view_count)
         values (#{userEmail}, #{createdAt}, #{continentValue}, #{countryValue}, #{regionValue}, #{capacity},
-                #{dateFrom}, #{dateTo}, #{coverImage}, #{coverImageMime}, #{title}, #{content},#{viewCount});
+                #{dateFrom}, #{dateTo}, #{coverImage}, #{coverImageMime}, #{title}, #{content}, #{viewCount});
+    </insert>
+    <insert id="insertCommentLike"
+            useGeneratedKeys="true"
+            keyColumn="index"
+            keyProperty="index"
+            parameterType="com.dripsoda.community.entities.accompany.CommentLikeEntity">
+        insert into `dripsoda_accompany`.`comment_likes`(`index`, `comment_index`, `article_index`, `user_email`,
+                                                         `checked_flag`)
+            value (#{index}, #{commentIndex}, #{articleIndex}, #{userEmail}, #{isChecked})
     </insert>
 
     <insert id="insertRequest"
@@ -47,18 +63,22 @@
             keyProperty="index"
             parameterType="com.dripsoda.community.entities.accompany.CommentEntity">
         INSERT INTO `dripsoda_accompany`.`comment`
-        (`index`, `article_index`, `comment_parent_index`, `user_email`, `created_at`, `content`, `modified_at`, `comment_is_deleted`,`comment_flag`,`depth`,`likes`,`orderNumber`)
-        VALUES (#{index}, #{articleIndex}, #{commentParentIndex}, #{userEmail}, #{createdAt}, #{content}, #{modifiedAt}, #{isDeleted}, #{isComment}, #{depth}, #{likes}, #{orderNumber})
+        (`index`, `article_index`, `comment_parent_index`, `user_email`, `created_at`, `content`, `modified_at`,
+         `comment_is_deleted`, `comment_flag`, `depth`, `likes`, `orderNumber`)
+        VALUES (#{index}, #{articleIndex}, #{commentParentIndex}, #{userEmail}, #{createdAt}, #{content}, #{modifiedAt},
+                #{isDeleted}, #{isComment}, #{depth}, #{likes}, #{orderNumber})
     </insert>
-    
+
     <insert id="createComment"
             useGeneratedKeys="true"
             keyColumn="index"
             keyProperty="index"
-    parameterType="map">
+            parameterType="map">
         INSERT INTO `dripsoda_accompany`.`comment`
-        (`index`, `article_index`, `comment_parent_index`, `user_email`, `created_at`, `content`, `modified_at`, `comment_is_deleted`)
-        VALUES (#{index}, #{articleIndex}, #{commentParentIndex}, #{userEmail}, #{createdAt}, #{content}, #{modifiedAt}, #{isDeleted})
+        (`index`, `article_index`, `comment_parent_index`, `user_email`, `created_at`, `content`, `modified_at`,
+         `comment_is_deleted`)
+        VALUES (#{index}, #{articleIndex}, #{commentParentIndex}, #{userEmail}, #{createdAt}, #{content}, #{modifiedAt},
+                #{isDeleted})
     </insert>
 
     <select id="selectArticleByIndex"
@@ -108,6 +128,7 @@
         LIMIT 8
         ]]></select>
 
+
     <select id="selectArticlesForHome"
             resultType="com.dripsoda.community.dtos.accompany.ArticleRecentListDto"><![CDATA[
         SELECT `article`.`index`              AS `index`,
@@ -130,9 +151,22 @@
              `dripsoda_member`.`users` AS `user` ON `article`.`user_email` = `user`.`email`
                  LEFT JOIN `dripsoda_accompany`.`regions` AS `region` ON `article`.`region_value` = `region`.`value`
         ORDER BY `article`.`created_at` DESC,
-                 `article`.`view_count` DESC
+                 `article`.`view_count`
         LIMIT 8;
         ]]></select>
+
+    <select id="selectArticlesForRecent"
+            resultType="com.dripsoda.community.dtos.accompany.ArticleBestTravleDto">
+        select article.`region_value`                          as `regionValue`,
+               `region`.`text`                                 as `regionText`,
+               (select count(*) from `dripsoda_accompany`.`regions` as region
+                where region.`value` = article.`region_value`) as `articleRegionCount`
+        from `dripsoda_accompany`.`articles` as article
+                 LEFT JOIN `dripsoda_accompany`.`regions` AS `region` ON `article`.`region_value` = `region`.`value`
+        order by `articleRegionCount`
+        limit 10
+    </select>
+
     <select id="selectContinents"
             resultType="com.dripsoda.community.entities.accompany.ContinentEntity">
         SELECT `value` AS `value`,
@@ -142,7 +176,7 @@
     </select>
 
     <select id="selectArticles"
-    resultType="com.dripsoda.community.entities.accompany.ArticleEntity">
+            resultType="com.dripsoda.community.entities.accompany.ArticleEntity">
         SELECT `index`            as `index`,
                `user_email`       as `userEmail`,
                `created_at`       as `createdAt`,
@@ -158,7 +192,7 @@
                `content`          as `content`,
                `view_count`       as `viewCount`
         FROM `dripsoda_accompany`.`articles`
-        ORDER BY  `created_at` ,`view_count` DESC
+        ORDER BY `created_at`, `view_count` DESC
         LIMIT 8
     </select>
     <select id="selectCountries"
@@ -210,7 +244,7 @@
         from `dripsoda_accompany`.`comment` c
                  left join `dripsoda_accompany`.`comment` parent
                            on c.`comment_parent_index` = parent.`comment_parent_index`
-        where c.`article_index` = #{articleIndex}
+        where c.`article_index` = #{id}
         order by parent.`index` IS NULL, c.`created_at`;
     </select>
 
@@ -229,11 +263,11 @@
         LIMIT 1
     </select>
     <select id="selectCommentByIndex"
-    resultType="com.dripsoda.community.entities.accompany.CommentEntity">
+            resultType="com.dripsoda.community.entities.accompany.CommentEntity">
         SELECT `index`                AS `index`,
                `article_index`        AS `articleIndex`,
                `comment_parent_index` AS `commentParentIndex`,
-               `user_email`           AS `userEamail`,
+               `user_email`           AS `userEmail`,
                `created_at`           AS `createdAt`,
                `content`              AS `content`,
                `modified_at`          AS `modifiedAt`,
@@ -245,8 +279,26 @@
         FROM `dripsoda_accompany`.`comment`
         WHERE `index` = #{index}
     </select>
+    <select id="selectCommentByArticleIndexAndIndex"
+            resultType="com.dripsoda.community.entities.accompany.CommentEntity">
+        SELECT `index`                AS `index`,
+               `article_index`        AS `articleIndex`,
+               `comment_parent_index` AS `commentParentIndex`,
+               `user_email`           AS `userEmail`,
+               `created_at`           AS `createdAt`,
+               `content`              AS `content`,
+               `modified_at`          AS `modifiedAt`,
+               `comment_is_deleted`   AS `isDeleted`,
+               `comment_flag`         AS `isComment`,
+               `depth`                AS `depth`,
+               `likes`                AS `likes`,
+               `orderNumber`          AS `orderNumber`
+        FROM `dripsoda_accompany`.`comment`
+        WHERE `article_index` = #{id}
+          and `index` = #{commentId}
+    </select>
     <select id="selectCommentsByArticleIndex"
-     resultType="com.dripsoda.community.entities.accompany.CommentEntity">
+            resultType="com.dripsoda.community.entities.accompany.CommentEntity">
         SELECT `index`                AS `index`,
                `article_index`        AS `articleIndex`,
                `comment_parent_index` AS `commentParentIndex`,
@@ -263,6 +315,30 @@
         WHERE `article_index` = #{articleIndex}
         order by `orderNumber`
     </select>
+    <select id="selectArticleCommentsByArticleIndex"
+            resultType="com.dripsoda.community.dtos.accompany.ArticleCommentDto"><![CDATA[
+        SELECT c.`index`                AS `index`,
+               c.`article_index`        AS `articleIndex`,
+               c.`comment_parent_index` AS `commentParentIndex`,
+               c.`user_email`           AS `userEmail`,
+               c.`created_at`           AS `createdAt`,
+               c.`content`              AS `content`,
+               c.`modified_at`          AS `modifiedAt`,
+               c.`comment_is_deleted`   AS `isDeleted`,
+               c.`comment_flag`         AS `isComment`,
+               c.`depth`                AS `depth`,
+               c.`likes`                AS `likes`,
+               c.`orderNumber`          AS `orderNumber`,
+               u.`name`                 as `userName`,
+               u.`nickname`             as `userNickname`,
+               u.`profile_id`           as `userProfileId`,
+               u.`profile_data`         as `userProfileData`
+        FROM `dripsoda_accompany`.`comment` as c
+                 left join `dripsoda_member`.`users` as u
+                           on c.`user_email` = u.`email`
+        WHERE `article_index` = #{articleIndex}
+        order by `orderNumber`
+        ]]></select>
     <select id="SelectCountCommentsByArticleIndex"
             resultType="long">
         SELECT COUNT(*)
@@ -309,24 +385,28 @@
     <update id="updateView">
         UPDATE `dripsoda_accompany`.`articles`
         SET view_count = view_count + 1
-        WHERE  `index` = #{index}
+        WHERE `index` = #{index}
         LIMIT 1
     </update>
     <update id="updateComment"
             parameterType="com.dripsoda.community.entities.accompany.CommentEntity">
-        update  `dripsoda_accompany`.`comment`
-        set
-            `article_index`        = #{articleIndex},
+        update `dripsoda_accompany`.`comment`
+        set `article_index`        = #{articleIndex},
             `comment_parent_index` = #{commentParentIndex},
             `user_email`           = #{userEmail},
             `created_at`           = #{createdAt},
             `content`              = #{content},
             `modified_at`          = #{modifiedAt},
             `comment_is_deleted`   = #{isDeleted},
-            `comment_flag`         = #{isComment},
-            `depth`                = #{depth},
-            `likes`                = #{likes},
-            `orderNumber`          = #{orderNumber}
+            `likes`                = #{likes}
         WHERE `index` = #{index}
+    </update>
+    <update id="updateCommentLikes"
+            parameterType="com.dripsoda.community.entities.accompany.CommentEntity">
+        update `dripsoda_accompany`.`comment`
+        set `likes` = #{like}
+        where `article_index` = #{id}
+          and `index` = #{commentId}
+        limit 1
     </update>
 </mapper>

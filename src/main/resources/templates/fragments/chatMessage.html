@@ -1,0 +1,69 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="ko" xmlns:th="http://www.thymeleaf.org">-->
+<!--<ul th:fragment="content" th:if="${session.memberUser != null}" class="chat-message-list" id="chatMessageList">-->
+<!--    <li class="item top">-->
+<!--        <a class="logo-img-container" id="backButton">-->
+<!--            <svg width="20" height="20" viewBox="0 0 13 20" fill="none" xmlns="http://www.w3.org/2000/svg"-->
+<!--                 foundation="[object Object]" class="InnerIconstyled__Icon-ch-front__sc-197h5bb-0 dhClYc"-->
+<!--                 defaultopacity="1" hoveredopacity="1" margintop="0" marginright="0" marginbottom="0"-->
+<!--                 marginleft="8" withtheme="true">-->
+<!--                <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"-->
+<!--                      d="M9.17255 16.4226C8.84711 16.748 8.31947 16.748 7.99404 16.4226L2.1607 10.5893C1.83527 10.2638 1.83527 9.73619 2.1607 9.41075L7.99404 3.57742C8.31947 3.25198 8.84711 3.25198 9.17255 3.57742C9.49799 3.90285 9.49799 4.43049 9.17255 4.75593L3.92847 10L9.17255 15.2441C9.49799 15.5695 9.49799 16.0972 9.17255 16.4226Z"></path>-->
+<!--            </svg>-->
+<!--        </a>-->
+<!--        <div class="text-container">-->
+<!--            <h1>트립소다</h1>-->
+<!--            <span class="text">몇 분 내 답변을 받으실 수 있어요.</span>-->
+<!--        </div>-->
+<!--    </li>-->
+<!--    <li class="item qna">-->
+<!--        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"-->
+<!--             foundation="[object Object]" class="Iconstyled__Icon-sc-1iqwu2g-0 dKyOtd" data-testid="bezier-react-icon"-->
+<!--             color="txt-black-dark" margintop="0" marginright="0" marginbottom="0" marginleft="0">-->
+<!--            <path fill="currentColor" fill-rule="evenodd"-->
+<!--                  d="M20.138 2.018a.86.86 0 0 0-.427.115l-6.51 3.727a.86.86 0 0 1-.428.114H4a1 1 0 0 0-1 1V15a1 1 0 0 0 1 1h2.668l-.908 4.4a.5.5 0 0 0 .49.6h3.321a.8.8 0 0 0 .783-.638L11.255 16h1.518a.86.86 0 0 1 .428.114l6.51 3.727a.86.86 0 0 0 1.29-.747V2.88a.862.862 0 0 0-.863-.862Z"-->
+<!--                  clip-rule="evenodd"></path>-->
+<!--        </svg>-->
+<!--        <div class="text-container">-->
+<!--            <p>혼자여도 괜찮은 여행, 트립소다입니다!-->
+<!--                무엇이든 문의해주세요 👋</p>-->
+<!--        </div>-->
+<!--    </li>-->
+<!--    <li class="item logo">-->
+<!--        <div class="logo-img-container">-->
+<!--            <img alt="top" th:src="@{resources/images/logo.jpg}">-->
+<!--        </div>-->
+<!--        <div class="text-container">-->
+<!--            <h1>트립소다에 문의하기</h1>-->
+<!--        </div>-->
+<!--        <div class="text-container">-->
+<!--            <span class="text">운영시간 없음</span>-->
+<!--        </div>-->
+<!--    </li>-->
+<!--    <li class="item time">-->
+<!--        <span class="current-time" id="itemCurrentTime"></span>-->
+<!--    </li>-->
+<!--    <li class="item name">-->
+<!--        <span>관리자</span>-->
+<!--    </li>-->
+<!--    <li class="item manager">-->
+<!--        <img alt="관리자" th:src="@{resources/images/manager.jpg}">-->
+<!--        <div class="text-container">-->
+<!--            <span>방문해주셔서&nbsp;감사합니다:)</span>-->
+<!--            <br>-->
+<!--            <span>어떻게 도와드릴까요?</span>-->
+<!--        </div>-->
+<!--    </li>-->
+<!--    <li class="item user" th:each="userChat : ${userChat}">-->
+<!--        <span th:text="${userChat.getContent()}"></span>-->
+<!--    </li>-->
+<!--    <form class="_object-button chatForm" id="chatMessageForm">-->
+<!--        <label>-->
+<!--            <textarea name="content" placeholder="메시지를 입력해주세요."></textarea>-->
+<!--        </label>-->
+<!--        <label>-->
+<!--            <input hidden name="rid"  th:value="${session.memberUser.isAdmin() ? 1 : 2}" >-->
+<!--        </label>-->
+<!--        <input class="_object-button" type="submit" value="보내기">-->
+<!--    </form>-->
+<!--</ul>-->

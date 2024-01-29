@@ -299,7 +299,7 @@ body > .main > .content-container > .content > .comment-list > .comment-containe
 
 body > .main > .content-container > .content > .comment-list > .comment-container > .comment-content > .comment {
     margin-top: 16px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 400;
     line-height: 19.24px;
     color: rgb(37, 37, 37);
@@ -339,8 +339,16 @@ body > .main > .content-container > .content > .comment-list > .comment-containe
     font-weight: 400;
     line-height: 17.76px;
     color: rgb(106, 106, 106);
-    background-color: rgb(255, 253, 255);
+
 }
+body > .main > .content-container > .content > .comment-list > .comment-container > .comment-content > .feedback-container > .reply-container > .modify-button,
+body > .main > .content-container > .content > .comment-list > .comment-container > .comment-content > .feedback-container > .reply-container > .delete-button{
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 400;
+    color: rgb(106, 106, 106);
+}
+
 
 body > .main > .content-container > .content > .comment-list > .comment-container > .comment-content > .feedback-container > .great-container {
     position: relative;
@@ -353,6 +361,9 @@ body > .main > .content-container > .content > .comment-list > .comment-containe
     width: max-content;
     height: auto;
 }
+/*body > .main > .content-container > .content > .comment-list > .comment-container > .comment-content > .feedback-container > .great-container > svg:checked > path {*/
+/*    fill: rgb(233, 134, 112);*/
+/*}*/
 
 body > .main > .content-container > .content > .comment-list > .comment-container > .comment-content > .feedback-container > .great-container > .great {
     font-size: 12px;

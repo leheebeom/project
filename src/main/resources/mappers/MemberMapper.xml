@@ -55,6 +55,14 @@
                 #{profileData})
     </insert>
 
+    <insert id="insertChat"
+            useGeneratedKeys="true"
+            keyColumn="index"
+            keyProperty="index"
+            parameterType="com.dripsoda.community.entities.member.ChatEntity">
+        INSERT INTO `dripsoda_member`.`chats` (`index`, `room`, `send_user_email`, `receive_user_email`, `send_time`,`read_time`, `content`, `read_checked`)
+        values (#{index}, #{room}, #{sendUserEmail}, #{receiveUserEmail}, #{sendTime}, #{readTime}, #{content},#{readChecked})
+    </insert>
 
     <select id="selectContactAuthByContactCodeSalt"
             parameterType="com.dripsoda.community.entities.member.ContactAuthEntity"
@@ -120,7 +128,7 @@
 
     <select id="selectUsersForHome"
             parameterType="com.dripsoda.community.entities.member.UserEntity"
-            resultType="com.dripsoda.community.entities.member.UserEntity">
+            resultType="com.dripsoda.community.entities.member.UserEntity"><![CDATA[
         SELECT `email`                 AS `email`,
                `password`              AS `password`,
                `name`                  AS `name`,
@@ -136,9 +144,11 @@
                `profile_id`            as `profileId`,
                `profile_data`          as `profileData`
         FROM `dripsoda_member`.`users`
+        where admin_flag = 0
+          and status_value = 'OKY'
         order by `registered_at` desc
         LIMIT 30
-    </select>
+        ]]></select>
 
 
     <select id="selectProfileImage"
@@ -231,6 +241,27 @@
         LIMIT 1
     </select>
 
+    <select id="selectUserByAdmin"
+            resultType="com.dripsoda.community.entities.member.UserEntity">
+        SELECT `email`                 AS `email`,
+               `password`              AS `password`,
+               `name`                  AS `name`,
+               `nickname`              AS `nickname`,
+               `contact_country_value` AS `contactCountryValue`,
+               `contact`               AS `contact`,
+               `policy_terms_at`       AS `policyTermsAt`,
+               `policy_privacy_at`     AS `policyPrivacyAt`,
+               `policy_marketing_at`   AS `policyMarketingAt`,
+               `status_value`          AS `statusValue`,
+               `registered_at`         AS `registeredAt`,
+               `admin_flag`            AS `isAdmin`,
+               `profile_id`            as `profileId`,
+               `profile_data`          as `profileData`
+        FROM `dripsoda_member`.`users`
+        WHERE `admin_flag` = 1
+        LIMIT 1
+    </select>
+
     <select id="selectUserByContact"
             parameterType="com.dripsoda.community.entities.member.UserEntity"
             resultType="com.dripsoda.community.entities.member.UserEntity">
@@ -252,6 +283,82 @@
         WHERE `contact` = #{contact}
         LIMIT 1
     </select>
+    
+    <select id="selectChatByIndex"
+    resultType="com.dripsoda.community.entities.member.ChatEntity">
+        SELECT `index`              as `index`,
+               `room`               as `room`,
+               `send_user_email`    as `sendUserEmail`,
+               `receive_user_email` as `receiveUserEmail`,
+               `send_time`          as `sendTime`,
+               `read_Time`          as `readTime`,
+               `content`            as `content`,
+               `read_checked`       as `readChecked`
+        FROM `dripsoda_member`.`chats`
+        where `index` = #{index}
+        LIMIT 1
+    </select>
+
+    <select id="selectUserByChat"
+            resultType="com.dripsoda.community.entities.member.ChatEntity"><![CDATA[
+        SELECT `index`              as `index`,
+               `room`               as `room`,
+               `send_user_email`    as `sendUserEmail`,
+               `receive_user_email` as `receiveUserEmail`,
+               `send_time`          as `sendTime`,
+               `read_Time`          as `readTime`,
+               `content`            as `content`,
+               `read_checked`       as `readChecked`
+        FROM `dripsoda_member`.`chats`
+        where `send_user_email` = #{email}
+          and room = 2
+        ]]></select>
+
+    <select id="selectAdminByChat"
+            resultType="com.dripsoda.community.entities.member.ChatEntity">
+        SELECT `index`              as `index`,
+               `room`               as `room`,
+               `send_user_email`    as `sendUserEmail`,
+               `receive_user_email` as `receiveUserEmail`,
+               `send_time`          as `sendTime`,
+               `read_Time`          as `readTime`,
+               `content`            as `content`,
+               `read_checked`       as `readChecked`
+        FROM `dripsoda_member`.`chats`
+        where `receive_user_email` = #{email}
+          and room = 1
+    </select>
+
+    <select id="selectChatAdmin"
+    resultType="com.dripsoda.community.entities.member.ChatEntity">
+        SELECT `index`              as `index`,
+               `room`               as `room`,
+               `send_user_email`    as `sendUserEmail`,
+               `receive_user_email` as `receiveUserEmail`,
+               `send_time`          as `sendTime`,
+               `read_Time`          as `readTime`,
+               `content`            as `content`,
+               `read_checked`       as `readChecked`
+        FROM `dripsoda_member`.`chats`
+        where `send_user_email` = #{email}
+          and room = 2
+    </select>
+
+    <select id="selectChats"
+            resultType="com.dripsoda.community.entities.member.ChatEntity">
+        SELECT `index`              as `index`,
+               `room`               as `room`,
+               `send_user_email`    as `sendUserEmail`,
+               `receive_user_email` as `receiveUserEmail`,
+               `send_time`          as `sendTime`,
+               `read_Time`          as `readTime`,
+               `content`            as `content`,
+               `read_checked`       as `readChecked`
+        FROM `dripsoda_member`.`chats`
+        WHERE `room` = 2
+    </select>
+    
+    
 
     <update id="updateContactAuth"
             parameterType="com.dripsoda.community.entities.member.ContactAuthEntity">
@@ -295,6 +402,14 @@
             `profile_data`          = #{profileData}
         WHERE `email` = #{email}
         LIMIT 1
+    </update>
+
+    <update id="updateChat"
+    parameterType="com.dripsoda.community.entities.member.ChatEntity">
+        update `dripsoda_member`.`chats`
+        set `read_time` = #{readTime},
+            `read_checked` = #{readChecked}
+        where `index` = #{index}
     </update>
 
 

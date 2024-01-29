@@ -41,6 +41,7 @@
                 <!--                <input type="text" placeholder="작성자">-->
                 <label class="_object-label">
                     <span hidden>댓글</span>
+                    <input name="commentIndex" type="hidden">
                     <textarea name="content" placeholder="댓글을 입력해주세요."></textarea>
                 </label>
                 <span class="warning" id="warning"></span>
@@ -57,34 +58,49 @@
 
             <div class="comment-list" id="commentList" th:each="accompanyComment : ${accompanyComments}">
                 <div class="comment-container">
-                    <div class="comment-content" th:class="${accompanyComment.getCommentParentIndex() == null} ?'comment-content' : 'comment-content reply' ">
+                    <div class="comment-content"
+                         th:class="${accompanyComment.getCommentParentIndex() == null} ?'comment-content' : 'comment-content reply' ">
                         <div class="comment-user-container">
                             <div class="comment-user-image-container" style="width: 40px; height: 40px;">
                                 <div class="comment-user-image">
                                     <div class="comment-user-image-box">
-                                        <img alt="user-img"
-                                             src=""
-                                             class="user-image">
+                                        <img th:if="${accompanyComment.getUserProfileId() == 'no' or accompanyComment.getUserProfileId() == null}"
+                                             th:src="@{/resources/images/vector_profile_default.svg}" alt="디폴트"
+                                             class="profile-image">
+                                        <img th:if="${accompanyComment.getUserProfileId() != 'no' && accompanyComment.getUserProfileId() != ''}"
+                                             th:src="@{'/member/profile-id?profileId=' + ${accompanyComment.getUserProfileId()}}"
+                                             class="profile-image">
                                     </div>
                                 </div>
                             </div>
                             <div class="comment-user">
-                                <span class="nickname">닉네임</span>
-                                <span class="created" th:text="${#dates.format(accompanyComment.getCreatedAt(),('yyyy-MM-dd'))}">작성일시</span>
+                                <span class="nickname" th:text="${accompanyComment.getUserNickname()}">닉네임</span>
+                                <span class="created"
+                                      th:text="${#dates.format(accompanyComment.getCreatedAt(),('yyyy-MM-dd'))}">작성일시</span>
                             </div>
                         </div>
-                        <p class="comment" th:text="${accompanyComment.getContent()}">
+                        <p class="comment" th:data-comment="${accompanyComment.getIndex()}" th:text="${accompanyComment.getContent()}">
                             <span></span>작성내용
                         </p>
                         <div class="feedback-container">
                             <div class="reply-container">
-                                <button class="reply-button" id="replyButton" th:data-index="${accompanyComment.getIndex()}">답글 달기
+                                <button class="reply-button"
+                                        th:data-index="${accompanyComment.getIndex()}">답글 달기
+                                </button>
+                               <button class="modify-button"
+                                       th:if="${session.memberUser != null and accompanyComment.getUserEmail() !=null and session.memberUser.getEmail().equals(accompanyComment.getUserEmail())}"
+                                       th:data-index="${accompanyComment.getIndex()}">수정
+                               </button>
+                                <button class="delete-button"
+                                        th:if="${session.memberUser != null and accompanyComment.getUserEmail() !=null and session.memberUser.getEmail().equals(accompanyComment.getUserEmail())}"
+                                        th:data-index="${accompanyComment.getIndex()}">삭제
+
                                 </button>
                             </div>
                             <div class="great-container">
-                                <p class="great">좋아요</p>
+                                <p class="great" th:text="'좋아요 '+${accompanyComment.getLikes()}+'개'">좋아요</p>
                                 <svg width="13" height="13" viewBox="0 0 20 20" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
+                                     xmlns="http://www.w3.org/2000/svg" class="great-button" th:data-index="${accompanyComment.getIndex()}">
                                     <path fill-rule="evenodd" clip-rule="evenodd"
                                           d="M1.40632 10.2375C-0.547821 8.05243 -0.465441 4.71746 1.65346 2.62939C3.85807 0.456869 7.43245 0.456868 9.63706 2.62939L10.0001 2.98712L10.3629 2.62962L11.4157 3.69802L10.0001 5.09306L8.5842 3.6978C6.96355 2.10073 4.32697 2.10073 2.70632 3.6978C1.0979 5.28281 1.0979 7.84339 2.70631 9.4284L4.15169 10.8527L9.99996 16.6161L17.2936 9.42862C18.902 7.84361 18.902 5.28303 17.2936 3.69802L18.3465 2.62962C20.5511 4.80214 20.5511 8.3245 18.3465 10.497L10.7122 18.0201C10.3189 18.4078 9.68107 18.4078 9.28769 18.0201L2.01636 10.8546L1.65346 10.4968C1.56847 10.4131 1.48676 10.3273 1.40832 10.2397C1.40765 10.2389 1.40699 10.2382 1.40632 10.2375ZM18.3465 2.62962C16.1418 0.457092 12.5675 0.45709 10.3629 2.62962L11.4157 3.69802C13.0364 2.10096 15.6729 2.10096 17.2936 3.69802L18.3465 2.62962Z"
                                           fill="#6a6a6a"></path>
@@ -94,46 +110,7 @@
                     </div>
                 </div>
             </div>
-<!--            <div class="comment-list reply" id="replyList" th:each="accompanyComment : ${accompanyComments}"-->
-<!--                 th:if="${accompanyComment.getCommentParentIndex() != null}">-->
-<!--                <div class="comment-container">-->
-<!--                    <div class="comment-content reply">-->
-<!--                        <div class="comment-user-container">-->
-<!--                            <div class="comment-user-image-container" style="width: 40px; height: 40px;">-->
-<!--                                <div class="comment-user-image">-->
-<!--                                    <div class="comment-user-image-box">-->
-<!--                                        <img alt="user-img"-->
-<!--                                             src=""-->
-<!--                                             class="user-image">-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                            <div class="comment-user">-->
-<!--                                <span class="nickname">닉네임</span>-->
-<!--                                <span class="created" th:text="${accompanyComment.getCreatedAt()}">작성일시</span>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        <p class="comment" th:text="${accompanyComment.getContent()}">-->
-<!--                            <span></span>작성내용-->
-<!--                        </p>-->
-<!--                        <div class="feedback-container">-->
-<!--                            <div class="reply-container">-->
-<!--                                <button class="reply-button" th:data-index="${accompanyComment.getIndex()}">답글 달기-->
-<!--                                </button>-->
-<!--                            </div>-->
-<!--                            <div class="great-container">-->
-<!--                                <p class="great">좋아요</p>-->
-<!--                                <svg width="13" height="13" viewBox="0 0 20 20" fill="none"-->
-<!--                                     xmlns="http://www.w3.org/2000/svg">-->
-<!--                                    <path fill-rule="evenodd" clip-rule="evenodd"-->
-<!--                                          d="M1.40632 10.2375C-0.547821 8.05243 -0.465441 4.71746 1.65346 2.62939C3.85807 0.456869 7.43245 0.456868 9.63706 2.62939L10.0001 2.98712L10.3629 2.62962L11.4157 3.69802L10.0001 5.09306L8.5842 3.6978C6.96355 2.10073 4.32697 2.10073 2.70632 3.6978C1.0979 5.28281 1.0979 7.84339 2.70631 9.4284L4.15169 10.8527L9.99996 16.6161L17.2936 9.42862C18.902 7.84361 18.902 5.28303 17.2936 3.69802L18.3465 2.62962C20.5511 4.80214 20.5511 8.3245 18.3465 10.497L10.7122 18.0201C10.3189 18.4078 9.68107 18.4078 9.28769 18.0201L2.01636 10.8546L1.65346 10.4968C1.56847 10.4131 1.48676 10.3273 1.40832 10.2397C1.40765 10.2389 1.40699 10.2382 1.40632 10.2375ZM18.3465 2.62962C16.1418 0.457092 12.5675 0.45709 10.3629 2.62962L11.4157 3.69802C13.0364 2.10096 15.6729 2.10096 17.2936 3.69802L18.3465 2.62962Z"-->
-<!--                                          fill="#6a6a6a"></path>-->
-<!--                                </svg>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
+
         </div>
         <aside class="aside">
             <div class="user-container">

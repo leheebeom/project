@@ -49,12 +49,14 @@
             <li class="item" th:if="${session.memberUser == null}">
                 <a class="link" th:href="@{/member/userRegister}">회원가입</a>
             </li>
-
             <li class="item" th:if="${session.memberUser != null}">
                 <a class="link" th:href="@{/member/userLogout}">로그아웃</a>
             </li>
             <li class="item" th:if="${session.memberUser != null}">
                 <a class="link" th:href="@{/member/userMy}">마이페이지</a>
+            </li>
+            <li class="item" th:if="${session.memberUser != null && session.memberUser.isAdmin() == true}">
+                <a class="link" th:href="@{/member/manager}">관리자페이지</a>
             </li>
             <li class="item button" id="_writeButton">글쓰기</li>
         </ul>

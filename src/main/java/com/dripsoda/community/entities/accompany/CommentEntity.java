@@ -25,7 +25,7 @@ public class CommentEntity {
     //댓글 존재여부 대댓글을 위해
     private Boolean isComment;
     private Integer depth;
-    private long likes;
+    private int likes;
 
     private long orderNumber;
 
@@ -47,11 +47,11 @@ public class CommentEntity {
         return this;
     }
 
-    public long getLikes() {
+    public int getLikes() {
         return likes;
     }
 
-    public CommentEntity setLikes(long likes) {
+    public CommentEntity setLikes(int likes) {
         this.likes = likes;
         return this;
     }
@@ -69,7 +69,7 @@ public class CommentEntity {
     public CommentEntity() {
     }
 
-    public CommentEntity(int index, int articleIndex, Integer commentParentIndex, String userEmail, Date createdAt, String content, Date modifiedAt, Boolean isDeleted, Boolean isComment, Integer depth, long likes, long orderNumber) {
+    public CommentEntity(int index, int articleIndex, Integer commentParentIndex, String userEmail, Date createdAt, String content, Date modifiedAt, Boolean isDeleted, Boolean isComment, Integer depth, int likes, long orderNumber) {
         this.index = index;
         this.articleIndex = articleIndex;
         this.commentParentIndex = commentParentIndex;

@@ -69,6 +69,3 @@ const myButton = window.document.getElementById('myButton');
 
 
 
-
-
-

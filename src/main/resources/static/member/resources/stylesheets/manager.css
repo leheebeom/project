@@ -67,54 +67,37 @@ body > .main > .content > .title {
     font-weight: 500;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
-}
-body > .main > .content.qna .title {
-    margin-bottom: 0;
+    text-align: center;
 }
 
-body > .main > .content.qna > .content > .list_wrap {
-    margin-right: auto;
-    margin-left: auto;
+body > .main > .content > .board-table {
+    width: 100%;
+}
+body > .main > .content > .board-table > .table-text {
+    text-align: center;
 }
 
-body > .main > .content.qna > .content > .list_wrap > .thead {
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: justify;
-    justify-content: space-between;
-    padding: 21px 35px;
-    border-bottom: 1px solid rgb(233, 233, 233);
-}
-body > .main > .content.qna > .content > .list_wrap > .thead > span {
-    position: relative;
-    display: inline-block;
-    padding-left: 30px;
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 700;
+body > .main > .content > .user > .board-table {
+    border-collapse: collapse;
+    width: 100%;
 }
 
-body > .main > .content.qna > .content > .list_wrap > .thead > .more-container {
+body > .main > .content > .user > .board-table > tr > th,
+body > .main > .content > .user > .board-table > tr > td {
+    border: 1px solid rgb(230, 230, 230);
+    padding: 10px;
+    text-align: center;
+}
+.send {
     cursor: pointer;
-    position: relative;
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: end;
-    justify-content: flex-end;
-    width: max-content;
-    min-width: 160px;
-    height: auto;
 }
 
-body > .main > .content.qna > .content > .list_wrap > .thead > .more-container > a > p {
-    cursor: pointer;
-    position: relative;
-    display: inline-block;
-    padding-right: 8px;
-    font-size: 15px;
-    line-height: 24px;
-    vertical-align: top;
-    color: rgb(0, 206, 124);
+
+body > .main > .content > .user > .board-table > tr > th {
+    background-color: rgb(240, 240, 240);
 }
+
+body > .main > .content > .user > .board-table tbody {
+    text-align: center;
+}
+

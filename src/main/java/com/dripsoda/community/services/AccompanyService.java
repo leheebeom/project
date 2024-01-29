@@ -1,5 +1,7 @@
 package com.dripsoda.community.services;
 
+import com.dripsoda.community.dtos.accompany.ArticleBestTravleDto;
+import com.dripsoda.community.dtos.accompany.ArticleCommentDto;
 import com.dripsoda.community.dtos.accompany.ArticleRecentListDto;
 import com.dripsoda.community.dtos.accompany.ArticleSearchDto;
 import com.dripsoda.community.entities.accompany.*;
@@ -13,14 +15,17 @@ import com.dripsoda.community.mappers.IMemberMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service(value = "com.dripsoda.community.services.AccompanyService")
 public class AccompanyService {
 
+
+    private static final Logger logger = LoggerFactory.getLogger(AccompanyService.class);
     private final IAccompanyMapper accompanyMapper;
     private final IMemberMapper memberMapper;
 
@@ -53,6 +58,27 @@ public class AccompanyService {
         return comments;
     }
 
+    public IResult modifyComment(CommentEntity comment) {
+        CommentEntity oldComment = this.accompanyMapper.selectCommentByIndex(comment.getIndex());
+        if (oldComment == null) {
+            return CommentResult.NOT_FOUND;
+        }
+        if (!comment.getUserEmail().equals(oldComment.getUserEmail())) {
+            return CommentResult.NOT_SIGNED;
+        }
+        comment.setIndex(oldComment.getIndex())
+                .setArticleIndex(oldComment.getArticleIndex())
+                .setCommentParentIndex(oldComment.getCommentParentIndex())
+                .setUserEmail(oldComment.getUserEmail())
+                .setCreatedAt(oldComment.getCreatedAt())
+                .setDeleted(oldComment.getDeleted())
+                .setLikes(oldComment.getLikes())
+                .setModifiedAt(new Date());
+        return this.accompanyMapper.updateComment(comment) > 0
+                ? CommonResult.SUCCESS
+                : CommonResult.FAILURE;
+    }
+
     public void updateViews(int index) {
         accompanyMapper.updateView(index);
     }
@@ -72,7 +98,6 @@ public class AccompanyService {
     }
 
 
-
     public IResult putArticle(ArticleEntity article) {
         return this.accompanyMapper.insertArticle(article) > 0
                 ? CommonResult.SUCCESS
@@ -85,6 +110,11 @@ public class AccompanyService {
                 : CommonResult.FAILURE;
     }
 
+    public IResult deleteComment(Integer id, Integer commentId) {
+        return this.accompanyMapper.deleteComment(id, commentId) > 0
+                ? CommonResult.SUCCESS
+                : CommonResult.FAILURE;
+    }
 
     public IResult modifyArticle(ArticleEntity article) {
         ArticleEntity oldArticle = this.accompanyMapper.selectArticleByIndex(article.getIndex());
@@ -131,6 +161,46 @@ public class AccompanyService {
                 : CommonResult.FAILURE;
     }
 
+    @Transactional
+    public IResult addCommentLike(UserEntity user,Integer id, Integer commentId) {
+        ArticleEntity article = this.accompanyMapper.selectArticleByIndex(id);
+        CommentEntity comment = this.accompanyMapper.selectCommentByArticleIndexAndIndex(id,commentId);
+        if(user == null || !user.getEmail().equals(comment.getUserEmail())) {
+            return CommentResult.NOT_SIGNED;
+        }
+        if (article == null || article.getIndex() == 0) {
+            return CommentResult.NOT_FOUND;
+        }
+
+        if(comment == null || comment.getIndex() == 0) {
+            return CommentResult.NOT_FOUND;
+        }
+
+        CommentLikeEntity commentLikeEntity = CommentLikeEntity.build()
+                .setUserEmail(user.getEmail())
+                .setArticleIndex(id)
+                .setCommentIndex(commentId)
+                .setChecked(true);
+        comment.setLikes(comment.getLikes() + 1);
+        int likeInsertResult = this.accompanyMapper.insertCommentLike(commentLikeEntity);
+        if (likeInsertResult > 0) {
+            int updateResult = this.accompanyMapper.updateCommentLikes(comment.getLikes(), comment.getArticleIndex(), comment.getIndex());
+
+            if (updateResult > 0) {
+                logger.info("Comment like added successfully");
+                return CommonResult.SUCCESS;
+            } else {
+                logger.error(" updateResult failure");
+                // updateResult 실패 시 CommonResult.FAILURE 반환
+                return CommonResult.FAILURE;
+            }
+        } else {
+            logger.error("likeInsertResult failure");
+            // likeInsertResult 실패 시 CommonResult.FAILURE 반환
+            return CommonResult.FAILURE;
+        }
+    }
+
     public boolean checkRequest(UserEntity requester, int articleIndex) {
         if (requester == null) {
             return false;
@@ -140,10 +210,6 @@ public class AccompanyService {
 
     public CommentEntity getCommentIndex(int index) {
         return this.accompanyMapper.selectCommentByIndex(index);
-    }
-
-    public List<CommentEntity> findCommentByArticle(Integer article) {
-        return accompanyMapper.findCommentByArticle(article);
     }
 
     public List<CommentEntity> getCommentsByArticleIndex(Integer articleIndex) {
@@ -169,7 +235,7 @@ public class AccompanyService {
                 .setCommentParentIndex(null)
                 .setModifiedAt(comment.getModifiedAt())
                 .setDeleted(false)
-                .setLikes(0L)
+                .setLikes(0)
                 .setComment(false)
                 .setDepth(0)
                 .setOrderNumber(totalComment);
@@ -177,7 +243,8 @@ public class AccompanyService {
                 ? CommonResult.SUCCESS
                 : CommonResult.FAILURE;
     }
-//
+
+    //
     @Transactional
     public IResult replyComment(UserEntity user, Integer articleIndex, Integer commentId, CommentEntity reply) {
         ArticleEntity article = this.accompanyMapper.selectArticleByIndex(articleIndex);
@@ -199,7 +266,7 @@ public class AccompanyService {
                 .setCommentParentIndex(comment.getIndex())
                 .setModifiedAt(reply.getModifiedAt())
                 .setDeleted(false)
-                .setLikes(0L)
+                .setLikes(0)
                 .setComment(true)
                 .setDepth(comment.getDepth() + 1)
                 .setOrderNumber(comment.getOrderNumber());
@@ -216,10 +283,18 @@ public class AccompanyService {
 //
 //    }
 
-    public List<ArticleEntity> getArticlesForAll() {
-      return this.accompanyMapper.selectArticles();
+    public List<ArticleCommentDto> getArticleCommentsByArticleIndex(Integer articleIndex) {
+        return this.accompanyMapper.selectArticleCommentsByArticleIndex(articleIndex);
     }
 
+    public List<ArticleEntity> getArticlesForAll() {
+        return this.accompanyMapper.selectArticles();
+    }
+
+
+    public List<ArticleBestTravleDto> getArticlesForRecent() {
+        return this.accompanyMapper.selectArticlesForRecent();
+    }
 
     public List<ArticleRecentListDto> getArticles() {
         return this.accompanyMapper.selectArticlesForHome();

@@ -2,18 +2,19 @@ package com.dripsoda.community.services;
 
 import com.dripsoda.community.components.MailComponent;
 import com.dripsoda.community.components.SmsComponent;
-import com.dripsoda.community.dtos.accompany.ArticleSearchDto;
 import com.dripsoda.community.entities.member.*;
 import com.dripsoda.community.enums.CommonResult;
+import com.dripsoda.community.enums.member.ChatResult;
 import com.dripsoda.community.enums.member.UserLoginResult;
 import com.dripsoda.community.exceptions.RollbackException;
 import com.dripsoda.community.interfaces.IResult;
 import com.dripsoda.community.mappers.IMemberMapper;
 import com.dripsoda.community.regex.MemberRegex;
 import com.dripsoda.community.utils.CryptoUtils;
-import org.apache.catalina.User;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,6 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +32,8 @@ public class MemberService {
     private final IMemberMapper memberMapper;
     private final SmsComponent smsComponent;
     private final MailComponent mailComponent;
+
+    private static final Logger logger = LoggerFactory.getLogger(MemberService.class);
 
     @Autowired
     public MemberService(IMemberMapper memberMapper, SmsComponent smsComponent, MailComponent mailComponent) {
@@ -215,6 +217,82 @@ public class MemberService {
     }
 
     @Transactional
+    public IResult putChat(UserEntity user, int roomIndex, String content) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
+        if (user == null) {
+            return ChatResult.NOT_SIGNED;
+        }
+        if (!(roomIndex == 1 || roomIndex == 2)) {
+            return ChatResult.NOT_FOUND;
+        }
+        // 나머지 로직
+        //관리자 아이디 찾기
+        UserEntity admin = this.memberMapper.selectUserByAdmin();
+        //readTime 의 경우 일단 현재 만들어진 시간 후에 update로 변경.
+        ChatEntity chat = ChatEntity.build()
+                .setSendUserEmail(user.getEmail())
+                .setReceiveUserEmail(!user.getEmail().equals(admin.getEmail()) ? admin.getEmail() : user.getEmail())
+                .setRoom(roomIndex)
+                .setSendTime(new Date())
+                .setReadTime(new Date())
+                .setReadChecked(0)
+                .setContent(content);
+
+        int insertChat = this.memberMapper.insertChat(chat);
+
+        if (insertChat > 0) {
+//            String smsContent;
+//            smsContent = "[드립소다] 고객님의 답변이 등록되었습니다.";
+//            if (this.smsComponent.send(user.getContact(), smsContent) != 202) {
+//                throw new RollbackException();
+//            }
+            return CommonResult.SUCCESS;
+        } else {
+            return CommonResult.FAILURE;
+        }
+    }
+
+    @Transactional
+    public IResult putMnagerChat(ChatEntity chat, UserEntity user, String content) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
+        if (chat == null) {
+            return ChatResult.NOT_FOUND;
+        }
+        if (user == null) {
+            return ChatResult.NOT_SIGNED;
+        }
+        //readTime 의 경우 일단 현재 만들어진 시간 후에 update로 변경.
+        ChatEntity mangerChat = ChatEntity.build()
+                .setSendUserEmail(user.getEmail())
+                .setReceiveUserEmail(chat.getSendUserEmail())
+                .setRoom(1)
+                .setSendTime(new Date())
+                .setReadTime(new Date())
+                .setReadChecked(0)
+                .setContent(content);
+
+        chat.setReadTime(new Date());
+        chat.setReadChecked(1);
+
+        int insertChat = this.memberMapper.insertChat(mangerChat);
+
+        if (insertChat > 0) {
+            int updateChat = this.memberMapper.updateChat(chat);
+            if (updateChat > 0) {
+                return CommonResult.SUCCESS;
+                //            String smsContent;
+//            smsContent = "[드립소다] 문의가 완료 되었습니다. 확인해주세요.";
+//            if (this.smsComponent.send(user.getContact(), smsContent) != 202) {
+//                throw new RollbackException();
+
+//            }
+            } else {
+                return CommonResult.FAILURE;
+            }
+        } else {
+            return CommonResult.FAILURE;
+        }
+    }
+
+    @Transactional
     public IResult recoverUserPassword(UserEntity user) throws
             MessagingException,
             RollbackException {
@@ -385,6 +463,22 @@ public class MemberService {
                 ? CommonResult.SUCCESS
                 : CommonResult.FAILURE;
 
+    }
+
+    public List<ChatEntity> chatAdminCheckList(String email) {
+        return this.memberMapper.selectAdminByChat(email);
+    }
+
+    public List<ChatEntity> chatUserCheckList(String email) {
+        return this.memberMapper.selectUserByChat(email);
+    }
+
+    public ChatEntity getChatbyIndex(int id) {
+        return this.memberMapper.selectChatByIndex(id);
+    }
+
+    public List<ChatEntity> getChats() {
+        return this.memberMapper.selectChats();
     }
 
     public UserEntity getUser(String email) {

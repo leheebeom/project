@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dripsoda.community.mappers.IQnaMapper">
+    <delete id="deleteQnaArticle">
+        DELETE
+        FROM `dripsoda_qna`.`qna_articles`
+        WHERE `index` = #{index}
+    </delete>
+    <insert id="insertArticle"
+            useGeneratedKeys="true"
+            keyColumn="index"
+            keyProperty="index"
+            parameterType="com.dripsoda.community.entities.qna.QnaArticleEntity">
+        insert into `dripsoda_qna`.`qna_articles` (`user_email`, `category_id`, `created_at`, `title`, `content`,
+                                                   view_count)
+        values (#{userEmail}, #{categoryId}, #{createdAt}, #{title}, #{content}, #{viewCount});
+    </insert>
+    <update id="updateView">
+        UPDATE `dripsoda_qna`.`qna_articles`
+        SET view_count = view_count + 1
+        WHERE `index` = #{index}
+        LIMIT 1
+    </update>
+
+    <select id="selectArticleByIndex"
+            resultType="com.dripsoda.community.entities.qna.QnaArticleEntity">
+        SELECT `index`       AS `index`,
+               `category_id` AS `categoryId`,
+               `user_email`  AS `userEmail`,
+               `created_at`  AS `createdAt`,
+               `title`       AS `title`,
+               `content`     AS `content`,
+               `view_count`  AS `viewCount`
+        FROM `dripsoda_qna`.`qna_articles`
+        WHERE `index` = #{index}
+          AND `category_id` = #{categoryId}
+        ORDER BY `index` DESC
+    </select>
+
+    <select id="selectCategoryIdByIndex"
+            resultType="int">
+        SELECT `category_id` as `categoryId`
+        FROM `dripsoda_qna`.`qna_articles`
+        WHERE `index` = #{index}
+        ORDER BY `index` DESC
+    </select>
+
+    <select id="selectHelpPageByIndex"
+            resultType="com.dripsoda.community.vos.qna.QnaArticleReadVo">
+        SELECT current_row.*,
+               IFNULL(previous_row.`index`, 0)                   AS `prev`,
+               IFNULL(next_row.`index`, 0)                       AS `next`,
+               IFNULL(previous_row_title.`title`, '이전 글이 없습니다.') AS `prevTitle`,
+               IFNULL(next_row_title.`title`, '다음 글이 없습니다.')     AS `nextTitle`
+        FROM (SELECT `index`,
+                     `category_id`,
+                     `user_email`,
+                     `created_at`,
+                     `title`,
+                     `content`,
+                     `view_count`
+              FROM `dripsoda_qna`.`qna_articles`
+              WHERE `index` = #{index}
+                AND `category_id` = #{categoryId}) AS current_row
+                 LEFT JOIN (SELECT `index`
+                            FROM `dripsoda_qna`.`qna_articles`
+                            WHERE #{index} > `index`
+                              AND `category_id` = #{categoryId}
+                            ORDER BY `index` DESC
+                            LIMIT 1) AS previous_row ON 1 = 1
+                 LEFT JOIN (SELECT `index`,
+                                   `title`
+                            FROM `dripsoda_qna`.`qna_articles`
+                            WHERE #{index} > `index`
+                              AND `category_id` = #{categoryId}
+                            ORDER BY `index` DESC
+                            LIMIT 1) AS previous_row_title ON previous_row.`index` = previous_row_title.`index`
+                 LEFT JOIN (SELECT `index`
+                            FROM `dripsoda_qna`.`qna_articles`
+                            WHERE `index` > #{index}
+                              AND `category_id` = #{categoryId}
+                            ORDER BY `index` ASC
+                            LIMIT 1) AS next_row ON 1 = 1
+                 LEFT JOIN (SELECT `index`,
+                                   `title`
+                            FROM `dripsoda_qna`.`qna_articles`
+                            WHERE `index` > #{index}
+                              AND `category_id` = #{categoryId}
+                            ORDER BY `index` ASC
+                            LIMIT 1) AS next_row_title ON next_row.`index` = next_row_title.`index`
+        ORDER BY current_row.`index` DESC;
+    </select>
+
+    <select id="selectCategories"
+            resultType="com.dripsoda.community.entities.qna.CategoryEntity">
+        SELECT `id`   AS `id`,
+               `text` AS `text`
+        FROM `dripsoda_qna`.`category`
+        ORDER BY `id`
+
+    </select>
+
+    <select id="selectQnaArticlesByHelp"
+            resultType="com.dripsoda.community.entities.qna.QnaArticleEntity">
+        SELECT `index`       as `index`,
+               `category_id` as `categoryId`,
+               `user_email`  as `userEmail`,
+               `created_at`  as `createdAt`,
+               `title`       as `title`,
+               `content`     as `content`,
+               `view_count`  as `viewCount`
+        FROM `dripsoda_qna`.`qna_articles`
+        where `category_id` = 1
+    </select>
+    <select id="selectQnaArticlesByEvent"
+            resultType="com.dripsoda.community.entities.qna.QnaArticleEntity">
+        SELECT `index`       as `index`,
+               `category_id` as `categoryId`,
+               `user_email`  as `userEmail`,
+               `created_at`  as `createdAt`,
+               `title`       as `title`,
+               `content`     as `content`,
+               `view_count`  as `viewCount`
+        FROM `dripsoda_qna`.`qna_articles`
+        where `category_id` = 2
+    </select>
+    <select id="selectQnaArticlesByQna"
+            resultType="com.dripsoda.community.entities.qna.QnaArticleEntity">
+        SELECT `index`       as `index`,
+               `category_id` as `categoryId`,
+               `user_email`  as `userEmail`,
+               `created_at`  as `createdAt`,
+               `title`       as `title`,
+               `content`     as `content`,
+               `view_count`  as `viewCount`
+        FROM `dripsoda_qna`.`qna_articles`
+        where `category_id` = 3
+    </select>
+    <update id="updateQnaArticle"
+            parameterType="com.dripsoda.community.entities.qna.QnaArticleEntity">
+        UPDATE `dripsoda_qna`.`qna_articles`
+        SET `user_email` = #{userEmail},
+            `created_at` = #{createdAt},
+            `title`      = #{title},
+            `content`    = #{content},
+            `view_count` = #{viewCount}
+        WHERE `index` = #{index}
+        LIMIT 1
+    </update>
+</mapper>

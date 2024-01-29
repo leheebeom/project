@@ -16,8 +16,11 @@ const modifyButton = window.document.getElementById('modifyButton');
 const viewCount = window.document.getElementById('viewCount');
 const contentForm = window.document.getElementById('contentForm');
 const replyForm = window.document.getElementById('replyForm');
-const replyButtonAll  = window.document.querySelectorAll('.reply-button');
+const replyButtonAll = window.document.querySelectorAll('.reply-button');
 const parentIndex = window.document.getElementById('number');
+const commentModifyButtonAll = window.document.querySelectorAll('.reply-container > .modify-button');
+const commentDeleteButtonAll = window.document.querySelectorAll('.reply-container > .delete-button');
+const greatButtonAll = window.document.querySelectorAll('.great-container > .great-button');
 
 const showForm = form => form.classList.add('visible');
 const hideForm = form => form.classList.remove('visible');
@@ -48,6 +51,35 @@ const checkRequest = () => {
     };
     xhr.send();
 };
+
+const loadComment = () => {
+    cover.show('댓글 정보를 불러오고 있습니다.\n\n잠시만 기다려 주세요.')
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+    formData.append('commentIndex', contentForm['commentIndex'].value);
+    xhr.open('PATCH', window.location.href);
+    xhr.onreadystatechange = () => {
+        if(xhr.readyState === XMLHttpRequest.DONE) {
+            cover.hide()
+            if(xhr.status >= 200 && xhr.status <300) {
+                const responseJson = JSON.parse(xhr.responseText);
+                contentForm['content'].value = responseJson['content'];
+                contentForm['commentIndex'].value = responseJson['commentIndex'];
+            } else if(xhr.status === 403) {
+                alert('로그인 정보가 유효하지 않습니다.')
+            } else if(xhr.status === 404) {
+                alert('존재하지 않는 코멘트입니다.')
+                if (window.history.length > 0) {
+                    window.history.back();
+                } else {
+                    window.close();
+                }
+            }
+        }
+    };
+    xhr.send(formData);
+};
+
 
 const xhr = new XMLHttpRequest();
 cover.show('요청한 정보를 불러오고 있습니다.\n\n잠시만 기다려 주세요.')
@@ -180,8 +212,19 @@ const warning = {
         warning.getElement().classList.add('visible');
     }
 };
+const handleModifyButtonClick = (commentIndex) => {
+    // content-form에 modify 클래스 추가
+    contentForm.classList.add('modify');
 
+};
+const setDefaultFormState = () => {
+    // content-form에 modify 클래스 제거
+    contentForm.classList.remove('modify');
 
+    // 여기에 필요한 기본 동작을 추가할 수 있습니다.
+};
+
+let commentId
 
 contentForm.onsubmit = e => {
     e.preventDefault();
@@ -193,19 +236,21 @@ contentForm.onsubmit = e => {
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
     formData.append('content', contentForm['content'].value);
-    xhr.open('POST', `../read/${id}/comments`);
+    const url = contentForm.classList.contains('modify')
+        ? `../modify/${id}/${commentId}`
+        : `../read/${id}/comments`;
+    xhr.open('POST', url);
     xhr.onreadystatechange = () => {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status >= 200 && xhr.status < 300) {
                 const responseJson = JSON.parse(xhr.responseText);
                 switch (responseJson['result']) {
                     case 'success' :
-                        const id = responseJson['articleId'];
-                        window.location.reload();
+                        window.location.href = `../read/${id}`;
                         break
                     case 'not_found' :
-                        alert('더 이상 존재하지 않는 동행 정보입니다.');
-                        window.location.href = '../';
+                        alert('더 이상 존재하지 않는 댓글 정보입니다.');
+                        window.location.href = `../read/${id}`;
                         break;
                     case 'not_signed' :
                         alert('로그인정보가 유효하지 않습니다.');
@@ -221,7 +266,7 @@ contentForm.onsubmit = e => {
     xhr.send(formData);
 };
 
-let commentId
+
 replyButtonAll.forEach((reply) => {
     // Adding a click event listener to each reply button
     reply.addEventListener('click', () => {
@@ -229,20 +274,143 @@ replyButtonAll.forEach((reply) => {
         hideForm(contentForm);
         replyForm['content'].focus();
         commentId = reply.dataset.index;
-        console.log(commentId);
+        const commentUserNickname = reply.closest('.comment-container').querySelector('.nickname').innerText;
+        replyForm['content'].value = `@${commentUserNickname} `;
     });
 });
 
 
+commentModifyButtonAll.forEach((modify) => {
+    modify.addEventListener('click', () => {
+        showForm(contentForm);
+        hideForm(replyForm);
+        let commentIndex = modify.getAttribute('data-index');
+        // Change from 'button' to 'modify'
+        setDefaultFormState();
+        handleModifyButtonClick(commentIndex);
+        let parseCommentIndex =  parseInt(modify.getAttribute('data-index'), 10);
+        commentId = parseCommentIndex;
+        let commentElement = document.querySelector('.comment[data-comment="' + commentIndex + '"]');
+        contentForm['commentIndex'].value = parseCommentIndex;
+        // Set the comment content in the contentForm
+        document.querySelector('#contentForm textarea[name="content"]').value = commentElement.innerText;
+        document.querySelector('#contentForm textarea[name="content"]').focus(); // Use 'document.querySelector' instead of 'contentForm'
+        loadComment();
+
+    });
+});
+setDefaultFormState();
+const toggleGreatColor = (button) => {
+    if (!button) return;
+
+    const path = button.querySelector('path');
+    const newColor = '#E98670'; // New color
+    path.setAttribute('fill', newColor);
+};
+
+greatButtonAll.forEach((great) => {
+   great.addEventListener('click', () =>{
+       toggleGreatColor(great);
+      let commentIndex = great.getAttribute('data-index');
+      commentId = parseInt(commentIndex);
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', `../like/${id}/${commentId}`);
+       xhr.onreadystatechange = () => {
+           if (xhr.readyState === XMLHttpRequest.DONE) {
+               cover.hide();
+               if (xhr.status >= 200 && xhr.status < 300) {
+                   const responseJson = JSON.parse(xhr.responseText);
+                   switch (responseJson['result']) {
+                       case 'success':
+                           window.location.href = `../read/${id}`;
+                           break;
+                       case 'not_found' :
+                           window.location.href = `../read/${id}`;
+                           break;
+                       case 'not_signed' :
+                           alert('로그인 정보가 유효하지 않습니다.');
+                           break
+                       default :
+                           alert('알 수 없는 이유로 좋아요를 누를 수 없습니다.');
+                   }
+               } else {
+                   alert('서버와 통신하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
+               }
+           }
+       };
+       xhr.send();
+   });
+});
+
+commentDeleteButtonAll.forEach((deleteComment) => {
+   deleteComment.addEventListener('click', () => {
+       let deleteCommentIndex = deleteComment.getAttribute('data-index');
+       commentId = parseInt(deleteCommentIndex);
+       if (!confirm('정말로 댓글을 삭제할까요?')) {
+           return;
+       }
+       cover.show('댓글을 삭제하고 있습니다.\n\n잠시만 기다려 주세요.');
+       const xhr = new XMLHttpRequest();
+       xhr.open('DELETE', `../delete/${id}/${commentId}`);
+       xhr.onreadystatechange = () => {
+           if (xhr.readyState === XMLHttpRequest.DONE) {
+               cover.hide();
+               if (xhr.status >= 200 && xhr.status < 300) {
+                   const responseJson = JSON.parse(xhr.responseText);
+                   switch (responseJson['result']) {
+                       case 'success':
+                           alert('댓글을 성공적으로 삭제하였습니다.');
+                           window.location.href = `../read/${id}`;
+                           break;
+                       case 'not_found' :
+                           alert('더 이상 존재하지 않는 댓글 정보입니다.');
+                           window.location.href = `../read/${id}`;
+                           break;
+                       case 'not_signed' :
+                           alert('로그인 정보가 유효하지 않습니다.');
+                           break
+                       default :
+                           alert('알 수 없는 이유로 댓글을 삭제하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
+                   }
+               } else {
+                   alert('서버와 통신하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
+               }
+           }
+       };
+       xhr.send();
+   })
+});
+
+replyForm.addEventListener('input', () => {
+    const replyContent = replyForm['content'].value.trim();
+    // 답글 내용이 비어 있거나 '@'로 시작하지 않을 경우
+    if (replyContent === '' || !replyContent.startsWith('@')) {
+        replyButtonAll.forEach((reply) => {
+            reply.dataset.index = commentId; // 댓글 버튼으로 변경
+            showForm(contentForm);
+            hideForm(replyForm);
+        });
+    } else {
+        // '@'로 시작하는 경우, 서버에 제출되지 않도록 설정
+        replyButtonAll.forEach((reply) => {
+            reply.dataset.index = ''; // 서버에 전송하지 않음
+        });
+    }
+});
 replyForm.onsubmit = e => {
     e.preventDefault();
-    if (replyForm['content'].value === '') {
-        alert('댓글을 작성해주세요.');
+    const replyContent = replyForm['content'].value.trim();
+    // 정규 표현식을 사용하여 @닉네임(공백) 부분을 지운 내용 추출
+    const nicknameMatch = /^@(\S+)\s*(.*)/.exec(replyContent);
+    const contentWithoutNickname = nicknameMatch ? nicknameMatch[2] : replyContent;
+    // 답글이 비어있는 경우
+    if (contentWithoutNickname === '') {
+        alert('답글을 작성해주세요.');
         return false;
     }
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
-    formData.append('content', replyForm['content'].value);
+    formData.append('content', contentWithoutNickname);
     xhr.open('POST', `./${id}/reply/${commentId}`);
     xhr.onreadystatechange = () => {
         if (xhr.readyState === XMLHttpRequest.DONE) {
@@ -250,18 +418,17 @@ replyForm.onsubmit = e => {
                 const responseJson = JSON.parse(xhr.responseText);
                 switch (responseJson['result']) {
                     case 'success' :
-                        const id = responseJson['articleId'];
-                        window.location.reload();
+                        window.location.href = `../read/${id}`;
                         break
                     case 'not_found' :
-                        alert('더 이상 존재하지 않는 동행 정보입니다.');
-                        window.location.href = '../';
+                        alert('더 이상 존재하지 않는 댓글 정보입니다.');
+                        window.location.href = `../read/${id}`;
                         break;
                     case 'not_signed' :
                         alert('로그인정보가 유효하지 않습니다.');
                         break
                     default:
-                        warning.show('알 수 없는 이유로 댓글을 작성하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
+                        warning.show('알 수 없는 이유로 답글을 작성하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
                 }
             } else {
                 warning.show('서버와 통신하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
@@ -270,3 +437,6 @@ replyForm.onsubmit = e => {
     };
     xhr.send(formData);
 };
+
+
+

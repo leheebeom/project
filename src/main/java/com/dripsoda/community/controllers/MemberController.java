@@ -1,32 +1,33 @@
 package com.dripsoda.community.controllers;
 
+import com.dripsoda.community.entities.accompany.ArticleEntity;
+import com.dripsoda.community.entities.accompany.ImageEntity;
 import com.dripsoda.community.entities.member.*;
+import com.dripsoda.community.entities.qna.CategoryEntity;
+import com.dripsoda.community.entities.qna.QnaArticleEntity;
 import com.dripsoda.community.enums.CommonResult;
 import com.dripsoda.community.exceptions.RollbackException;
 import com.dripsoda.community.interfaces.IResult;
-import com.dripsoda.community.regex.MemberRegex;
+import com.dripsoda.community.services.AccompanyService;
 import com.dripsoda.community.services.MemberService;
+import com.dripsoda.community.services.QnaService;
 import com.dripsoda.community.utils.CryptoUtils;
 import com.dripsoda.community.utils.FileUtil;
 import com.dripsoda.community.vos.member.LoginVo;
-import org.apache.catalina.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.mail.MessagingException;
-import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,8 +36,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
@@ -44,11 +45,16 @@ import java.util.Optional;
 @RequestMapping(value = "/member")
 public class MemberController {
     private final MemberService memberService;
+    private final QnaService qnaService;
+    private final AccompanyService accompanyService;
 
     @Autowired
-    public MemberController(MemberService memberService) {
+    public MemberController(MemberService memberService, QnaService qnaService, AccompanyService accompanyService) {
         this.memberService = memberService;
+        this.qnaService = qnaService;
+        this.accompanyService = accompanyService;
     }
+
 
     @RequestMapping(value = "userEmailCheck", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
@@ -344,6 +350,197 @@ public class MemberController {
         return modelAndView;
     }
 
+    @RequestMapping(value = "manager", method = RequestMethod.GET)
+    public ModelAndView getManager(ModelAndView modelAndView,
+                                   HttpSession session,
+                                   @RequestParam(value = "tab", required = false, defaultValue = "user") String tab
+    ) {
+        UserEntity user = (UserEntity) session.getAttribute(UserEntity.ATTRIBUTE_NAME);
+        if (user == null) {
+            modelAndView.setViewName("redirect:/member/userLogin");
+            return modelAndView;
+        }
+        if (!user.isAdmin()) {
+            session.invalidate();
+            modelAndView.setViewName("redirect:/member/userLogin");
+            return modelAndView;
+        }
+        if (tab == null || tab.equals("user") || (!tab.equals("accompany") && !tab.equals("qna") && !tab.equals("comment"))) {
+            modelAndView.addObject(ContactCountryEntity.ATTRIBUTE_NAME_PLURAL, this.memberService.getContactCountries());
+        }
+        modelAndView.addObject(UserEntity.ATTRIBUTE_NAME_PLURAL, this.memberService.getUsers());
+        modelAndView.addObject(ArticleEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getArticles());
+        modelAndView.addObject(ChatEntity.ATTRIBUTE_NAME_PLURAL, this.memberService.getChats());
+//        modelAndView.addObject(QnaArticleEntity.ATTRIBUTE_NAME_PLURAL,  this.qnaService.get)
+        modelAndView.setViewName("member/manager");
+        return modelAndView;
+    }
+
+
+    @RequestMapping(value = "manager/write", method = RequestMethod.GET)
+    public ModelAndView getWrite(
+            @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+            HttpSession session,
+            ModelAndView modelAndView
+    ) {
+        if (user == null) {
+            modelAndView.setViewName("redirect:/member/userLogin");
+            return modelAndView;
+        }
+        if (!user.isAdmin()) {
+            session.invalidate();
+            modelAndView.setViewName("redirect:/member/userLogin");
+            return modelAndView;
+        }
+        modelAndView.addObject(CategoryEntity.ATTRIBUTE_NAME_PLURAL, this.qnaService.getCategories());
+        modelAndView.setViewName("member/write");
+        return modelAndView;
+    }
+
+
+    @RequestMapping(value = "manager/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String postWrite(
+            @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user,
+            QnaArticleEntity qnaArticle,
+            @RequestParam(value = "categoryId") int categoryId
+    ) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM--dd");
+        qnaArticle.setIndex(-1)
+                .setCategoryId(categoryId)
+                .setUserEmail(user.getEmail())
+                .setCreatedAt(new Date());
+        IResult result = this.qnaService.putArticle(qnaArticle);
+        JSONObject responseJson = new JSONObject();
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        if (result == CommonResult.SUCCESS) {
+            responseJson.put("id", qnaArticle.getIndex());
+        }
+        return responseJson.toString();
+    }
+    //qna게시판은 일반 회원 접근 불가 + coverImage가 없기 때문에 새로 만들어야됨. // 유지 보수 측면에서 동행 게시판과는 다르기 때문에 장점이 될 수 있어서 다른 게시판을 하나 더 생성해야되겠다.
+    //qna 게시판의 종류는 - 공지사항, 이벤트, qna 총 3가지 category설정해야됨. 인덱스 값 주고 value 값으로 3가지만 주면 될듯.
+// read의 경우 /member/manage/write가 아니라 /qna/read가 되어야 되기 때문 //
+
+    @RequestMapping(value = "manager/read/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String deleteRead(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+                             @PathVariable(value = "id") int id) {
+        JSONObject responseJson = new JSONObject();
+        int categoryId = this.qnaService.getCategoryId(id);
+        QnaArticleEntity qnaArticle = this.qnaService.getArticle(id, categoryId);
+        if (qnaArticle == null) {
+            responseJson.put(IResult.ATTRIBUTE_NAME, CommonResult.FAILURE);
+            return responseJson.toString();
+        }
+        //i라는 이름은 inaccessible 보여지는 이름을 완전히 보여주는건 올바르지 않다고 생각.
+        if (user == null || !user.isAdmin() && !user.getEmail().equals(qnaArticle.getUserEmail())) {
+            responseJson.put(IResult.ATTRIBUTE_NAME, "i");
+            return responseJson.toString();
+        }
+        IResult result = this.qnaService.deleteQnaArticle(id);
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
+
+    @RequestMapping(value = "manager/image/{id}", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getImage(@PathVariable(value = "id") int id) {
+        ImageEntity image = this.accompanyService.getImage(id);
+        if (image == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        HttpHeaders headers = new HttpHeaders();
+        String[] mimeArray = image.getMime().split("/");
+        String mimeType = mimeArray[0];
+        String mimeSubType = mimeArray[1];
+        headers.setContentLength(image.getData().length);
+        headers.setContentType(new MediaType(mimeType, mimeSubType, StandardCharsets.UTF_8));
+        return new ResponseEntity<>(image.getData(), headers, HttpStatus.OK);
+    }
+
+
+    @RequestMapping(value = "manager/image", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String postImage(
+            @RequestParam(value = "upload") MultipartFile upload,
+            @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user
+    ) throws IOException {
+        ImageEntity image = ImageEntity.build()
+                .setUserEmail(user.getEmail())
+                .setCreatedAt(new Date())
+                .setName(upload.getOriginalFilename())
+                .setMime(upload.getContentType())
+                .setData(upload.getBytes());
+        IResult result = this.accompanyService.uploadImage(image);
+        JSONObject responseJson = new JSONObject();
+        if (result == CommonResult.SUCCESS) {
+            responseJson.put("url", String.format("http://localhost:8080/member/manager/image/%d", image.getIndex()));
+        } else {
+            JSONObject errorJson = new JSONObject();
+            errorJson.put("message", "이미지 업로드에 실패하였습니다. 잠시 후 다시 시도해주세요.");
+            responseJson.put("error", errorJson);
+        }
+        return responseJson.toString();
+    }
+
+    //qna 글 수정
+    @RequestMapping(value = "manager/modify/{id}", method = RequestMethod.GET)
+    public ModelAndView getModify(
+            @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+            @PathVariable(value = "id") int id,
+            HttpSession session,
+            ModelAndView modelAndView
+    ) {
+        if (user == null) {
+            modelAndView.setViewName("redirect:/member/userLogin");
+            return modelAndView;
+        }
+        if (!user.isAdmin()) {
+            session.invalidate();
+            modelAndView.setViewName("redirect:/member/userLogin");
+            return modelAndView;
+        }
+        modelAndView.setViewName("member/modify");
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "manager/modify/{id}", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String patchModify(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+                              @PathVariable(value = "id") int id,
+                              HttpServletResponse response) throws JsonProcessingException {
+        int categoryId = this.qnaService.getCategoryId(id);
+        QnaArticleEntity qnaArticle = this.qnaService.getArticle(id, categoryId);
+        if (qnaArticle == null) {
+            response.setStatus(404);
+            return null;
+        }
+        if (user == null || !user.isAdmin() && !user.getEmail().equals(qnaArticle.getUserEmail())) {
+            response.setStatus(403);
+            return null;
+        }
+        return new ObjectMapper().writeValueAsString(qnaArticle);
+    }
+
+    @RequestMapping(value = "manager/modify/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String postModify(
+            @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user,
+            @PathVariable(value = "id") int id,
+            QnaArticleEntity qnaArticle
+    ) throws IOException, ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        int categoryId = this.qnaService.getCategoryId(id);
+        qnaArticle.setIndex(id)
+                .setUserEmail(user.getEmail())
+                .setCategoryId(categoryId);
+        IResult result = this.qnaService.modifyQnaArticle(qnaArticle);
+        JSONObject responseJson = new JSONObject();
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
+
+
     @RequestMapping(value = "userMy", method = RequestMethod.GET)
     public ModelAndView getUserMy(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
                                   @RequestParam(value = "tab", required = false, defaultValue = "info") String tab,
@@ -514,6 +711,80 @@ public class MemberController {
         session.removeAttribute(UserEntity.ATTRIBUTE_NAME);
         return responseJson.toString();
     }
+
+
+    @RequestMapping(value = "chatMessage/{rid}", method = RequestMethod.GET)
+    @ResponseBody
+    public String getChatMessage(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+                                 @PathVariable(value = "rid", required = false) int rid) {
+        JSONObject responseJson = new JSONObject();
+        if (user == null) {
+            responseJson.put(IResult.ATTRIBUTE_NAME, false);
+        }
+        if (!(rid == 1 || rid == 2)) {
+            responseJson.put(IResult.ATTRIBUTE_NAME, false);
+        }
+        return responseJson.toString();
+    }
+
+    @RequestMapping(value = "chatMessage/{rid}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String postChatMessage(
+            @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user,
+            @RequestParam(value = "rid", required = false) int rid,
+            @RequestParam(value = "content") String content
+    ) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
+        JSONObject responseJson = new JSONObject();
+        IResult result = this.memberService.putChat(user, rid, content);
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        if (result == CommonResult.SUCCESS) {
+            responseJson.put("rid", rid);
+        }
+        return responseJson.toString();
+    }
+
+    //관리자가 채팅 보냄 - 보낸 사람의 인덱스 번호로  답변하기 -
+    @RequestMapping(value = "managerMessage/{id}", method = RequestMethod.GET)
+    public ModelAndView getManagerMessage(
+            HttpServletResponse response,
+            HttpSession session,
+            @PathVariable(value = "id") int id,
+            ModelAndView modelAndView
+    ) {
+        UserEntity user = (UserEntity) session.getAttribute(UserEntity.ATTRIBUTE_NAME);
+        ChatEntity chat = this.memberService.getChatbyIndex(id);
+        if(chat == null) {
+            response.setStatus(404);
+            modelAndView.setViewName("error/error"); // 커스텀 에러 페이지로 이동하도록 설정
+            return modelAndView;
+        }
+        if (user == null || !user.isAdmin()) {
+            // 유저가 로그인하지 않았거나, 관리자 권한이 없는 경우 404 Forbidden 응답 반환
+            response.setStatus(404);
+            modelAndView.setViewName("error/error"); // 커스텀 에러 페이지로 이동하도록 설정
+            return modelAndView;
+        }
+        modelAndView.setViewName("member/managerChat");
+        return modelAndView;
+    }
+    @RequestMapping(value = "managerMessage/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String  postManagerMessage(
+            @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user,
+            @PathVariable(value = "id") int id,
+            @RequestParam(value = "content") String content
+    ) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM--dd");
+        ChatEntity chat = this.memberService.getChatbyIndex(id);
+        IResult result = this.memberService.putMnagerChat(chat, user, content);
+        JSONObject responseJson = new JSONObject();
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        if (result == CommonResult.SUCCESS) {
+//            responseJson.put("id", qnaArticle.getIndex());
+        }
+        return responseJson.toString();
+    }
+
 }
 
 

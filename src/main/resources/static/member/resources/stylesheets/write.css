@@ -1,0 +1,77 @@
+@charset "UTF-8";
+
+body {
+    background-color: rgb(var(--body-background-color-dim));
+}
+
+body > .main {
+    padding: 3rem 0;
+}
+
+body > .main > .form {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+body > .main > .form > * + * {
+    margin-top: 2rem;
+}
+
+body > .main > .form > .cover-image-container {
+    height: 20rem;
+    border: 0.0625rem solid rgb(230, 230, 230);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    position: relative;
+}
+
+body > .main > .form > .content-container > .content {
+    height: auto;
+    min-height: 20rem;
+    margin-top: -1rem;
+    resize: vertical;
+}
+
+body > .main > .form > .warning {
+    color: rgb(231, 76, 60);
+    display: none;
+}
+
+body > .main > .form > .warning.visible {
+    display: block;
+}
+
+body > .main > .form > .button-container {
+    align-items: stretch;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+body > .main > .form > .button-container > * {
+    flex: 1;
+}
+
+body > .main > .form > .button-container > * + * {
+    margin-left: 1rem;
+}
+
+body > .main > .form > .button-container > .back {
+    background-color: rgb(var(--body-color-inactive));
+}
+
+body > .main > .form > .button-container > .back:hover {
+    background-color: rgb(130, 130, 130);
+}
+
+
+
+
+
+
+
+
+
+

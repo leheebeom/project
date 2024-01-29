@@ -12,6 +12,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -31,14 +33,17 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
-@SpringBootApplication(exclude={SecurityAutoConfiguration.class})
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @Controller(value = "com.dripsoda.community.controllers.AccompanyController")
 @RequestMapping(value = "/accompany")
 public class AccompanyController {
     private final AccompanyService accompanyService;
     private final MemberService memberService;
+    private static final Logger logger = LoggerFactory.getLogger(AccompanyController.class);
+
 
     @Autowired
     public AccompanyController(AccompanyService accompanyService, MemberService memberService) {
@@ -48,6 +53,7 @@ public class AccompanyController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView getIndex(ModelAndView modelAndView) {
+
         modelAndView.setViewName("accompany/index");
         return modelAndView;
     }
@@ -242,8 +248,10 @@ public class AccompanyController {
             response.addCookie(newCookie);
         }
         //댓글 보여지는 화면
+
         modelAndView.addObject("articleId", id);
-        modelAndView.addObject(CommentEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getCommentsByArticleIndex(id));
+        //ex 2번 글이면 2번글에 대한 모든 댓글 조회
+        modelAndView.addObject(CommentEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getArticleCommentsByArticleIndex(id));
         modelAndView.setViewName("accompany/read");
 
         return modelAndView;
@@ -270,12 +278,39 @@ public class AccompanyController {
         return responseJson.toString();
     }
 
+    //읽는 페이지에서 댓글수정이 이루어져야됨.
+    @RequestMapping(value = "read/{id}", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String patchModify(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+                              @PathVariable(value = "id") Integer id,
+                              HttpServletResponse response,
+                              @RequestParam(value = "commentIndex", required = false) Integer commentIndex,
+                              @RequestParam(value = "content", required = false) String content) throws JsonProcessingException {
+        ArticleEntity article = this.accompanyService.getArticle(id);
+        CommentEntity comment = this.accompanyService.getCommentIndex(commentIndex);
+        if (article == null) {
+            response.setStatus(404);
+            return null;
+        }
+        if (comment == null) {
+            response.setStatus(404);
+            return null;
+        }
+        if (user == null || !user.getEmail().equals(comment.getUserEmail())) {
+            response.setStatus(403);
+            return null;
+        }
+        return new ObjectMapper().writeValueAsString(comment);
+    }
+
+    //관리자 볼 수 있는 전체 댓글 http로 던짐.
+
     @RequestMapping(value = "read/{id}/comments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CommentEntity>> getComment(
             @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
             @PathVariable(value = "id") Integer id
     ) {
-        if (user == null) {
+        if(user == null || !user.isAdmin()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         List<CommentEntity> comments = this.accompanyService.getAllCommentsForArticle(id);
@@ -294,18 +329,18 @@ public class AccompanyController {
         // 댓글 작성을 처리하기 위한 서비스 메소드 호출
         ArticleEntity article = this.accompanyService.getArticle(id);
         // 게시글 값이 널이면 404
-        if(article == null) {
+        if (article == null) {
             response.setStatus(404);
             return null;
         }
         //comment 객체 빌드 - id 값은 path의 id 값, 세션의 유저 이메일 값. 만약 session의 유저 값이 없으면 로그인 화면 - 로그인 하고 오라고 하기,
 
         //reply 이 있으면 parentIndex 값이 commentIndex , 없으면 parentIndex 값이 null
-        IResult result = accompanyService.createComment(user,id,newComment);
+        IResult result = accompanyService.createComment(user, id, newComment);
         JSONObject responseJson = new JSONObject();
         responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
 
-        if(result == CommonResult.SUCCESS) {
+        if (result == CommonResult.SUCCESS) {
             System.out.println("값 석세스임 이제");
             responseJson.put("articleId", newComment.getArticleIndex());
             responseJson.put("id", newComment.getIndex());
@@ -319,27 +354,87 @@ public class AccompanyController {
     @ResponseBody
     public String postReply(@PathVariable(value = "id") Integer id,
                             @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
-                              HttpServletResponse response,
+                            HttpServletResponse response,
                             @PathVariable(value = "commentId") Integer commentId,
                             @ModelAttribute("newReply") CommentEntity newReply) throws JsonProcessingException {
         // 댓글 작성을 처리하기 위한 서비스 메소드 호출
         ArticleEntity article = this.accompanyService.getArticle(id);
         CommentEntity comment = this.accompanyService.getCommentIndex(commentId);
         // 게시글 값이 널이면 404
-        if(article == null) {
+        if (article == null) {
             response.setStatus(404);
             return null;
         }
-        if(comment == null) {
+        if (comment == null) {
             response.setStatus(404);
             return null;
         }
-        IResult result = accompanyService.replyComment(user,id,commentId,newReply);
+        IResult result = accompanyService.replyComment(user, id, commentId, newReply);
         JSONObject responseJson = new JSONObject();
         responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
         return responseJson.toString();
     }
 
+    @RequestMapping(value = "modify/{id}/{commentId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String commentModify(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user,
+                                @PathVariable(value = "id") Integer id,
+                                @PathVariable(value = "commentId") Integer commentId,
+                                CommentEntity comment) {
+        comment.setIndex(commentId)
+                .setArticleIndex(id)
+                .setUserEmail(user.getEmail());
+        IResult result = this.accompanyService.modifyComment(comment);
+        JSONObject responseJson = new JSONObject();
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
+
+    @RequestMapping(value = "delete/{id}/{commentId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String deleteComment(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+                                @PathVariable(value = "id") Integer id,
+                                @PathVariable(value = "commentId") Integer commentId) {
+        JSONObject responseJson = new JSONObject();
+        CommentEntity comment = this.accompanyService.getCommentIndex(commentId);
+        if (comment == null) {
+            responseJson.put(CommonResult.ATTRIBUTE_NAME, CommentResult.NOT_FOUND);
+            return responseJson.toString();
+        }
+        if (user == null || !user.isAdmin() && !user.getEmail().equals(comment.getUserEmail())) {
+            responseJson.put(CommentResult.ATTRIBUTE_NAME, CommentResult.NOT_SIGNED);
+            return responseJson.toString();
+        }
+        IResult result = this.accompanyService.deleteComment(id,commentId);
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
+
+    //좋아요
+    @RequestMapping(value = "like/{id}/{commentId}",method = RequestMethod.PUT)
+    @ResponseBody
+    public String putLikeComment(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+                                 @PathVariable(value = "id") Integer id,
+                                 @PathVariable(value = "commentId") Integer commentId,
+                                 CommentLikeEntity commentLike,
+                                 HttpServletResponse response
+    ) {
+        JSONObject responseJson = new JSONObject();
+        ArticleEntity article = this.accompanyService.getArticle(id);
+        CommentEntity comment = this.accompanyService.getCommentIndex(commentId);
+        if(user == null) {
+            responseJson.put(CommentResult.ATTRIBUTE_NAME, CommentResult.NOT_SIGNED.name().toLowerCase());
+            return responseJson.toString();
+        }
+        commentLike.setUserEmail(user.getEmail());
+        commentLike.setArticleIndex(id);
+        commentLike.setCommentIndex(commentId);
+
+        IResult result = this.accompanyService.addCommentLike(user,id,commentId);
+        //매퍼 마저 작성.
+        responseJson.put(CommonResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
 
     @RequestMapping(value = "read/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

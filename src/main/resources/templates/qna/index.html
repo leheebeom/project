@@ -13,7 +13,7 @@
 <main class="_main main">
     <ul class="nav box" th:with="tab = ${#request.getParameter('tab')}">
         <li class="item"
-            th:selected="${tab == null || tab.equals('help') || (!tab.equals('event') && !tab.equals('qna') && !tab.equals('question'))}">
+            th:selected="${tab == null || tab.equals('help') || (!tab.equals('event') && !tab.equals('qna'))}">
             <a class="link" th:href="@{./ (tab=help)}">
                 <span class="text">공지사항</span>
             </a>
@@ -28,27 +28,135 @@
                 <span class="text">qna</span>
             </a>
         </li>
-        <li class="item" th:selected="${tab != null && tab.equals('question')}">
-            <a class="link" th:href="@{./ (tab=question)}">
-                <span class="text">문의하기</span>
-            </a>
-        </li>
+<!--        <li class="item" th:selected="${tab != null && tab.equals('question')}">-->
+<!--            <a class="link" th:href="@{./ (tab=question)}">-->
+<!--                <span class="text">문의하기</span>-->
+<!--            </a>-->
+<!--        </li>-->
+        <!--        <li class="item" th:if="${userMaster.getStatusValue() == 'MAS'}">-->
+        <!--            <a class="link">관리자 페이지</a>-->
+        <!--        </li>-->
     </ul>
     <th:block th:switch="${#request.getParameter('tab')}">
-        <section class="content box help" th:case="'help'">
-            <h2 class="title">공지사항</h2>
-            <th:block th:replace="~{fragments/qna/help.html :: content}"></th:block>
-        </section>
+
         <section class="content box event" th:case="'event'">
             <h2 class="title">이벤트</h2>
-            <th:block th:replace="~{fragments/qna/event.html :: content}"></th:block>
+            <div class="content">
+                <div class="list_wrap">
+                    <div class="thead">
+                        <div class="tr" th:each="event : ${eventQna}">
+                            <span class="th sort">번호</span>
+                            <span class="th subject">제목</span>
+                            <span class="th date">작성일</span>
+                            <span class="th count">조회수</span>
+                        </div>
+                    </div>
+                    <form id="eventForm">
+                        <div class="tbody">
+                            <div>
+                                <div class="tr notice">
+                                    <div class="td merged-cell" th:if="${eventQna == null}">게시글이 존재하지 않습니다.</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="pagination">
+                <div class="pagination_wrap">
+                    <ul id="eventPageContainer">
+                        <li class="page">
+                            <a class="btn_num">1</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </section>
         <section class="content box qna" th:case="'qna'">
             <h2 class="title">qna</h2>
-            <th:block th:replace="~{fragments/qna/help.html :: content}"></th:block>
+            <div class="content">
+                <ul class="list_wrap">
+                    <li class="thead" th:each="qnaQna : ${qnaQna}">
+                        <span th:text="${qnaQna.getTitle()}"></span>
+                        <div class="more-container">
+                            <a th:href="@{'/qna/read/' + ${qnaQna.getIndex()}}">
+                                <p>상세보기</p>
+                            </a>
+                            <div class="more-icon">
+                                <svg width="8" height="14" viewBox="0 0 8 14" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg" style="cursor: pointer;">
+                                    <path d="M1 1L7 7L1 13" stroke="#00CE7C" stroke-width="1"
+                                          stroke-linecap="square"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </li>
+                    <form id="qnaForm">
+                        <div class="tbody">
+                            <div>
+                                <div class="tr notice">
+                                    <div class="td merged-cell" th:if="${qnaQna == null}">게시글이 존재하지 않습니다.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </ul>
+            </div>
+            <div class="pagination">
+                <div class="pagination_wrap">
+                    <ul id="qnaPageContainer">
+                        <li class="page">
+                            <a class="btn_num">1</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </section>
-        <section class="content box question" th:case="'question'">
-            <h2 class="title">문의하기</h2>
+<!--        <section class="content box question" th:case="'question'">-->
+<!--            <h2 class="title">문의하기</h2>-->
+<!--        </section>-->
+        <section class="content box help" th:case="*">
+            <h2 class="title">공지사항</h2>
+            <div class="content">
+                <div class="list_wrap">
+                    <div class="thead">
+                        <div class="tr head">
+                            <span class="th sort">번호</span>
+                            <span class="th subject">제목</span>
+                            <span class="th date">작성일</span>
+                            <span class="th count">조회수</span>
+                        </div>
+                        <div class="tr " th:each="help, iterStat : ${helpQna}">
+                            <span class="th sort" th:text="${iterStat.count}">번호</span>
+                            <span class="th subject"><a th:text="${help.getTitle()}"
+                                                        th:href="@{'/qna/read/' + ${help.getIndex()}}"></a>
+                            </span>
+                            <span class="th date" th:text="${#dates.format(help.getCreatedAt(),'yy-MM-dd')}">작성일</span>
+                            <span class="th count" th:text="${help.getViewCount()}">조회수</span>
+                        </div>
+                    </div>
+                    <form id="viewMenuForm">
+                        <div class="tbody">
+                            <div>
+                                <div class="tr notice">
+                                    <div class="td merged-cell" th:if="${helpQna == null}">게시글이 존재하지 않습니다.</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="pagination">
+                <div class="pagination_wrap">
+                    <ul id="helpPageContainer">
+                        <li class="page">
+                            <a class="btn_num">1</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </section>
     </th:block>
 </main>

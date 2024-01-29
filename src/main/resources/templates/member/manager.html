@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>DRIPSODA :: 혼자여도 괜찮은 여행, 드립소다</title>
+    <th:block th:insert="~{fragments/head.html :: content}"></th:block>
+    <link rel="stylesheet" th:href="@{/member/resources/stylesheets/manager.css}">
+    <script defer th:src="@{/member/resources/scripts/manager.js}"></script>
+</head>
+<body class="_layout-hmf">
+<th:block th:replace="~{fragments/header.html :: content}"></th:block>
+<main class="_main main">
+    <ul class="nav box" th:with="tab = ${#request.getParameter('tab')}">
+        <li class="item"
+            th:selected="${tab == null || tab.equals('user') || (!tab.equals('accompany') && !tab.equals('comment') && !tab.equals('qna'))}">
+            <a class="link" th:href="@{./manager (tab=user)}">
+                <span class="text">유저</span>
+            </a>
+        </li>
+        <li class="item" th:selected="${tab != null && tab.equals('accompany')}">
+            <a class="link" th:href="@{./manager (tab=accompany)}">
+                <span class="text">동행 게시글</span>
+            </a>
+        </li>
+        <li class="item" th:selected="${tab != null && tab.equals('comment')}">
+            <a class="link" th:href="@{./manager (tab=comment)}">
+                <span class="text">댓글</span>
+            </a>
+        </li>
+        <li class="item" th:selected="${tab != null && tab.equals('qna')}">
+            <a class="link" th:href="@{./manager (tab=qna)}">
+                <span class="text">qna</span>
+            </a>
+        </li>
+        <!--        <li class="item" th:if="${userMaster.getStatusValue() == 'MAS'}">-->
+        <!--            <a class="link">관리자 페이지</a>-->
+        <!--        </li>-->
+    </ul>
+    <th:block th:switch="${#request.getParameter('tab')}">
+        <section class="content box accompany" th:case="'accompany'">
+            <h2 class="title">동행 게시글</h2>
+        </section>
+        <section class="content box comment" th:case="'comment'">
+            <h2 class="title">댓글</h2>
+        </section>
+        <section class="content box qna" th:case="'qna'">
+            <h2 class="title">qna</h2>
+            <a class="_object-button" th:href="@{./manager/write}">공지사항 쓰기</a>
+            <h2 class="title">문의 사항</h2>
+            <table class="board-table" >
+                <thead>
+                <tr>
+                    <th>이메일</th>
+                    <th>내용</th>
+                    <th>보낸시간</th>
+                    <th>확인여부</th>
+                    <th>답장하러가기</th>
+                </tr>
+                </thead>
+                <tbody class="table-text" th:each="userChatList : ${memberChats}">
+                <tr>
+                    <td th:text="${userChatList.getSendUserEmail()}"></td>
+                    <td th:text="${userChatList.getContent()}"></td>
+                    <td th:text="${#dates.format(userChatList.getSendTime(), 'yyyy-MM-dd : HH:mm:ss')}"></td>
+                    <td th:text="${userChatList.readChecked}"></td>
+                    <td class="send">
+                        <a th:href="'./managerMessage/' + ${userChatList.getIndex()}">답장하기</a>
+                    </td>
+                </tr>
+                </tbody>
+
+            </table>
+            <table></table>
+
+        </section>
+        <section class="content box user" th:case="*">
+            <h2 class="title">회원</h2>
+            <table class="board-table" >
+                <thead>
+                <tr>
+                    <th>이메일</th>
+                    <th>이름</th>
+                    <th>전화번호</th>
+                    <th>상태</th>
+                    <th>관리 등급</th>
+                    <th>회원가입 날짜</th>
+                </tr>
+                </thead>
+                <tbody class="table-text" th:each="memberList : ${memberUsers}">
+                <tr>
+                    <td th:text="${memberList.getEmail()}"></td>
+                    <td th:text="${memberList.getName()}"></td>
+                    <td th:text="${memberList.getContact()}"></td>
+                    <td th:text="${memberList.getStatusValue()}"></td>
+                    <td th:text="${memberList.isAdmin()}"></td>
+                    <td th:text="${#dates.format(memberList.getRegisteredAt(), 'yyyy-MM-dd')}"></td>
+                </tr>
+                </tbody>
+
+            </table>
+            <table></table>
+        </section>
+    </th:block>
+</main>
+<th:block th:replace="~{fragments/footer.html :: content}"></th:block>
+</body>
+</html>
