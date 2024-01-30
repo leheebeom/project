@@ -51,7 +51,7 @@ const cover = {
 
 const _writeButton = window.document.getElementById('_writeButton');
 const _writeMenu = window.document.getElementById('_writeMenu');
-
+const searchForm = window.document.getElementById('searchForm');
 _writeButton?.addEventListener('click', () => {
     if (_writeMenu?.classList.contains('visible')) {
         _writeMenu?.classList.remove('visible');
@@ -65,7 +65,18 @@ _writeMenu?.addEventListener('mouseleave', () => {
 const loginButton = window.document.getElementById('loginButton');
 const myButton = window.document.getElementById('myButton');
 
-
+searchForm.onsubmit = e => {
+  e.preventDefault();
+  cover.show('동행 게시글 검색 중입니다.\n\n잠시만 기다려주세요.');
+  if(searchForm['keyword'].value === '') {
+      alert('검색어를 입력해주세요.');
+      return false;
+  }
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+    formData.append('keyword', searchForm['keyword'].value);
+    xhr.open()
+};
 
 
 

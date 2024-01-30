@@ -182,9 +182,9 @@ chatMessageForm.onsubmit = e => {
         return false;
     }
     const xhr = new XMLHttpRequest();
-    const formDate = new FormData();
-    formDate.append('content', chatMessageForm['content'].value);
-    formDate.append('rid', chatMessageForm['rid'].value);
+    const formData = new FormData();
+    formData.append('content', chatMessageForm['content'].value);
+    formData.append('rid', chatMessageForm['rid'].value);
     xhr.open('POST', `./member/chatMessage/${rid}`);
     xhr.onreadystatechange = () => {
         if (xhr.readyState === XMLHttpRequest.DONE) {
@@ -211,7 +211,7 @@ chatMessageForm.onsubmit = e => {
             }
         }
     };
-    xhr.send(formDate);
+    xhr.send(formData);
 }
 
 function showCurrentTime() {
