@@ -1,9 +1,6 @@
 package com.dripsoda.community.services;
 
-import com.dripsoda.community.dtos.accompany.ArticleBestTravleDto;
-import com.dripsoda.community.dtos.accompany.ArticleCommentDto;
-import com.dripsoda.community.dtos.accompany.ArticleRecentListDto;
-import com.dripsoda.community.dtos.accompany.ArticleSearchDto;
+import com.dripsoda.community.dtos.accompany.*;
 import com.dripsoda.community.entities.accompany.*;
 import com.dripsoda.community.entities.member.UserEntity;
 import com.dripsoda.community.enums.CommonResult;
@@ -291,6 +288,9 @@ public class AccompanyService {
         return this.accompanyMapper.selectArticles();
     }
 
+    public List<ArticleKeywordDto> getArticlesForKeyword(String keyword) {
+        return this.accompanyMapper.selectArticlesForKeyword(keyword);
+    }
 
     public List<ArticleBestTravleDto> getArticlesForRecent() {
         return this.accompanyMapper.selectArticlesForRecent();

@@ -2,7 +2,7 @@ package com.dripsoda.community.models;
 
 public class PagingModel {
     public static final int DEFAULT_PAGINATION_COUNT = 10; // paginationCount 기본값
-    public static final int DEFAULT_ROW_COUNT_PER_PAGE = 20; // rowCountPerPage 기본값
+    public static final int DEFAULT_ROW_COUNT_PER_PAGE = 10; // rowCountPerPage 기본값
 
     public static final int PAGE_RANGE_FACTOR = 5;
     public final int paginationCount; // 페이지 하단에 표시할 페이지 버튼의 개수 (기본값 DEFAULT_PAGINATION_COUNT)

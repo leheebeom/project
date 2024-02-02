@@ -52,8 +52,7 @@ public class AccompanyController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView getIndex(ModelAndView modelAndView) {
-
+    public ModelAndView getIndex(ModelAndView modelAndView){
         modelAndView.setViewName("accompany/index");
         return modelAndView;
     }
@@ -118,6 +117,19 @@ public class AccompanyController {
         responseJson.put(RegionEntity.ATTRIBUTE_NAME_PLURAL, regionsJson);
         return responseJson.toString();
     }
+
+    @RequestMapping(value = "search", method = RequestMethod.GET)
+    public ModelAndView getSearch(ModelAndView modelAndView,
+            @RequestParam(value = "keyword",required = false)String keyword){
+
+        if(keyword != null) {
+            modelAndView.addObject("articlesForKeyword", this.accompanyService.getArticlesForKeyword(keyword));
+            modelAndView.addObject("keyword", keyword);
+        }
+        modelAndView.setViewName("accompany/search");
+        return modelAndView;
+    }
+
 
     //
     @RequestMapping(value = "cover-image/{id}", method = RequestMethod.GET)

@@ -273,9 +273,6 @@ body > .main > .travel-search-container {
     width: 100%;
     height: auto;
     margin: 30px auto 0px;
-    display: none;
-}
-body > .main > .travel-search-container.visible {
     display: block;
 }
 
@@ -396,15 +393,11 @@ body > .main > .travel-search-container > .travel-search > .no-search-text-conta
     box-sizing: border-box;
     width: 100%;
     height: auto;
-    display: none;
+    display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1.5rem;
     margin-top: 2rem;
 }
-._main > .travel_menu_container.visible {
-    display: grid;
-}
-
 ._main > .travel_menu_container > .accompany {
     display: flex;
     flex-direction: column;

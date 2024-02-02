@@ -100,6 +100,13 @@
 
     </select>
 
+    <select id="selectArticleTotalCount"
+    resultType="int">
+        SELECT count(*)
+        FROM `dripsoda_qna`.`qna_articles`
+        where `category_id` = #{categoryId}
+    </select>
+
     <select id="selectQnaArticlesByHelp"
             resultType="com.dripsoda.community.entities.qna.QnaArticleEntity">
         SELECT `index`       as `index`,
@@ -111,6 +118,21 @@
                `view_count`  as `viewCount`
         FROM `dripsoda_qna`.`qna_articles`
         where `category_id` = 1
+        LIMIT #{count} offset #{offset}
+    </select>
+
+    <select id="selectArticleByCategoryIdAndPaging"
+            resultType="com.dripsoda.community.entities.qna.QnaArticleEntity">
+        SELECT `index`       as `index`,
+               `category_id` as `categoryId`,
+               `user_email`  as `userEmail`,
+               `created_at`  as `createdAt`,
+               `title`       as `title`,
+               `content`     as `content`,
+               `view_count`  as `viewCount`
+        FROM `dripsoda_qna`.`qna_articles`
+        where `category_id` = #{categoryId}
+        LIMIT #{count} offset #{offset}
     </select>
     <select id="selectQnaArticlesByEvent"
             resultType="com.dripsoda.community.entities.qna.QnaArticleEntity">
@@ -123,6 +145,7 @@
                `view_count`  as `viewCount`
         FROM `dripsoda_qna`.`qna_articles`
         where `category_id` = 2
+        LIMIT 12
     </select>
     <select id="selectQnaArticlesByQna"
             resultType="com.dripsoda.community.entities.qna.QnaArticleEntity">
@@ -135,6 +158,7 @@
                `view_count`  as `viewCount`
         FROM `dripsoda_qna`.`qna_articles`
         where `category_id` = 3
+        LIMIT 12
     </select>
     <update id="updateQnaArticle"
             parameterType="com.dripsoda.community.entities.qna.QnaArticleEntity">

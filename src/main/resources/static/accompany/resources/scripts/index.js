@@ -263,11 +263,3 @@ more.addEventListener('click', () => {
 
 
 
-
-
-
-
-
-
-
-

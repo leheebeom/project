@@ -7,13 +7,7 @@
             <li class="item">
                 <a class="link" th:href="@{/accompany/write}">
                     <i class="icon fa-solid fa-envelope"></i>
-                    <span class="text">여행친구 찾기</span>
-                </a>
-            </li>
-            <li class="item">
-                <a class="link" th:href="@{/qna/write}">
-                    <i class="icon fa-solid fa-circle-question"></i>
-                    <span class="text">여행 질문하기</span>
+                    <span class="text">동행모집 하기</span>
                 </a>
             </li>
         </ul>
@@ -33,11 +27,11 @@
             </li>
         </ul>
         <div id="searchFormContainer" class="search-form-container">
-            <form class="search-form" method="get" id="searchForm">
+            <form class="search-form" th:action="@{/accompany/search}" method="get" id="searchForm">
                 <label class="input-container">
-                    <span hidden>여행 qna을 검색해보세요!</span>
+                    <span hidden>동행 게시글을 검색해보세요!</span>
                     <i class="icon fa-solid fa-magnifying-glass"></i>
-                    <input class="input" maxlength="50" name="keyword" placeholder="여행 qna을 검색해보세요!" type="text">
+                    <input class="input" maxlength="50" name="keyword" placeholder="동행 게시글을 검색해보세요!" type="text">
                 </label>
             </form>
         </div>

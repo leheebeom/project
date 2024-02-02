@@ -1,9 +1,6 @@
 package com.dripsoda.community.mappers;
 
-import com.dripsoda.community.dtos.accompany.ArticleBestTravleDto;
-import com.dripsoda.community.dtos.accompany.ArticleCommentDto;
-import com.dripsoda.community.dtos.accompany.ArticleRecentListDto;
-import com.dripsoda.community.dtos.accompany.ArticleSearchDto;
+import com.dripsoda.community.dtos.accompany.*;
 import com.dripsoda.community.entities.accompany.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -30,6 +27,7 @@ public interface IAccompanyMapper {
     ArticleSearchDto[] selectArticlesForSearch(@Param(value = "region") RegionEntity region,
                                                @Param(value = "lastArticleIndex") int lastArticleIndex);
 
+    List<ArticleKeywordDto> selectArticlesForKeyword(@Param(value = "keyword") String keyword);
     ContinentEntity[] selectContinents();
 
     CountryEntity[] selectCountries();

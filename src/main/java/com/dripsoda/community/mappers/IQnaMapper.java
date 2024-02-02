@@ -11,10 +11,13 @@ import java.util.List;
 @Mapper
 public interface IQnaMapper {
 
-    int deleteQnaArticle(@Param(value = "index")int index);
+    int deleteQnaArticle(@Param(value = "index") int index);
+
     int insertArticle(QnaArticleEntity article);
 
     int updateQnaArticle(QnaArticleEntity qnaArticle);
+
+    int selectArticleTotalCount(@Param(value = "categoryId") int categoryId);
 
     void updateView(@Param(value = "index") int index);
 
@@ -23,13 +26,16 @@ public interface IQnaMapper {
 
     CategoryEntity[] selectCategories();
 
-    List<QnaArticleEntity> selectQnaArticlesByHelp();
+    List<QnaArticleEntity> selectArticleByCategoryIdAndPaging(@Param(value = "categoryId") int categoryId, @Param(value = "offset") int offset, @Param(value = "count") int count);
 
-    List<QnaArticleEntity> selectQnaArticlesByEvent();
+//    List<QnaArticleEntity> selectQnaArticlesByHelp(@Param(value = "offset") int offset, @Param(value = "count") int count);
+//
+//    List<QnaArticleEntity> selectQnaArticlesByEvent();
+//
+//    List<QnaArticleEntity> selectQnaArticlesByQna();
 
-    List<QnaArticleEntity> selectQnaArticlesByQna();
     int selectCategoryIdByIndex(@Param(value = "index") int index);
 
-   QnaArticleReadVo selectHelpPageByIndex(@Param(value = "index") int index, int categoryId);
+    QnaArticleReadVo selectHelpPageByIndex(@Param(value = "index") int index, int categoryId);
 
 }

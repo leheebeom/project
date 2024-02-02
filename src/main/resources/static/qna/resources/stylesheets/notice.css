@@ -380,10 +380,13 @@
     margin-left: -1px;
 }
 
-.pagination ul li a:hover {
+.pagination ul li a:hover, .pagination ul li a.selected{
     background-color: #e0e0e0;
 }
 
+.pagination ul li a:focus {
+    outline: none;
+}
 .pagination ul li.active a {
     background: #3e3d55;
     color: #fff;
@@ -392,13 +395,13 @@
 .pagination a {
     display: inline-block;
     border: 1px solid #ddd;
-    width: 70px;
-    height: 70px;
+    width: 50px;
+    height: 50px;
     background: #fff;
     font-size: 15px;
     color: #151432;
     text-align: center;
-    line-height: 70px;
+    line-height: 50px;
     vertical-align: middle;
     float: left;
     box-sizing: border-box;

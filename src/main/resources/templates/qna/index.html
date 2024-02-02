@@ -28,46 +28,58 @@
                 <span class="text">qna</span>
             </a>
         </li>
-<!--        <li class="item" th:selected="${tab != null && tab.equals('question')}">-->
-<!--            <a class="link" th:href="@{./ (tab=question)}">-->
-<!--                <span class="text">문의하기</span>-->
-<!--            </a>-->
-<!--        </li>-->
-        <!--        <li class="item" th:if="${userMaster.getStatusValue() == 'MAS'}">-->
-        <!--            <a class="link">관리자 페이지</a>-->
-        <!--        </li>-->
     </ul>
-    <th:block th:switch="${#request.getParameter('tab')}">
 
+    <th:block th:switch="${#request.getParameter('tab')}">
         <section class="content box event" th:case="'event'">
             <h2 class="title">이벤트</h2>
             <div class="content">
                 <div class="list_wrap">
                     <div class="thead">
-                        <div class="tr" th:each="event : ${eventQna}">
+                        <div class="tr head">
                             <span class="th sort">번호</span>
                             <span class="th subject">제목</span>
                             <span class="th date">작성일</span>
                             <span class="th count">조회수</span>
                         </div>
-                    </div>
-                    <form id="eventForm">
-                        <div class="tbody">
-                            <div>
-                                <div class="tr notice">
-                                    <div class="td merged-cell" th:if="${eventQna == null}">게시글이 존재하지 않습니다.</div>
-                                </div>
-                            </div>
-
+                        <div class="tr " th:each="event, iterStat : ${eventQna}">
+                            <span class="th sort" th:text="${iterStat.count}">번호</span>
+                            <span class="th subject"><a th:text="${event.getTitle()}"
+                                                        th:href="@{'/qna/read/' + ${event.getIndex()}}"></a>
+                            </span>
+                            <span class="th date" th:text="${#dates.format(event.getCreatedAt(),'yy-MM-dd')}">작성일</span>
+                            <span class="th count" th:text="${event.getViewCount()}">조회수</span>
                         </div>
+                    </div>
                     </form>
                 </div>
             </div>
             <div class="pagination">
                 <div class="pagination_wrap">
                     <ul id="eventPageContainer">
-                        <li class="page">
-                            <a class="btn_num">1</a>
+                        <li class="page" th:if="${paging.requestPage > 1}">
+                            <a class="btn_num"  th:href="@{'/qna/?tab=event&page=1'}"
+                               th:id="'page_' + ${pageNumber}">&lt;&lt;</a>
+                        </li>
+                        <!-- 이전 페이지로 가는 링크를 생성하는 부분 -->
+                        <li class="page" th:if="${paging.requestPage > 1}">
+                            <a class="btn_num" th:href="@{'/qna/?tab=event&page=' + ${paging.requestPage - 1}}"
+                               th:id="'page_' + ${pageNumber}">&lt;</a>
+                        </li>
+                        <li class="page" th:each="pageNumber : ${#numbers.sequence(paging.boundStartPage, paging.boundEndPage)}"
+                            th:class="${pageNumber == paging.requestPage} ? 'current-page' : ''">
+                            <a class="btn_num " th:href="@{'/qna/?tab=event&page=' + ${pageNumber}}" th:text="${pageNumber}"
+                               th:id="'page_' + ${pageNumber}"   th:classappend="${pageNumber == paging.requestPage} ? 'selected' : ''"></a>
+                        </li>
+                        <!-- 다음 페이지로 가는 링크를 생성하는 부분 -->
+                        <li class="page"  th:if="${paging.requestPage < paging.maxPage}">
+                            <a class="btn_num"th:href="@{'/qna/?tab=event&page=' + ${paging.maxPage + 1}}"
+                               th:id="'page_' + ${pageNumber}">&gt;</a>
+                        </li>
+                        <!-- 맨 마지막 페이지로 가는 링크를 생성하는 부분 -->
+                        <li class="page" th:if="${paging.requestPage < paging.maxPage}">
+                            <a class="btn_num" th:href="@{'/qna/?tab=event&page=' + ${paging.maxPage}}"
+                               th:id="'page_' + ${pageNumber}">&gt;&gt;</a>
                         </li>
                     </ul>
                 </div>
@@ -106,8 +118,29 @@
             <div class="pagination">
                 <div class="pagination_wrap">
                     <ul id="qnaPageContainer">
-                        <li class="page">
-                            <a class="btn_num">1</a>
+                        <li class="page" th:if="${paging.requestPage > 1}">
+                            <a class="btn_num"  th:href="@{'/qna/?tab=qna&page=1'}"
+                               th:id="'page_' + ${pageNumber}">&lt;&lt;</a>
+                        </li>
+                        <!-- 이전 페이지로 가는 링크를 생성하는 부분 -->
+                        <li class="page" th:if="${paging.requestPage > 1}">
+                            <a class="btn_num" th:href="@{'/qna/?tab=qna&page=' + ${paging.requestPage - 1}}"
+                               th:id="'page_' + ${pageNumber}">&lt;</a>
+                        </li>
+                        <li class="page" th:each="pageNumber : ${#numbers.sequence(paging.boundStartPage, paging.boundEndPage)}"
+                            th:class="${pageNumber == paging.requestPage} ? 'current-page' : ''">
+                            <a class="btn_num " th:href="@{'/qna/?tab=qna&page=' + ${pageNumber}}" th:text="${pageNumber}"
+                               th:id="'page_' + ${pageNumber}"   th:classappend="${pageNumber == paging.requestPage} ? 'selected' : ''"></a>
+                        </li>
+                        <!-- 다음 페이지로 가는 링크를 생성하는 부분 -->
+                        <li class="page"  th:if="${paging.requestPage < paging.maxPage}">
+                            <a class="btn_num"th:href="@{'/qna/?tab=qna&page=' + ${paging.maxPage + 1}}"
+                               th:id="'page_' + ${pageNumber}">&gt;</a>
+                        </li>
+                        <!-- 맨 마지막 페이지로 가는 링크를 생성하는 부분 -->
+                        <li class="page" th:if="${paging.requestPage < paging.maxPage}">
+                            <a class="btn_num" th:href="@{'/qna/?tab=qna&page=' + ${paging.maxPage}}"
+                               th:id="'page_' + ${pageNumber}">&gt;&gt;</a>
                         </li>
                     </ul>
                 </div>
@@ -128,7 +161,7 @@
                             <span class="th count">조회수</span>
                         </div>
                         <div class="tr " th:each="help, iterStat : ${helpQna}">
-                            <span class="th sort" th:text="${iterStat.count}">번호</span>
+                            <span class="th sort" th:text="${paging.rowCountPerPage * (paging.requestPage - 1) + iterStat.count}">번호</span>
                             <span class="th subject"><a th:text="${help.getTitle()}"
                                                         th:href="@{'/qna/read/' + ${help.getIndex()}}"></a>
                             </span>
@@ -151,8 +184,29 @@
             <div class="pagination">
                 <div class="pagination_wrap">
                     <ul id="helpPageContainer">
-                        <li class="page">
-                            <a class="btn_num">1</a>
+                        <li class="page" th:if="${paging.requestPage > 1}">
+                            <a class="btn_num"  th:href="@{'/qna/?tab=help&page=1'}"
+                               th:id="'page_' + ${pageNumber}">&lt;&lt;</a>
+                        </li>
+                        <!-- 이전 페이지로 가는 링크를 생성하는 부분 -->
+                        <li class="page" th:if="${paging.requestPage > 1}">
+                            <a class="btn_num" th:href="@{'/qna/?tab=help&page=' + ${paging.requestPage - 1}}"
+                               th:id="'page_' + ${pageNumber}">&lt;</a>
+                        </li>
+                        <li class="page" th:each="pageNumber : ${#numbers.sequence(paging.boundStartPage, paging.boundEndPage)}"
+                            th:class="${pageNumber == paging.requestPage} ? 'current-page' : ''">
+                            <a class="btn_num " th:href="@{'/qna/?tab=help&page=' + ${pageNumber}}" th:text="${pageNumber}"
+                               th:id="'page_' + ${pageNumber}"   th:classappend="${pageNumber == paging.requestPage} ? 'selected' : ''"></a>
+                        </li>
+                        <!-- 다음 페이지로 가는 링크를 생성하는 부분 -->
+                        <li class="page"  th:if="${paging.requestPage < paging.maxPage}">
+                            <a class="btn_num"th:href="@{'/qna/?tab=help&page=' + ${paging.maxPage + 1}}"
+                               th:id="'page_' + ${pageNumber}">&gt;</a>
+                        </li>
+                        <!-- 맨 마지막 페이지로 가는 링크를 생성하는 부분 -->
+                        <li class="page" th:if="${paging.requestPage < paging.maxPage}">
+                            <a class="btn_num" th:href="@{'/qna/?tab=help&page=' + ${paging.maxPage}}"
+                               th:id="'page_' + ${pageNumber}">&gt;&gt;</a>
                         </li>
                     </ul>
                 </div>

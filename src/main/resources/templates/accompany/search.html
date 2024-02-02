@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>드립소다 여행친구찾기</title>
+    <th:block th:insert="~{fragments/head.html :: content}"></th:block>
+    <link rel="stylesheet" th:href="@{/accompany/resources/stylesheets/search.css}">
+    <script defer th:src="@{/accompany/resources/scripts/search.js}"></script>
+</head>
+<body class="_layout-hmf">
+<th:block th:replace="~{fragments/header.html :: content}"></th:block>
+<div class="banner">
+    <span class="small-text">나와 맞는 여행동행과 이야기를 나누어 보아요!</span>
+    <span class="big-text">여행친구찾기</span>
+</div>
+<main class="_main main">
+        <div class="travel-search-container" id="travelSearchContainer" th:if="${articlesForKeyword != null and articlesForKeyword.isEmpty()}">
+            <div class="travel-search">
+                <div class="search">
+                    <div class="search">
+                        <div class="search-icon-container">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                      d="M12.3683 6.93577C13.9789 8.32555 14.1578 10.7578 12.7681 12.3683C11.3783 13.9789 8.94604 14.1578 7.3355 12.7681C5.72496 11.3783 5.54599 8.94604 6.93577 7.3355C8.32555 5.72496 10.7578 5.54599 12.3683 6.93577ZM16.7435 13.6178C18.4844 10.4395 17.8358 6.3704 14.9816 3.90742C11.6985 1.07438 6.74045 1.43919 3.90742 4.72225C1.07438 8.00531 1.43919 12.9634 4.72225 15.7964C7.54492 18.2322 11.6058 18.3041 14.4897 16.1898L19.1699 20.2285C19.8848 20.8454 20.9645 20.766 21.5815 20.0511C22.1984 19.3361 22.119 18.2564 21.404 17.6395L16.7435 13.6178Z"
+                                      fill="#7D7DFF"></path>
+                            </svg>
+                        </div>
+                        <p class="search-text"  th:text="'\'' + ${keyword} + '\' 검색하셨나요?'"></p></div>
+                    <div class="search-text-container">
+                        <p class="search-text"  th:text="'\'' + ${keyword} + '\' 검색결과가 없습니다, 다른 키워드로 검색해보세요'"></p>
+                    </div>
+                </div>
+                <div class="no-search-text-container">
+                    <div style="height: 182px; background: rgb(248, 248, 248);">
+                        <p class="no-search-text">검색결과가 없습니다,
+                            다른 키워드로 검색해보세요<img alt="아이콘" th:src="@{/resources/images/eyes.png}" class="no-search-img"></p>
+                        <div class="_object-button" id="searchButton">
+                            <p>검색하기</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div class="travel_menu_container"
+         id="travelMenuContainer" th:each="articleKeywordDto : ${articlesForKeyword}">
+        <a class="accompany" th:data-index="${articleKeywordDto.getIndex()}"
+           th:href="'./read/' + ${articleKeywordDto.getIndex()}">
+            <img class="cover-image" alt="" th:src="'./cover-image/' + ${articleKeywordDto.getIndex()}">
+            <span class="location-container" id="locationContainer">
+                        <span class="icon-container"></span>
+                        <span class="text" th:text="${articleKeywordDto.getRegionText()+ '&nbsp;'}"></span>
+                        <span class="duration date-From"
+                              th:text="${#dates.format(articleKeywordDto.getDateFrom(), 'MM-dd')}"></span>
+                        <span class="duration">&nbsp;~&nbsp;</span>
+                        <span class="duration date-to"
+                              th:text="${#dates.format(articleKeywordDto.getDateTo(), 'MM-dd')}"></span>
+                    </span>
+            <span class="title-container">
+<!--                        <span class="status">모집중</span>-->
+                        <span class="title" th:text="${articleKeywordDto.getTitle()}">홍콩으로 가는 그브</span>
+                    </span>
+            <span class="content" th:utext="${articleKeywordDto.getContent()}">그레이브즈</span>
+            <span class="nickname" th:text="'닉네임  ' + ${articleKeywordDto.getUserNickname()}"></span>
+        </a>
+    </div>
+</main>
+<th:block th:replace="~{fragments/footer.html :: content}"></th:block>
+</body>
+</html>

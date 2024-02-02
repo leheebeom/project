@@ -128,7 +128,33 @@
         LIMIT 8
         ]]></select>
 
-
+    <select id="selectArticlesForKeyword"
+            resultType="com.dripsoda.community.dtos.accompany.ArticleKeywordDto">
+        SELECT `article`.`index`              AS `index`,
+               `article`.`user_email`         AS `userEmail`,
+               `article`.`created_at`         AS `createdAt`,
+               `article`.`continent_value`    AS `continentValue`,
+               `article`.`country_value`      AS `countryValue`,
+               `article`.`region_value`       AS `regionValue`,
+               `article`.`capacity`           AS `capacity`,
+               `article`.`date_from`          AS `dateFrom`,
+               `article`.`date_to`            AS `dateTo`,
+               `article`.`title`              AS `title`,
+               LEFT(`article`.`content`, 100) AS `content`,
+               `article`.view_count           as `viewCount`,
+               `user`.`name`                  AS `userName`,
+               `user`.`nickname`              AS `userNickname`,
+               `region`.`text`                as `regionText`
+        FROM `dripsoda_accompany`.`articles` AS `article`
+                 LEFT JOIN `dripsoda_member`.`users` AS `user` ON `article`.`user_email` = `user`.`email`
+                 LEFT JOIN `dripsoda_accompany`.`regions` AS `region` ON `article`.`region_value` = `region`.`value`
+        WHERE (`index` LIKE '%' #{keyword} '%' OR
+               `article`.`title` LIKE '%' #{keyword} '%' OR
+               `article`.`content` LIKE '%' #{keyword} '%' OR
+               `user`.`name` LIKE '% '#{keyword} '%' OR
+               `user`.`nickname` LIKE '%' #{keyword} '%')
+        ORDER BY `article`.`index` DESC
+    </select>
     <select id="selectArticlesForHome"
             resultType="com.dripsoda.community.dtos.accompany.ArticleRecentListDto"><![CDATA[
         SELECT `article`.`index`              AS `index`,

@@ -7,6 +7,7 @@ import com.dripsoda.community.interfaces.IResult;
 import com.dripsoda.community.mappers.IAccompanyMapper;
 import com.dripsoda.community.mappers.IMemberMapper;
 import com.dripsoda.community.mappers.IQnaMapper;
+import com.dripsoda.community.models.PagingModel;
 import com.dripsoda.community.vos.qna.QnaArticleReadVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -68,6 +69,10 @@ public class QnaService {
         return  this.qnaMapper.selectHelpPageByIndex(index, categoryId);
      }
 
+     public int ArticleTotalCount(int categoryId) {
+        return this.qnaMapper.selectArticleTotalCount(categoryId);
+     }
+
      public int getCategoryId(int index){
         return this.qnaMapper.selectCategoryIdByIndex(index);
      }
@@ -77,16 +82,26 @@ public class QnaService {
         return this.qnaMapper.selectCategories();
     }
 
-    public List<QnaArticleEntity> getHelpQnaArticles() {
-        return this.qnaMapper.selectQnaArticlesByHelp();
+//    public List<QnaArticleEntity> getHelpQnaArticles(PagingModel pagingModel) {
+//        int startIndex = (pagingModel.requestPage - 1) * pagingModel.rowCountPerPage;
+//        int rowCountPerPage = pagingModel.rowCountPerPage;
+//        return this.qnaMapper.selectQnaArticlesByHelp(startIndex, rowCountPerPage);
+//    }
+
+    public List<QnaArticleEntity> getArticlesByTypeAndPaging(int type, PagingModel pagingModel) {
+        int startIndex = (pagingModel.requestPage - 1) * pagingModel.rowCountPerPage;
+        int rowCountPerPage = pagingModel.rowCountPerPage;
+        return this.qnaMapper.selectArticleByCategoryIdAndPaging(type,startIndex,rowCountPerPage);
     }
 
-    public List<QnaArticleEntity> getEventQnaArticles() {
-        return this.qnaMapper.selectQnaArticlesByEvent();
-    }
-    public List<QnaArticleEntity> getQnaArticles() {
-        return this.qnaMapper.selectQnaArticlesByQna();
-    }
+
+//    public List<QnaArticleEntity> getEventQnaArticles() {
+//        return this.qnaMapper.selectQnaArticlesByEvent();
+//    }
+//    public List<QnaArticleEntity> getQnaArticles() {
+//        return this.qnaMapper.selectQnaArticlesByQna();
+//    }
+
 
 
  }
