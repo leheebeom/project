@@ -1,3 +1,24 @@
+const swiperTextContainers = window.document.querySelectorAll('.travel-swiper-text-container');
+const tBtn1 = window.document.querySelector('.tBtn1');
+
+tBtn1.addEventListener('click', () => {
+    window.location.href = './accompany/';
+});
+
+swiperTextContainers.forEach(container => {
+    container.addEventListener('click', function() {
+        // 클릭된 요소에서 관련 데이터 추출
+        const countryName = container.querySelector('.top-text .text').textContent;
+        const travelCompanions = container.querySelector('.middle-text .text span').textContent;
+        const travelProducts = container.querySelector('.bottom-text .text span').textContent;
+
+        // 폼에 데이터 전송
+        const searchForm = document.getElementById('searchForm');
+        searchForm.querySelector('input[name="keyword"]').value = countryName;
+        searchForm.submit();
+    });
+});
+
 loginButton.addEventListener('click', () => {
     window.location.href = '../../member/userLogin';
 });

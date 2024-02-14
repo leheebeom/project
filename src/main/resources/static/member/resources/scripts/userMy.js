@@ -1,5 +1,10 @@
 const infoForm = window.document.getElementById('infoForm');
 const truncateForm = window.document.getElementById('truncateForm');
+const profileForm = window.document.getElementById('profileForm');
+const profileNicknameInput = window.document.getElementById('profileNicknameInput');
+const profileNicknameInputCheck = window.document.getElementById('profileNicknameInputCheck');
+const profileNicknameDefault = document.querySelector('.profile-nickname-default');
+const profileNicknameCheck = document.querySelector('.profile-nickname-check');
 const warning = {
     getElement: () => window.document.getElementById('warning'),
     hide: () => warning.getElement().classList.remove('visible'),
@@ -40,10 +45,60 @@ const handleCheckboxChange = (clickedCheckbox) => {
         truncateButtonController.hide();
     }
 };
+
+profileNicknameInput?.addEventListener('click', ()=> {
+    profileNicknameDefault.classList.remove('visible');
+    profileNicknameCheck.classList.add('visible');
+    profileForm['profileNickname'].removeAttribute('disabled');
+});
+
+profileNicknameInputCheck?.addEventListener('click', ()=> {
+    if (profileForm['profileNickname'].value === '') {
+        alert('새로운 닉네임을 입력해 주세요.');
+        profileForm['profileNickname'].focus();
+        return;
+    }
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+    formData.append('profileNickname', profileForm['profileNickname'].value);
+    xhr.open('POST', `./userMyInfoNickname`);
+    xhr.onreadystatechange = () => {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            cover.hide();
+            if (xhr.status >= 200 && xhr.status < 300) {
+                const responseJson = JSON.parse(xhr.responseText);
+                switch (responseJson['result']) {
+                    case 'success':
+                        profileNicknameDefault.classList.add('visible');
+                        profileNicknameCheck.classList.remove('visible');
+                        profileForm['profileNickname'].setAttribute('disabled', 'disabled');
+                        break;
+                    default:
+                     alert('닉네임을 변경하는데 실패하였습니다. 잠시 후 다시 시도해주세요.\n\n 해당 문제가 계속해서 발생될 시 문의해주시기 바랍니다.');
+                }
+            } else {
+                warning.show('서버와 통신하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
+            }
+        }
+    };
+    xhr.send(formData);
+});
+
 checkboxes?.forEach((checkbox) => {
     checkbox.addEventListener('change', () => handleCheckboxChange(checkbox));
 });
 
+// profileForm?.changeNickname?.addEventListener('input', () => {
+//     infoForm.querySelectorAll('[rel="row-change-nick"]').forEach(x => {
+//         if (infoForm['changeNickname'].checked) {
+//             x.classList.add('visible');
+//             infoForm['newNickname'].value = '';
+//             infoForm['newNickname'].focus();
+//         } else {
+//             x.classList.remove('visible');
+//         }
+//     });
+// });
 
 infoForm?.changePassword?.addEventListener('input', () => {
     infoForm.querySelectorAll('[rel="row-change-password"]').forEach(x => {
@@ -124,13 +179,43 @@ infoForm?.newContactAuthRequestButton?.addEventListener('click', () => {
     xhr.send();
 });
 
-const profileImageInput =  document.querySelector('#infoForm input[name="profileImage"]');
-if (profileImageInput){
+// const profileImageInput = document.querySelector('#infoForm input[name="profileImage"]');
+// if (profileImageInput) {
+//     profileImageInput.addEventListener('input', () => {
+//         const xhr = new XMLHttpRequest();
+//         const formData = new FormData();
+//         if ((infoForm['profileImage'].files?.length ?? 0) > 0) {
+//             formData.append('profileImage', infoForm['profileImage'].files[0]);
+//         }
+//         xhr.open('POST', './userMyInfoProfileImage');
+//         xhr.onreadystatechange = () => {
+//             if (xhr.readyState === XMLHttpRequest.DONE) {
+//                 if (xhr.status >= 200 && xhr.status < 300) {
+//                     const responseJson = JSON.parse(xhr.responseText);
+//                     switch (responseJson['result']) {
+//                         case 'success':
+//                             alert('성공적으로 이미지를 변경했습니다.');
+//                             window.location.reload();
+//                             break;
+//                         default:
+//                             warning.show('알 수 없는 이유로 이미지를 변경 할 수 없습니다. 다시 확인해 주세요.');
+//                     }
+//                 } else {
+//                     warning.show('서버와 통신하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
+//                 }
+//             }
+//         };
+//         xhr.send(formData);
+//     });
+// }
+
+const profileImageInput = document.querySelector('#profileForm input[name="profileImage"]');
+if (profileImageInput) {
     profileImageInput.addEventListener('input', () => {
         const xhr = new XMLHttpRequest();
         const formData = new FormData();
-        if ((infoForm['profileImage'].files?.length ?? 0) > 0) {
-            formData.append('profileImage', infoForm['profileImage'].files[0]);
+        if ((profileForm['profileImage'].files?.length ?? 0) > 0) {
+            formData.append('profileImage', profileForm['profileImage'].files[0]);
         }
         xhr.open('POST', './userMyInfoProfileImage');
         xhr.onreadystatechange = () => {
@@ -153,6 +238,7 @@ if (profileImageInput){
         xhr.send(formData);
     });
 }
+
 infoForm?.newContactAuthCheckButton?.addEventListener('click', () => {
     warning.hide();
     if (infoForm['newContactAuthCode'].value === '') {
@@ -220,6 +306,7 @@ if (infoForm !== null) {
             infoForm['oldPassword'].focus();
             return false;
         }
+
         if (!new RegExp('^([\\da-zA-Z`~!@#$%^&*()\\-_=+\\[{\\]}\\\\|;:\'\",<.>/?]{8,50})$').test(infoForm['oldPassword'].value)) {
             warning.show('올바른 현재 비밀번호를 입력해 주세요.');
             infoForm['oldPassword'].focusAndSelect();
@@ -254,7 +341,6 @@ if (infoForm !== null) {
             }
         }
         cover.show('회원정보를 변경하고 있습니다.\n\n잠시만 기다려 주세요.');
-
         const xhr = new XMLHttpRequest();
         const formData = new FormData();
         formData.append('oldPassword', infoForm['oldPassword'].value);
@@ -297,7 +383,7 @@ if (infoForm !== null) {
 if (truncateForm !== null) {
     truncateForm.onsubmit = e => {
         e.preventDefault();
-        if(truncateForm['content'].value === '') {
+        if (truncateForm['content'].value === '') {
             alert('탈퇴하려는 이유를 알려주세요.');
             truncateForm['content'].focus();
             return;
@@ -335,8 +421,34 @@ if (truncateForm !== null) {
         };
         xhr.send(formData);
     }
-};
+}
+;
 
+const accompany = window.document.querySelectorAll('.accompany');
+const accompanyArray = Array.from(accompany);
+
+accompanyArray.forEach(article => {
+    const currentDate = new Date();
+    const dateFromElement = article.querySelector('.date-From');
+    const dateString = dateFromElement.innerText;
+
+    const dateObject = new Date(currentDate.getFullYear(), parseInt(dateString.split('-')[0]) - 1, parseInt(dateString.split('-')[1]));
+
+    const status = currentDate > dateObject ? 'expired' : 'status';
+
+    const statusElement = window.document.createElement('span');
+    statusElement.classList.add('status');
+
+    if (status === 'expired') {
+        statusElement.classList.add('expired');
+        statusElement.innerText = '모집 마감';
+    } else {
+        statusElement.innerText = '모집중';
+    }
+
+    const titleContainerElement = article.querySelector('.title-container');
+    titleContainerElement.prepend(statusElement);
+});
 
 
 

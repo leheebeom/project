@@ -1,6 +1,6 @@
 const deleteButton = window.document.getElementById('deleteButton');
 const id = parseInt(window.location.href.split('/').at(-1).split('?')[0]);
-deleteButton.addEventListener('click', () => {
+deleteButton?.addEventListener('click', () => {
     if (!confirm('정말로 qna를 삭제할까요?')) {
         return;
     }

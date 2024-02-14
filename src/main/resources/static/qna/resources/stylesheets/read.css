@@ -68,7 +68,7 @@ body > .main > .title-container > .content-container > .text-container {
     box-sizing: border-box;
     min-height: 8.25rem;
     padding: 1.875rem 2.0625rem;
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1.5em;
     white-space: pre-line;
     border-bottom: 0.0625rem solid rgb(233, 233, 233);
@@ -93,10 +93,12 @@ body > .main > .title-container > .content-container > .text-container > .text-i
 
 body > .main > .title-container > .content-container > .list-container {
     margin-top: 4.375rem;
-    border-top: 1px solid rgb(233, 233, 233);
+    border-top: 0.0625rem solid rgb(233, 233, 233);
 }
 
-body > .main > .title-container > .content-container > .list-container > .list-next {
+body > .main > .title-container > .content-container > .list-container > .list-next,
+body > .main > .title-container > .content-container > .list-container > .list-prev
+{
     cursor: pointer;
     display: flex;
     -webkit-box-align: center;
@@ -107,27 +109,42 @@ body > .main > .title-container > .content-container > .list-container > .list-n
     border-bottom: 0.0625rem solid rgb(233, 233, 233);
 }
 
-body > .main > .title-container > .content-container > .list-container > .list-next > .next {
+body > .main > .title-container > .content-container > .list-container > .list-next > .next,
+body > .main > .title-container > .content-container > .list-container > .list-prev > .prev{
     position: relative;
     display: block;
     box-sizing: border-box;
-    min-width: 118px;
-    padding-left: 22px;
-    font-size: 15px;
-    line-height: 24px;
+    min-width: 7.375rem;
+    padding-left: 1.375rem;
+    font-size: 0.9375rem;
+    line-height: 1.5rem;
     color: #00ce7c;;
 }
 
-body > .main > .title-container > .content-container > .list-container > .list-next > .next-title {
+body > .main > .title-container > .content-container > .list-container > .list-next > .next-title,
+body > .main > .title-container > .content-container > .list-container > .list-prev > .prev-title{
     position: relative;
     overflow: hidden;
     display: inline-block;
-    padding-right: 25px;
-    font-size: 16px;
+    padding-right: 1.5625rem;
+    font-size: 1rem;
     font-weight: 400;
-    line-height: 24px;
+    line-height: 1.5rem;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+body > .main > .title-container > .content-container > .go-to-list {
+    width: 3.5rem;
+    margin-top: 0.625rem;
+}
+
+body > .main > .title-container > .content-container > .modify {
+    margin-top: 1.25rem;
+}
+
+body > .main > .title-container > .content-container > .modify > .modify {
+    color: rgb(255, 255, 255);
 }
 
 img {

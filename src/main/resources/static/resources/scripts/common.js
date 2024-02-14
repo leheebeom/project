@@ -75,7 +75,7 @@ const myButton = window.document.getElementById('myButton');
         const formContainer = document.getElementById('searchFormContainer');
 
         // 창 너비가 1200px 미만인 경우 form 요소를 삭제
-        if (screenWidth < 1200) {
+        if (768 < screenWidth  &&  screenWidth < 1200) {
             // form 요소가 존재하는지 확인 후 삭제
             if (form) {
                 form.remove();
@@ -122,6 +122,18 @@ const myButton = window.document.getElementById('myButton');
     // 초기에도 함수 호출
     removeOrRecreateForm();
 })();
+
+const menuToggle = window.document.getElementById('menuToggle');
+const _buttonMenu = window.document.getElementById('_buttonMenu');
+
+menuToggle?.addEventListener('click', () =>{
+   if(_buttonMenu?.classList.contains('visible')) {
+       -_buttonMenu?.classList.remove('visible');
+   } else {
+       _buttonMenu?.classList.add('visible');
+   }
+});
+
 
 
 

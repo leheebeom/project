@@ -5,6 +5,7 @@ import com.dripsoda.community.entities.accompany.*;
 import com.dripsoda.community.entities.member.UserEntity;
 import com.dripsoda.community.enums.CommonResult;
 import com.dripsoda.community.enums.accompany.CommentResult;
+import com.dripsoda.community.exceptions.RollbackException;
 import com.dripsoda.community.interfaces.IResult;
 import com.dripsoda.community.services.AccompanyService;
 import com.dripsoda.community.services.MemberService;
@@ -29,12 +30,15 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @Controller(value = "com.dripsoda.community.controllers.AccompanyController")
@@ -42,7 +46,9 @@ import java.util.List;
 public class AccompanyController {
     private final AccompanyService accompanyService;
     private final MemberService memberService;
+
     private static final Logger logger = LoggerFactory.getLogger(AccompanyController.class);
+
 
 
     @Autowired
@@ -51,8 +57,9 @@ public class AccompanyController {
         this.memberService = memberService;
     }
 
+
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView getIndex(ModelAndView modelAndView){
+    public ModelAndView getIndex(ModelAndView modelAndView) {
         modelAndView.setViewName("accompany/index");
         return modelAndView;
     }
@@ -120,9 +127,9 @@ public class AccompanyController {
 
     @RequestMapping(value = "search", method = RequestMethod.GET)
     public ModelAndView getSearch(ModelAndView modelAndView,
-            @RequestParam(value = "keyword",required = false)String keyword){
+                                  @RequestParam(value = "keyword", required = false) String keyword) {
 
-        if(keyword != null) {
+        if (keyword != null) {
             modelAndView.addObject("articlesForKeyword", this.accompanyService.getArticlesForKeyword(keyword));
             modelAndView.addObject("keyword", keyword);
         }
@@ -154,7 +161,7 @@ public class AccompanyController {
             @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
             ModelAndView modelAndView
     ) {
-        if (user == null) {
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
             modelAndView.setViewName("redirect:/member/userLogin");
             return modelAndView;
         }
@@ -205,6 +212,24 @@ public class AccompanyController {
         return new ResponseEntity<>(image.getData(), headers, HttpStatus.OK);
     }
 
+
+//    // s3이미지 다운로드 - s3 이미지를 단순히 보여주는 목적이기 떄문에 html에서 처리.
+//    @GetMapping("/s3/{imageName}")
+//    public ResponseEntity<byte[]> getS3Images(@PathVariable String imageName) {
+//        try {
+//            // S3에서 이미지 다운로드
+//            S3Object s3Object = s3Client.getObject(storageConfig.getBucketName(), imageName);
+//            // 이미지 데이터를 byte 배열로 변환하여 반환
+//            InputStream inputStream = s3Object.getObjectContent();
+//            byte[] imageBytes = IOUtils.toByteArray(inputStream);
+//            inputStream.close();
+//            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageBytes);
+//        } catch (IOException e) {
+//            logger.error("Error downloading image from S3: {}", e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+//        }
+//    }
+
     @RequestMapping(value = "image", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public String postImage(
@@ -232,6 +257,7 @@ public class AccompanyController {
 
     @RequestMapping(value = "read/{id}", method = RequestMethod.GET)
     public ModelAndView getRead(@PathVariable(value = "id") Integer id,
+                                @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
                                 ModelAndView modelAndView,
                                 HttpServletResponse response,
                                 HttpServletRequest request) throws Exception {
@@ -259,8 +285,24 @@ public class AccompanyController {
             newCookie.setMaxAge(60 * 60 * 24);                                // 쿠키 시간
             response.addCookie(newCookie);
         }
-        //댓글 보여지는 화면
 
+        //좋아요 판별.
+        if (user != null) {
+            List<CommentLikeEntity> commentLikeEntity = this.accompanyService.getCommentLikeByUserEmail(user.getEmail());
+            //13번에 관한 코멘트 라이크 엔티티가 만들어 졋음.
+            modelAndView.addObject(CommentLikeEntity.ATTRIBUTE_NAME_PLURAL, commentLikeEntity);
+            if (commentLikeEntity != null && !commentLikeEntity.isEmpty()) {
+                List<Integer> likedCommentIndices = new ArrayList<>();
+                // 좋아요를 누른 댓글의 인덱스를 추출하여 리스트에 추가
+                for (CommentLikeEntity likeEntity : commentLikeEntity) {
+                    likedCommentIndices.add(likeEntity.getCommentIndex());
+                }
+                // 모델에 추가
+                modelAndView.addObject("likedCommentIndices", likedCommentIndices);
+            }
+        }
+        //댓글 보여지는 화면
+//        modelAndView.addObject("likedComments", likedComments);
         modelAndView.addObject("articleId", id);
         //ex 2번 글이면 2번글에 대한 모든 댓글 조회
         modelAndView.addObject(CommentEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getArticleCommentsByArticleIndex(id));
@@ -308,7 +350,7 @@ public class AccompanyController {
             response.setStatus(404);
             return null;
         }
-        if (user == null || !user.getEmail().equals(comment.getUserEmail())) {
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS") && !user.getEmail().equals(comment.getUserEmail())) {
             response.setStatus(403);
             return null;
         }
@@ -322,7 +364,7 @@ public class AccompanyController {
             @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
             @PathVariable(value = "id") Integer id
     ) {
-        if(user == null || !user.isAdmin()) {
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS") && !user.isAdmin()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         List<CommentEntity> comments = this.accompanyService.getAllCommentsForArticle(id);
@@ -413,36 +455,65 @@ public class AccompanyController {
             responseJson.put(CommonResult.ATTRIBUTE_NAME, CommentResult.NOT_FOUND);
             return responseJson.toString();
         }
-        if (user == null || !user.isAdmin() && !user.getEmail().equals(comment.getUserEmail())) {
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS") && !user.getEmail().equals(comment.getUserEmail())) {
             responseJson.put(CommentResult.ATTRIBUTE_NAME, CommentResult.NOT_SIGNED);
             return responseJson.toString();
         }
-        IResult result = this.accompanyService.deleteComment(id,commentId);
+        IResult result = this.accompanyService.deleteComment(id, commentId);
         responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
         return responseJson.toString();
     }
 
     //좋아요
-    @RequestMapping(value = "like/{id}/{commentId}",method = RequestMethod.PUT)
+    @RequestMapping(value = "like/{id}/{commentId}", method = RequestMethod.PUT)
     @ResponseBody
     public String putLikeComment(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
                                  @PathVariable(value = "id") Integer id,
                                  @PathVariable(value = "commentId") Integer commentId,
                                  CommentLikeEntity commentLike,
-                                 HttpServletResponse response
+                                 HttpServletResponse response,
+                                 HttpSession session
     ) {
         JSONObject responseJson = new JSONObject();
         ArticleEntity article = this.accompanyService.getArticle(id);
         CommentEntity comment = this.accompanyService.getCommentIndex(commentId);
-        if(user == null) {
+
+        // 세션에 좋아요 정보 저장
+
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
             responseJson.put(CommentResult.ATTRIBUTE_NAME, CommentResult.NOT_SIGNED.name().toLowerCase());
             return responseJson.toString();
         }
+
         commentLike.setUserEmail(user.getEmail());
         commentLike.setArticleIndex(id);
         commentLike.setCommentIndex(commentId);
+        IResult result = this.accompanyService.addCommentLike(user, id, commentId);
 
-        IResult result = this.accompanyService.addCommentLike(user,id,commentId);
+        //매퍼 마저 작성.
+        responseJson.put(CommonResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        if (result == CommonResult.SUCCESS) {
+
+        }
+        return responseJson.toString();
+    }
+
+    @RequestMapping(value = "like/{id}/{commentId}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public String deleteLikeComment(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+                                    @PathVariable(value = "id") Integer id,
+                                    @PathVariable(value = "commentId") Integer commentId,
+                                    CommentLikeEntity commentLike
+    ) {
+        JSONObject responseJson = new JSONObject();
+        ArticleEntity article = this.accompanyService.getArticle(id);
+        CommentEntity comment = this.accompanyService.getCommentIndex(commentId);
+        // 세션에 좋아요 정보 저장
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
+            responseJson.put(CommentResult.ATTRIBUTE_NAME, CommentResult.NOT_SIGNED.name().toLowerCase());
+            return responseJson.toString();
+        }
+        IResult result = this.accompanyService.deleteCommentLike(user, id, commentId);
         //매퍼 마저 작성.
         responseJson.put(CommonResult.ATTRIBUTE_NAME, result.name().toLowerCase());
         return responseJson.toString();
@@ -458,7 +529,7 @@ public class AccompanyController {
             responseJson.put(IResult.ATTRIBUTE_NAME, CommonResult.FAILURE);
             return responseJson.toString();
         }
-        if (user == null || !user.isAdmin() && !user.getEmail().equals(article.getUserEmail())) {
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS") && !user.getEmail().equals(article.getUserEmail())) {
             responseJson.put(IResult.ATTRIBUTE_NAME, "k");
             return responseJson.toString();
         }
@@ -473,7 +544,7 @@ public class AccompanyController {
             @PathVariable(value = "id") int id,
             ModelAndView modelAndView
     ) {
-        if (user == null) {
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
             modelAndView.setViewName("redirect:/member/userLogin");
             return modelAndView;
         }
@@ -491,7 +562,7 @@ public class AccompanyController {
             response.setStatus(404);
             return null;
         }
-        if (user == null || !user.isAdmin() && !user.getEmail().equals(article.getUserEmail())) {
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS") && !user.getEmail().equals(article.getUserEmail())) {
             response.setStatus(403);
             return null;
         }
@@ -530,7 +601,7 @@ public class AccompanyController {
             @PathVariable(value = "id") int id
     ) {
         JSONObject responseJson = new JSONObject();
-        if (user == null) {
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
             responseJson.put(IResult.ATTRIBUTE_NAME, false);
         } else {
             responseJson.put(IResult.ATTRIBUTE_NAME, this.accompanyService.checkRequest(user, id));
@@ -546,6 +617,21 @@ public class AccompanyController {
     ) {
         JSONObject responseJson = new JSONObject();
         IResult result = this.accompanyService.putRequest(user, id);
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
+
+    @RequestMapping(value = "request/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String deleteRequest(
+            @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user,
+            @PathVariable(value = "id") int id
+    ) throws RollbackException {
+        JSONObject responseJson = new JSONObject();
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
+            responseJson.put(IResult.ATTRIBUTE_NAME, false);
+        }
+        IResult result = this.accompanyService.deleteRequest(user, id);
         responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
         return responseJson.toString();
     }

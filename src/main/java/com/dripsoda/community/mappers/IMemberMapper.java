@@ -1,5 +1,6 @@
 package com.dripsoda.community.mappers;
 
+import com.dripsoda.community.dtos.member.ChatSendUserContactDto;
 import com.dripsoda.community.entities.member.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -38,9 +39,10 @@ public interface IMemberMapper {
     UserEntity selectUserByContact(UserEntity user);
 
 
-    ChatEntity selectChatByIndex(@Param(value = "index") int index);
+    ChatSendUserContactDto selectChatByIndex(@Param(value = "index") int index);
     List<ChatEntity> selectUserByChat(@Param(value = "email") String email);
 
+    List<ChatEntity> selectUserByChats(@Param(value = "email") String email);
     List<ChatEntity> selectAdminByChat(@Param(value = "email")String email);
     List<ChatEntity> selectChats();
     int updateContactAuth(ContactAuthEntity contactAuth);

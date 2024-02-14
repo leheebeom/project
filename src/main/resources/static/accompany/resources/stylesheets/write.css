@@ -267,6 +267,17 @@ body > .main > .form > .button-container > .back:hover {
 }
 
 
+@media (max-width: 80rem) {
+    body > .main > .form > .geo-box > .geo-container {
+        flex-direction: column;
+    }
+    body > .main > .form > .geo-box > .geo-container > .continent-container {
+        flex-direction: row;
+    }
+    body > .main > .form > .geo-box  > .date-container > .text {
+        padding: 0;
+    }
+}
 
 
 

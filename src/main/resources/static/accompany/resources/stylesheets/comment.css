@@ -6,24 +6,24 @@ body > .main > .error {
     -webkit-box-pack: center;
     justify-content: center;
     min-height: 100%;
-    padding: 6% 0px 7.5%;
+    padding: 6% 0 7.5%;
 }
 .error > h1 {
-    font-size: 60px;
+    font-size: 3.75rem;
     font-weight: normal;
-    line-height: 89px;
+    line-height: 5.5625rem;
     color: rgb(0, 206, 124);
 }
 
 .error > p{
-    font-size: 24px;
+    font-size: 1.5rem;
     font-weight: 350;
-    line-height: 36px;
+    line-height: 2.25rem;
     color: rgb(154, 154, 154);
 }
 
 .error > img {
     width: 64.5%;
     height: auto;
-    margin: 6% 0px 7.6%;
+    margin: 6% 0 7.6%;
 }

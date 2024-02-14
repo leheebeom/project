@@ -2,6 +2,7 @@ package com.dripsoda.community.services;
 
 import com.dripsoda.community.components.MailComponent;
 import com.dripsoda.community.components.SmsComponent;
+import com.dripsoda.community.dtos.member.ChatSendUserContactDto;
 import com.dripsoda.community.entities.member.*;
 import com.dripsoda.community.enums.CommonResult;
 import com.dripsoda.community.enums.member.ChatResult;
@@ -240,11 +241,11 @@ public class MemberService {
         int insertChat = this.memberMapper.insertChat(chat);
 
         if (insertChat > 0) {
-//            String smsContent;
-//            smsContent = "[드립소다] 고객님의 답변이 등록되었습니다.";
-//            if (this.smsComponent.send(user.getContact(), smsContent) != 202) {
-//                throw new RollbackException();
-//            }
+            String smsContent;
+            smsContent = "[드립소다] 고객님의 답변이 등록되었습니다.";
+            if (this.smsComponent.send(user.getContact(), smsContent) != 202) {
+                throw new RollbackException();
+            }
             return CommonResult.SUCCESS;
         } else {
             return CommonResult.FAILURE;
@@ -252,13 +253,15 @@ public class MemberService {
     }
 
     @Transactional
-    public IResult putMnagerChat(ChatEntity chat, UserEntity user, String content) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
+    public IResult putMnagerChat(ChatSendUserContactDto chat, UserEntity user, String content) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
         if (chat == null) {
             return ChatResult.NOT_FOUND;
         }
         if (user == null) {
             return ChatResult.NOT_SIGNED;
         }
+
+
         //readTime 의 경우 일단 현재 만들어진 시간 후에 update로 변경.
         ChatEntity mangerChat = ChatEntity.build()
                 .setSendUserEmail(user.getEmail())
@@ -277,13 +280,14 @@ public class MemberService {
         if (insertChat > 0) {
             int updateChat = this.memberMapper.updateChat(chat);
             if (updateChat > 0) {
-                return CommonResult.SUCCESS;
-                //            String smsContent;
-//            smsContent = "[드립소다] 문의가 완료 되었습니다. 확인해주세요.";
-//            if (this.smsComponent.send(user.getContact(), smsContent) != 202) {
-//                throw new RollbackException();
 
-//            }
+                //chat유저의 contact
+                String smsContent;
+                smsContent = "[드립소다] 고객님이 등록해주신 질문에 대한 답변이 완료 되었습니다.";
+                if (this.smsComponent.send(chat.getSendUserContact(), smsContent) != 202) {
+                    throw new RollbackException();
+                }
+                return CommonResult.SUCCESS;
             } else {
                 return CommonResult.FAILURE;
             }
@@ -386,7 +390,9 @@ public class MemberService {
                 .setPolicyMarketingAt(existingUser.getPolicyMarketingAt())
                 .setStatusValue(existingUser.getStatusValue())
                 .setRegisteredAt(existingUser.getRegisteredAt())
-                .setAdmin(existingUser.isAdmin());
+                .setAdmin(existingUser.isAdmin())
+                .setProfileData(existingUser.getProfileData())
+                .setProfileId(existingUser.getProfileId());
         if (user.getStatusValue().equals("SUS")) {
             return UserLoginResult.SUSPENDED;
         }
@@ -408,13 +414,13 @@ public class MemberService {
         if (newUser.getPassword() != null && !newUser.getPassword().matches(MemberRegex.USER_PASSWORD)) {
             return CommonResult.FAILURE; // 신규 비밀번호 정규화 실패
         }
+
         if (newUser.getContact() != null && (!newUser.getContact().matches(MemberRegex.USER_CONTACT) || this.checkContactAuth(contactAuth) != CommonResult.FAILURE_EXPIRED)) {
             return CommonResult.FAILURE; // 신규 연락처 정규화 실패 혹은 인증 실패
         }
         String oldCurrentPassword = currentUser.getPassword(); // Update 실패시 세션에 있는 객체가 가진 원래 값으로 되돌려 놓기 위해 백업 해놓아야함.
         String oldCurrentContact = currentUser.getContact();
-        String oldCurrentProfileId = currentUser.getProfileId();
-        byte[] oldCurrentProfileData = currentUser.getProfileData();
+
 
         if (newUser.getPassword() != null) {
             currentUser.setPassword(CryptoUtils.hashSha512(newUser.getPassword()));
@@ -422,19 +428,12 @@ public class MemberService {
         if (newUser.getContact() != null) {
             currentUser.setContact(newUser.getContact());
         }
-        if (newUser.getProfileId() != null) {
-            currentUser.setProfileId(newUser.getProfileId());
-        }
-        if (newUser.getProfileData() != null) {
-            currentUser.setProfileData(newUser.getProfileData());
-        }
+
         //0이랑 비교
         int record = this.memberMapper.updateUser(currentUser);
         if (record == 0) {
             currentUser.setPassword(oldCurrentPassword);
             currentUser.setContact(oldCurrentContact);
-            currentUser.setProfileId(oldCurrentProfileId);
-            currentUser.setProfileData(oldCurrentProfileData);
             throw new RollbackException();
         }
         return CommonResult.SUCCESS;
@@ -465,6 +464,25 @@ public class MemberService {
 
     }
 
+    public IResult modifyUserProfileNickname(UserEntity currentUser, UserEntity newUser) throws RollbackException {
+
+        if(currentUser == null || currentUser.getNickname() == null) {
+            return CommonResult.FAILURE;
+        }
+        String oldCurrentNickname = currentUser.getNickname();
+
+        if (newUser.getNickname() != null) {
+            currentUser.setNickname(newUser.getNickname());
+        }
+
+        int record = this.memberMapper.updateUser(currentUser);
+        if(record == 0) {
+            currentUser.setNickname(oldCurrentNickname);
+            throw new RollbackException();
+        }
+        return CommonResult.SUCCESS;
+    }
+
     public List<ChatEntity> chatAdminCheckList(String email) {
         return this.memberMapper.selectAdminByChat(email);
     }
@@ -473,7 +491,11 @@ public class MemberService {
         return this.memberMapper.selectUserByChat(email);
     }
 
-    public ChatEntity getChatbyIndex(int id) {
+    public List<ChatEntity> getChatsAll(String email) {
+        return this.memberMapper.selectUserByChats(email);
+    }
+
+    public ChatSendUserContactDto getChatbyIndex(int id) {
         return this.memberMapper.selectChatByIndex(id);
     }
 

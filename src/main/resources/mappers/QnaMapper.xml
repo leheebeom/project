@@ -132,6 +132,7 @@
                `view_count`  as `viewCount`
         FROM `dripsoda_qna`.`qna_articles`
         where `category_id` = #{categoryId}
+        order by `index` desc
         LIMIT #{count} offset #{offset}
     </select>
     <select id="selectQnaArticlesByEvent"

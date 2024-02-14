@@ -21,6 +21,8 @@ const parentIndex = window.document.getElementById('number');
 const commentModifyButtonAll = window.document.querySelectorAll('.reply-container > .modify-button');
 const commentDeleteButtonAll = window.document.querySelectorAll('.reply-container > .delete-button');
 const greatButtonAll = window.document.querySelectorAll('.great-container > .great-button');
+const greatHitButtonAll = window.document.querySelectorAll('.great-container > .great-hit-button');
+
 
 const showForm = form => form.classList.add('visible');
 const hideForm = form => form.classList.remove('visible');
@@ -204,6 +206,39 @@ requestButton.addEventListener('click', () => {
     xhr.send();
 });
 
+retractButton.addEventListener('click', () => {
+    cover.show('동행 취소 처리 중입니다.\n\n잠시만 기다려 주세요.');
+    const xhr = new XMLHttpRequest();
+    xhr.open('DELETE', `../request/${id}`);
+    xhr.onreadystatechange = () => {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            cover.hide();
+            if (xhr.status >= 200 && xhr.status < 300) {
+                const responseJson = JSON.parse(xhr.responseText);
+                switch (responseJson['result']) {
+                    case 'not_found' :
+                        alert('더 이상 존재하지 않는 동행 정보입니다.');
+                        window.location.href = '../';
+                        break;
+                    case 'not_signed' :
+                        alert('로그인 정보가 유효하지 않습니다.');
+                        break
+                    case 'success' :
+                        alert('동행 신청 취소에 성공하였습니다.');
+                        window.location.reload();
+                        break;
+                    default :
+                        alert('알 수 없는 이유로 동행 신청에 실패하였습니다. 잠시 후 다시 시도해 주세요.');
+                }
+            } else {
+                alert('서버와 통신하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
+            }
+        }
+    };
+    xhr.send();
+});
+
+
 const warning = {
     getElement: () => window.document.getElementById('warning'),
     hide: () => warning.getElement().classList.remove('visible'),
@@ -299,18 +334,37 @@ commentModifyButtonAll.forEach((modify) => {
 
     });
 });
-setDefaultFormState();
-const toggleGreatColor = (button) => {
-    if (!button) return;
 
-    const path = button.querySelector('path');
-    const newColor = '#E98670'; // New color
-    path.setAttribute('fill', newColor);
+setDefaultFormState();
+// const toggleGreatVisibility = (button, hitButton, isHitButton) => {
+//     if (!button || !hitButton) return;
+//
+//     // Toggle visibility
+//     button.style.display = isHitButton ? 'none' : 'inline-block';
+//     hitButton.style.display = isHitButton ? 'inline-block' : 'none';
+// };
+
+const createHitHeartSVG = () => {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute('width', '13');
+    svg.setAttribute('height', '13');
+    svg.setAttribute('viewBox', '0 0 20 20');
+    svg.setAttribute('fill', 'none');
+    svg.classList.add('great-hit-heart');
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute('fill-rule', 'evenodd');
+    path.setAttribute('clip-rule', 'evenodd');
+    path.setAttribute('d', 'M1.65346 2.62939C-0.551152 4.80192 -0.551153 8.32428 1.65346 10.4968L2.01647 10.8545L2.01636 10.8546L9.28769 18.0201C9.68107 18.4078 10.3189 18.4078 10.7122 18.0201L18.3465 10.497C20.5511 8.3245 20.5511 4.80214 18.3465 2.62962C16.1418 0.457092 12.5675 0.45709 10.3629 2.62962L10.0001 2.98712L9.63706 2.62939C7.43245 0.456868 3.85807 0.456869 1.65346 2.62939Z');
+    path.setAttribute('fill', '#E98670');
+
+    svg.appendChild(path);
+    return svg;
 };
+
 
 greatButtonAll.forEach((great) => {
    great.addEventListener('click', () =>{
-       toggleGreatColor(great);
       let commentIndex = great.getAttribute('data-index');
       commentId = parseInt(commentIndex);
       const xhr = new XMLHttpRequest();
@@ -332,6 +386,39 @@ greatButtonAll.forEach((great) => {
                            break
                        default :
                            alert('알 수 없는 이유로 좋아요를 누를 수 없습니다.');
+                   }
+               } else {
+                   alert('서버와 통신하지 못하였습니다. 잠시 후 다시 시도해 주세요.');
+               }
+           }
+       };
+       xhr.send();
+   });
+});
+
+greatHitButtonAll.forEach((greatHit) => {
+   greatHit.addEventListener('click', () => {
+       let commentIndex = greatHit.getAttribute('data-index');
+       commentId = parseInt(commentIndex);
+       const xhr = new XMLHttpRequest();
+       xhr.open('DELETE', `../like/${id}/${commentId}`);
+       xhr.onreadystatechange = () => {
+           if (xhr.readyState === XMLHttpRequest.DONE) {
+               cover.hide();
+               if (xhr.status >= 200 && xhr.status < 300) {
+                   const responseJson = JSON.parse(xhr.responseText);
+                   switch (responseJson['result']) {
+                       case 'success':
+                           window.location.href = `../read/${id}`;
+                           break;
+                       case 'not_found' :
+                           window.location.href = `../read/${id}`;
+                           break;
+                       case 'not_signed' :
+                           alert('로그인 정보가 유효하지 않습니다.');
+                           break
+                       default :
+                           alert('알 수 없는 이유로 좋아요 삭제를 할 수 없습니다.');
                    }
                } else {
                    alert('서버와 통신하지 못하였습니다. 잠시 후 다시 시도해 주세요.');

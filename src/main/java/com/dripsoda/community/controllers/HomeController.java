@@ -37,25 +37,34 @@ public class HomeController {
 
         String userEmail = (user != null) ? user.getEmail() : null;
 
+        if(user != null) {
+            modelAndView.addObject("profileImg", this.memberService.getUser(userEmail));
+        }
 
         modelAndView.setViewName("home/index");
 
         List<ArticleBestTravleDto> articleRecentList = this.accompanyService.getArticlesForRecent();
+
+        List<ChatEntity> allChatList = this.memberService.getChatsAll(userEmail);
 
         List<ChatEntity> chatList = this.memberService.chatUserCheckList(userEmail);
 
         List<ChatEntity> adminChatList = this.memberService.chatAdminCheckList(userEmail);
 
         List<UserEntity> userList = this.memberService.getUsers();
+        int articleTotalCount = this.accompanyService.getCountArticles();
 
         modelAndView.addObject("userChat", chatList);
 
         //후에 해당 사용자에 맞는 관리자 답 보여주기.
+        modelAndView.addObject("allChat", allChatList);
 
         modelAndView.addObject("adminChat", adminChatList);
 
+        modelAndView.addObject("articleTotalCount", articleTotalCount);
 
         modelAndView.addObject("recentArticles", articleRecentList);
+
 
         modelAndView.addObject(UserEntity.ATTRIBUTE_NAME_PLURAL, userList);
 

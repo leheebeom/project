@@ -12,8 +12,38 @@
 <main class="_main main">
     <ul class="nav box" th:with="tab = ${#request.getParameter('tab')}">
         <li class="profile-container">
-            <div class="profile-image"></div>
-            <div class="nickname" th:text="${session.memberUser.getNickname()}"></div>
+            <form class="profile-form" id="profileForm"  enctype="multipart/form-data">
+                <!--                <div class="profile-image"></div>-->
+                <!--            <div class="nickname" th:text="${session.memberUser.getNickname()}"></div>-->
+                <label for="profileUploadInput" class="label profile">
+                    <div class="profile-image">
+                        <img th:if="${memberUser.getProfileId() == 'no' or memberUser.getProfileId() == null}"
+                             th:src="@{/resources/images/vector_profile_default.svg}" alt="디폴트"
+                             height="70px" width="70px" class="profile-image">
+
+                        <img th:if="${memberUser.getProfileId() != 'no' && memberUser.getProfileId() != ''}"
+                             th:src="@{'/member/profile-id?profileId=' + ${memberUser.getProfileId()}}"
+                             alt="미리보기" height="70px"
+                             width="70px" class="profile-image">
+                        <!--                                    <img th:src="${session.memberUser.getProfileData()}" alt="디폴트" height="70px" width="70px" class="profile-image">-->
+                    </div>
+                    <span hidden>프로필 사진</span>
+                    <input hidden type="text" name="profileId">
+                    <div class="camera-image-container">
+                        <img th:src="@{/resources/images/icon_camera.svg}" alt="카메라 이미지">
+                    </div>
+                </label>
+                <input class="profile-image" id="profileUploadInput" name="profileImage"
+                       type="file" accept="image/png, image/jpeg, image/jpg, image/gif">
+                <label class=" label nickname">
+                    <input class="_object-input input nickname" type="text" placeholder="닉네임을 입력해주세요.(12자)" maxlength="12" name="profileNickname" disabled th:value="${memberUser.getNickname()}">
+                    <span class="profile-nickname-check" id="profileNicknameInputCheck">확인</span>
+                    <svg width="15" class="profile-nickname-default visible" id="profileNicknameInput" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.4929 4.00588L17.9929 9.50628L6.05003 21.45L1.1456 22C0.990842 22.0182 0.833972 22.0011 0.686785 21.9499C0.539598 21.8988 0.405925 21.8149 0.295816 21.7046C0.185706 21.5944 0.102026 21.4606 0.0510672 21.3133C0.000107924 21.166 -0.0168045 21.0091 0.00160158 20.8544L0.546887 15.9464L12.4897 4.00274L12.4929 4.00588ZM21.395 3.18711L18.8132 0.603497C18.6216 0.411857 18.3941 0.259839 18.1438 0.156122C17.8934 0.0524058 17.6251 -0.000976575 17.3541 -0.000976575C17.0831 -0.000976574 16.8148 0.0524058 16.5644 0.156122C16.3141 0.259839 16.0866 0.411857 15.895 0.603497L13.4656 3.0331L18.9656 8.53349L21.395 6.10389C21.5867 5.91228 21.7387 5.68479 21.8424 5.43443C21.9461 5.18406 21.9995 4.91571 21.9995 4.64471C21.9995 4.37371 21.9461 4.10537 21.8424 3.855C21.7387 3.60463 21.5867 3.37715 21.395 3.18554L21.395 3.18711Z"
+                              fill="#000"></path>
+                    </svg>
+                </label>
+            </form>
         </li>
         <li class="item"
             th:selected="${tab == null || tab.equals('info') || (!tab.equals('trip') && !tab.equals('book') && !tab.equals('comment') && !tab.equals('accompany') && !tab.equals('truncate'))}">
@@ -56,9 +86,60 @@
         </section>
         <section class="content box comment" th:case="'comment'">
             <h2 class="title">내 댓글</h2>
+            <div class="content">
+                <div class="list_wrap">
+                    <div class="thead">
+                        <div class="tr head">
+                            <span class="th sort">번호</span>
+                            <span class="th subject">제목</span>
+                            <span class="th date">작성일</span>
+                            <span class="th like">좋아요</span>
+                        </div>
+                        <div class="no-comment" th:if="${accompanyComments.isEmpty() || accompanyComments == null}">
+                            <span>등록된 댓글이 없습니다.</span>
+                        </div>
+                        <div class="tr" th:each="comment, iterStat : ${accompanyComments}">
+                            <span class="th sort" th:text="${iterStat.count}">번호</span>
+                            <span class="th subject"><a th:text="${comment.getContent()}"
+                                                        th:href="@{'/accompany/read/' + ${comment.getArticleIndex()}}"></a>
+                            </span>
+                            <span class="th date"
+                                  th:text="${#dates.format(comment.getCreatedAt(),'yy-MM-dd')}">작성일</span>
+                            <span class="th like" th:text="${comment.getLikes()}">좋아요 수</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
-        <section class="content box accompany" th:case="'accompany'">
+        <section class="content box" th:case="'accompany'">
             <h2 class="title">내 동행 게시글</h2>
+            <div class="no-comment" th:if="${accompanyArticles.isEmpty() || accompanyArticles == null}">
+                <span>등록된 게시글이 없습니다.</span>
+            </div>
+            <div class="travel_menu_container"
+                 id="travelMenuContainer">
+                <div class="travel_menu" th:each="userArticleDto : ${accompanyArticles}">
+                    <a class="accompany" th:data-index="${userArticleDto.getIndex()}"
+                       th:href="'/accompany/read/' + ${userArticleDto.getIndex()}">
+                        <img class="cover-image" alt=""
+                             th:src="'/accompany/cover-image/' + ${userArticleDto.getIndex()}">
+                        <span class="location-container" id="locationContainer">
+                        <span class="icon-container"></span>
+                        <span class="text" th:text="${userArticleDto.getRegionText()+ '&nbsp;'}"></span>
+                        <span class="duration date-From"
+                              th:text="${#dates.format(userArticleDto.getDateFrom(), 'MM-dd')}"></span>
+                        <span class="duration">&nbsp;~&nbsp;</span>
+                        <span class="duration date-to"
+                              th:text="${#dates.format(userArticleDto.getDateTo(), 'MM-dd')}"></span>
+                    </span>
+                        <span class="title-container">
+                        <span class="title" th:text="${userArticleDto.getTitle()}">홍콩으로 가는 그브</span>
+                    </span>
+                        <span class="content" th:utext="${userArticleDto.getContent()}">그레이브즈</span>
+                        <span class="nickname" th:text="'닉네임  ' + ${userArticleDto.getUserNickname()}"></span>
+                    </a>
+                </div>
+            </div>
         </section>
         <section class="content box truncate" th:case="'truncate'">
             <h2 class="title">회원탈퇴</h2>
@@ -137,29 +218,29 @@
             <form class="form" id="infoForm" enctype="multipart/form-data">
                 <table class="table">
                     <tbody class="body">
-                    <tr class="row">
-                        <th class="caption">이미지</th>
-                        <td class="cell">
-                            <label class="_object-label label profile">
-                                <div height="70px" width="70px" class="profile-image">
-                                    <img th:if="${memberUser.getProfileId() == 'no' or memberUser.getProfileId() == null}"
-                                         th:src="@{/resources/images/vector_profile_default.svg}" alt="디폴트"
-                                         height="70px" width="70px" class="profile-image">
+<!--                    <tr class="row">-->
+<!--                        <th class="caption">이미지</th>-->
+<!--                        <td class="cell">-->
+<!--                            <label class="_object-label label profile">-->
+<!--                                <div height="70px" width="70px" class="profile-image">-->
+<!--                                    <img th:if="${memberUser.getProfileId() == 'no' or memberUser.getProfileId() == null}"-->
+<!--                                         th:src="@{/resources/images/vector_profile_default.svg}" alt="디폴트"-->
+<!--                                         height="70px" width="70px" class="profile-image">-->
 
-                                    <img th:if="${memberUser.getProfileId() != 'no' && memberUser.getProfileId() != ''}"
-                                         th:src="@{'/member/profile-id?profileId=' + ${memberUser.getProfileId()}}"
-                                         alt="미리보기" height="70px"
-                                         width="70px" class="profile-image">
-                                    <!--                                    <img th:src="${session.memberUser.getProfileData()}" alt="디폴트" height="70px" width="70px" class="profile-image">-->
-                                </div>
+<!--                                    <img th:if="${memberUser.getProfileId() != 'no' && memberUser.getProfileId() != ''}"-->
+<!--                                         th:src="@{'/member/profile-id?profileId=' + ${memberUser.getProfileId()}}"-->
+<!--                                         alt="미리보기" height="70px"-->
+<!--                                         width="70px" class="profile-image">-->
+<!--                                    &lt;!&ndash;                                    <img th:src="${session.memberUser.getProfileData()}" alt="디폴트" height="70px" width="70px" class="profile-image">&ndash;&gt;-->
+<!--                                </div>-->
 
-                                <span hidden>프로필 사진</span>
-                                <input hidden type="text" name="profileId">
-                                <input class="_object-input input" id="profileUploadInput" name="profileImage"
-                                       type="file" accept="image/png, image/jpeg, image/jpg, image/gif">
-                            </label>
-                        </td>
-                    </tr>
+<!--                                <span hidden>프로필 사진</span>-->
+<!--                                <input hidden type="text" name="profileId">-->
+<!--                                <input class="_object-input input" id="profileUploadInput" name="profileImage"-->
+<!--                                       type="file" accept="image/png, image/jpeg, image/jpg, image/gif">-->
+<!--                            </label>-->
+<!--                        </td>-->
+<!--                    </tr>-->
                     <tr class="row">
                         <th class="caption">이메일</th>
                         <td class="cell">

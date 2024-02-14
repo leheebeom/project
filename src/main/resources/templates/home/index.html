@@ -30,31 +30,38 @@
                 <img alt="동행" class="_menu_accompany_image mImg" th:src="@{/resources/images/main_web_menu01.webp}">
                 <div class="_menu_accompany">
                     <h1>동행</h1>
-                    <span></span>
-                    "의 여행 동행
+                    <span class="_accompany_text" th:text="${articleTotalCount} + '개'"></span>의 여행 동행
                 </div>
             </button>
             <button class="_travel_button_02 tBtn2">
                 <img alt="일정" class="_menu_schedule_image mImg" th:src="@{/resources/images/main_web_menu02.webp}">
                 <div class="_menu_schedule">
                     <h1>일정</h1>
-                    <span></span>
-                    "의 여행 일정
+                    <span>150개</span>의 여행 일정
                 </div>
             </button>
             <button class="_travel_button_03 tBtn3">
                 <img alt="상품" class="_menu_goods_image mImg" th:src="@{/resources/images/main_web_menu03.webp}">
                 <div class="_menu_goods">
                     <h1>여행 상품</h1>
-                    <span></span>
-                    "의 여행 상품
+                    <span>118개</span>의 여행 상품
                 </div>
             </button>
             <div class="_right_top">
                 <div class="_right_top_left">
                     <div class="_my_profile_container">
-                        <div class="_my_profile_img_container">
+                        <div class="_my_profile_img_container"
+                             th:if="${session.memberUser == null || profileImg.getProfileId().equals('no')}">
+                            <!-- 사용자 프로필 이미지를 보여줍니다 -->
                             <img class="_my_profile_img" th:src="@{/resources/images/vector_profile_default.svg}"
+                                 alt="default">
+                        </div>
+                        <!-- 세션에 로그인된 사용자 정보가 없으면 -->
+                        <div class="_my_profile_img_container"
+                             th:unless="${session.memberUser == null || profileImg.getProfileId().equals('no')}">
+                            <!-- 기본 이미지를 보여줍니다 -->
+                            <img class="_my_profile_img"
+                                 th:src="@{'/member/profile-id?profileId=' + ${profileImg.getProfileId()}}"
                                  alt="profile">
                         </div>
                         <div class="_greetings">
@@ -170,15 +177,558 @@
                     <div class="btC">
                         <div class="swiper travel-swiper-container">
                             <div class="swiper-wrapper" th:each="recentArticle : ${recentArticles}">
-                                <div class="swiper-slide swiper-slide-active">Slide 1</div>
-                                <div class="swiper-slide swiper-slide-active">Slide 2</div>
-                                <div class="swiper-slide swiper-slide-active">Slide 3</div>
-                                <div class="swiper-slide swiper-slide-active">Slide 4</div>
-                                <div class="swiper-slide swiper-slide-active">Slide 5</div>
-                                <div class="swiper-slide swiper-slide-active">Slide 6</div>
-                                <div class="swiper-slide swiper-slide-active">Slide 7</div>
-                                <div class="swiper-slide swiper-slide-active">Slide 8</div>
-                                <div class="swiper-slide swiper-slide-active">Slide 9</div>
+                                <div class="swiper-slide swiper-slide-active">
+                                    <div class="image-container">
+                                        <img
+                                                src="https://dripsorda-s3-1.s3.ap-northeast-2.amazonaws.com/%EC%9D%BC%EB%B3%B8.webp">
+                                    </div>
+                                    <div class="travel-swiper-text-container">
+                                        <div class="travel-swiper-text">
+                                            <div class="top-text">
+                                                <p class="text">일본</p></div>
+                                            <div class="middle-text">
+                                                <div class="middle-text-container">
+                                                    <div class="svg-container">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M15.6925 12C17.7317 12 19.3848 10.3469 19.3848 8.30769C19.3848 6.26849 17.7317 4.61539 15.6925 4.61539C13.6533 4.61539 12.0002 6.26849 12.0002 8.30769C12.0002 10.3469 13.6533 12 15.6925 12ZM24.0002 18.9231C24.0002 19.0783 23.992 19.2322 23.9759 19.3845H7.40897C7.39293 19.2322 7.38477 19.0783 7.38477 18.9231C7.38477 15.6094 11.1042 12.9231 15.6925 12.9231C20.2807 12.9231 24.0002 15.6094 24.0002 18.9231Z"
+                                                                  fill="#fff"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M11.3075 10.3666C10.6732 11.0852 9.74518 11.5385 8.71131 11.5385C6.79956 11.5385 5.24977 9.98868 5.24977 8.07692C5.24977 6.16517 6.79956 4.61539 8.71131 4.61539C9.74518 4.61539 10.6732 5.06864 11.3075 5.78727C10.7689 6.39748 10.4421 7.19904 10.4421 8.07692C10.4421 8.95481 10.7689 9.75637 11.3075 10.3666ZM11.3075 12.7239C8.28245 13.4961 6.11516 15.5797 6.11516 18.0288C6.11516 18.1744 6.12282 18.3187 6.13785 18.4615H0.945544C0.930507 18.3187 0.922852 18.1744 0.922852 18.0288C0.922852 14.9222 4.40986 12.4038 8.71131 12.4038C9.62162 12.4038 10.4954 12.5166 11.3075 12.7239Z"
+                                                                  fill="#fff"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text">
+                                                        <span>1117명</span>의 여행 동행</p>
+                                                </div>
+                                                <div class="bottom-text">
+                                                    <div class="bottom-text-container">
+                                                        <svg width="20" height="20" viewBox="0 0 18 18" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M13.465 2.03889C12.5121 1.49098 11.2944 1.8706 10.8216 2.86297L9.3715 5.90667L3.27304 6.27228L2.27832 8.00238L8.01008 8.76425L5.93836 13.1127L3.57497 12.9962L2.58025 14.7263L5.71452 15.4863L6.15584 14.7187L6.15619 14.7189L5.71493 15.4864L7.94866 17.8127L8.94338 16.0826L7.78529 14.3013L10.4927 10.1901L14.0372 14.7634L15.0319 13.0333L12.2504 7.52101L14.1003 4.71197C14.698 3.8043 14.4072 2.58059 13.465 2.03889Z"
+                                                                  fill="#fff"></path>
+                                                            <mask id="mask0_616_69308" maskUnits="userSpaceOnUse" x="2"
+                                                                  y="1" width="14" height="17">
+                                                                <path d="M10.8221 2.86252C11.2949 1.87015 12.5126 1.49054 13.4656 2.03844C14.4078 2.58015 14.6986 3.80385 14.1009 4.71152L7.13894 15.2832L5.38506 14.2748L10.8221 2.86252Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M3.57553 12.9957L7.0483 13.167L5.71508 15.4858L2.58081 14.7258L3.57553 12.9957Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M8.94369 16.0822L7.04847 13.1671L5.71524 15.4859L7.94897 17.8123L8.94369 16.0822Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M15.1069 13.1929L12.0233 7.08196L10.3247 10.0363L14.1122 14.923L15.1069 13.1929Z"
+                                                                      fill="#0042C1"></path>
+                                                            </mask>
+                                                            <g mask="url(#mask0_616_69308)">
+                                                                <rect x="14.1167" y="1.86926" width="6.9856"
+                                                                      height="17.257"
+                                                                      transform="rotate(31.5716 14.1167 1.86926)"
+                                                                      fill="#fff"></rect>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text"><span>2개</span>의 여행 상품</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide swiper-slide-active">
+                                    <div class="image-container">
+                                        <img src="https://dripsorda-s3-1.s3.ap-northeast-2.amazonaws.com/%ED%95%9C%EA%B5%AD.webp">
+                                    </div>
+                                    <div class="travel-swiper-text-container">
+                                        <div class="travel-swiper-text">
+                                            <div class="top-text">
+                                                <p class="text">한국</p></div>
+                                            <div class="middle-text">
+                                                <div class="middle-text-container">
+                                                    <div class="svg-container">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M15.6925 12C17.7317 12 19.3848 10.3469 19.3848 8.30769C19.3848 6.26849 17.7317 4.61539 15.6925 4.61539C13.6533 4.61539 12.0002 6.26849 12.0002 8.30769C12.0002 10.3469 13.6533 12 15.6925 12ZM24.0002 18.9231C24.0002 19.0783 23.992 19.2322 23.9759 19.3845H7.40897C7.39293 19.2322 7.38477 19.0783 7.38477 18.9231C7.38477 15.6094 11.1042 12.9231 15.6925 12.9231C20.2807 12.9231 24.0002 15.6094 24.0002 18.9231Z"
+                                                                  fill="#fff"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M11.3075 10.3666C10.6732 11.0852 9.74518 11.5385 8.71131 11.5385C6.79956 11.5385 5.24977 9.98868 5.24977 8.07692C5.24977 6.16517 6.79956 4.61539 8.71131 4.61539C9.74518 4.61539 10.6732 5.06864 11.3075 5.78727C10.7689 6.39748 10.4421 7.19904 10.4421 8.07692C10.4421 8.95481 10.7689 9.75637 11.3075 10.3666ZM11.3075 12.7239C8.28245 13.4961 6.11516 15.5797 6.11516 18.0288C6.11516 18.1744 6.12282 18.3187 6.13785 18.4615H0.945544C0.930507 18.3187 0.922852 18.1744 0.922852 18.0288C0.922852 14.9222 4.40986 12.4038 8.71131 12.4038C9.62162 12.4038 10.4954 12.5166 11.3075 12.7239Z"
+                                                                  fill="#fff"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text">
+                                                        <span>784</span>의 여행 동행</p>
+                                                </div>
+                                                <div class="bottom-text">
+                                                    <div class="bottom-text-container">
+                                                        <svg width="20" height="20" viewBox="0 0 18 18" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M13.465 2.03889C12.5121 1.49098 11.2944 1.8706 10.8216 2.86297L9.3715 5.90667L3.27304 6.27228L2.27832 8.00238L8.01008 8.76425L5.93836 13.1127L3.57497 12.9962L2.58025 14.7263L5.71452 15.4863L6.15584 14.7187L6.15619 14.7189L5.71493 15.4864L7.94866 17.8127L8.94338 16.0826L7.78529 14.3013L10.4927 10.1901L14.0372 14.7634L15.0319 13.0333L12.2504 7.52101L14.1003 4.71197C14.698 3.8043 14.4072 2.58059 13.465 2.03889Z"
+                                                                  fill="#fff"></path>
+                                                            <mask id="mask0_616_69308" maskUnits="userSpaceOnUse" x="2"
+                                                                  y="1" width="14" height="17">
+                                                                <path d="M10.8221 2.86252C11.2949 1.87015 12.5126 1.49054 13.4656 2.03844C14.4078 2.58015 14.6986 3.80385 14.1009 4.71152L7.13894 15.2832L5.38506 14.2748L10.8221 2.86252Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M3.57553 12.9957L7.0483 13.167L5.71508 15.4858L2.58081 14.7258L3.57553 12.9957Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M8.94369 16.0822L7.04847 13.1671L5.71524 15.4859L7.94897 17.8123L8.94369 16.0822Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M15.1069 13.1929L12.0233 7.08196L10.3247 10.0363L14.1122 14.923L15.1069 13.1929Z"
+                                                                      fill="#0042C1"></path>
+                                                            </mask>
+                                                            <g mask="url(#mask0_616_69308)">
+                                                                <rect x="14.1167" y="1.86926" width="6.9856"
+                                                                      height="17.257"
+                                                                      transform="rotate(31.5716 14.1167 1.86926)"
+                                                                      fill="#fff"></rect>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text"><span>7개</span>의 여행 상품</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide swiper-slide-active">
+                                    <div class="image-container">
+                                        <img src="https://dripsorda-s3-1.s3.ap-northeast-2.amazonaws.com/%EB%AF%B8%EA%B5%AD.webp">
+                                    </div>
+                                    <div class="travel-swiper-text-container">
+                                        <div class="travel-swiper-text">
+                                            <div class="top-text">
+                                                <p class="text">몽골</p></div>
+                                            <div class="middle-text">
+                                                <div class="middle-text-container">
+                                                    <div class="svg-container">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M15.6925 12C17.7317 12 19.3848 10.3469 19.3848 8.30769C19.3848 6.26849 17.7317 4.61539 15.6925 4.61539C13.6533 4.61539 12.0002 6.26849 12.0002 8.30769C12.0002 10.3469 13.6533 12 15.6925 12ZM24.0002 18.9231C24.0002 19.0783 23.992 19.2322 23.9759 19.3845H7.40897C7.39293 19.2322 7.38477 19.0783 7.38477 18.9231C7.38477 15.6094 11.1042 12.9231 15.6925 12.9231C20.2807 12.9231 24.0002 15.6094 24.0002 18.9231Z"
+                                                                  fill="#fff"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M11.3075 10.3666C10.6732 11.0852 9.74518 11.5385 8.71131 11.5385C6.79956 11.5385 5.24977 9.98868 5.24977 8.07692C5.24977 6.16517 6.79956 4.61539 8.71131 4.61539C9.74518 4.61539 10.6732 5.06864 11.3075 5.78727C10.7689 6.39748 10.4421 7.19904 10.4421 8.07692C10.4421 8.95481 10.7689 9.75637 11.3075 10.3666ZM11.3075 12.7239C8.28245 13.4961 6.11516 15.5797 6.11516 18.0288C6.11516 18.1744 6.12282 18.3187 6.13785 18.4615H0.945544C0.930507 18.3187 0.922852 18.1744 0.922852 18.0288C0.922852 14.9222 4.40986 12.4038 8.71131 12.4038C9.62162 12.4038 10.4954 12.5166 11.3075 12.7239Z"
+                                                                  fill="#fff"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text">
+                                                        <span>198명</span>의 여행 동행</p>
+                                                </div>
+                                                <div class="bottom-text">
+                                                    <div class="bottom-text-container">
+                                                        <svg width="20" height="20" viewBox="0 0 18 18" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M13.465 2.03889C12.5121 1.49098 11.2944 1.8706 10.8216 2.86297L9.3715 5.90667L3.27304 6.27228L2.27832 8.00238L8.01008 8.76425L5.93836 13.1127L3.57497 12.9962L2.58025 14.7263L5.71452 15.4863L6.15584 14.7187L6.15619 14.7189L5.71493 15.4864L7.94866 17.8127L8.94338 16.0826L7.78529 14.3013L10.4927 10.1901L14.0372 14.7634L15.0319 13.0333L12.2504 7.52101L14.1003 4.71197C14.698 3.8043 14.4072 2.58059 13.465 2.03889Z"
+                                                                  fill="#fff"></path>
+                                                            <mask id="mask0_616_69308" maskUnits="userSpaceOnUse" x="2"
+                                                                  y="1" width="14" height="17">
+                                                                <path d="M10.8221 2.86252C11.2949 1.87015 12.5126 1.49054 13.4656 2.03844C14.4078 2.58015 14.6986 3.80385 14.1009 4.71152L7.13894 15.2832L5.38506 14.2748L10.8221 2.86252Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M3.57553 12.9957L7.0483 13.167L5.71508 15.4858L2.58081 14.7258L3.57553 12.9957Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M8.94369 16.0822L7.04847 13.1671L5.71524 15.4859L7.94897 17.8123L8.94369 16.0822Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M15.1069 13.1929L12.0233 7.08196L10.3247 10.0363L14.1122 14.923L15.1069 13.1929Z"
+                                                                      fill="#0042C1"></path>
+                                                            </mask>
+                                                            <g mask="url(#mask0_616_69308)">
+                                                                <rect x="14.1167" y="1.86926" width="6.9856"
+                                                                      height="17.257"
+                                                                      transform="rotate(31.5716 14.1167 1.86926)"
+                                                                      fill="#fff"></rect>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text"><span>7개</span>의 여행 상품</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide swiper-slide-active">
+                                    <div class="image-container">
+                                        <img src="https://dripsorda-s3-1.s3.ap-northeast-2.amazonaws.com/%EB%8C%80%EB%A7%8C.webp">
+                                    </div>
+                                    <div class="travel-swiper-text-container">
+                                        <div class="travel-swiper-text">
+                                            <div class="top-text">
+                                                <p class="text">베트남</p></div>
+                                            <div class="middle-text">
+                                                <div class="middle-text-container">
+                                                    <div class="svg-container">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M15.6925 12C17.7317 12 19.3848 10.3469 19.3848 8.30769C19.3848 6.26849 17.7317 4.61539 15.6925 4.61539C13.6533 4.61539 12.0002 6.26849 12.0002 8.30769C12.0002 10.3469 13.6533 12 15.6925 12ZM24.0002 18.9231C24.0002 19.0783 23.992 19.2322 23.9759 19.3845H7.40897C7.39293 19.2322 7.38477 19.0783 7.38477 18.9231C7.38477 15.6094 11.1042 12.9231 15.6925 12.9231C20.2807 12.9231 24.0002 15.6094 24.0002 18.9231Z"
+                                                                  fill="#fff"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M11.3075 10.3666C10.6732 11.0852 9.74518 11.5385 8.71131 11.5385C6.79956 11.5385 5.24977 9.98868 5.24977 8.07692C5.24977 6.16517 6.79956 4.61539 8.71131 4.61539C9.74518 4.61539 10.6732 5.06864 11.3075 5.78727C10.7689 6.39748 10.4421 7.19904 10.4421 8.07692C10.4421 8.95481 10.7689 9.75637 11.3075 10.3666ZM11.3075 12.7239C8.28245 13.4961 6.11516 15.5797 6.11516 18.0288C6.11516 18.1744 6.12282 18.3187 6.13785 18.4615H0.945544C0.930507 18.3187 0.922852 18.1744 0.922852 18.0288C0.922852 14.9222 4.40986 12.4038 8.71131 12.4038C9.62162 12.4038 10.4954 12.5166 11.3075 12.7239Z"
+                                                                  fill="#fff"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text">
+                                                        <span>162명</span>의 여행 동행</p>
+                                                </div>
+                                                <div class="bottom-text">
+                                                    <div class="bottom-text-container">
+                                                        <svg width="20" height="20" viewBox="0 0 18 18" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M13.465 2.03889C12.5121 1.49098 11.2944 1.8706 10.8216 2.86297L9.3715 5.90667L3.27304 6.27228L2.27832 8.00238L8.01008 8.76425L5.93836 13.1127L3.57497 12.9962L2.58025 14.7263L5.71452 15.4863L6.15584 14.7187L6.15619 14.7189L5.71493 15.4864L7.94866 17.8127L8.94338 16.0826L7.78529 14.3013L10.4927 10.1901L14.0372 14.7634L15.0319 13.0333L12.2504 7.52101L14.1003 4.71197C14.698 3.8043 14.4072 2.58059 13.465 2.03889Z"
+                                                                  fill="#fff"></path>
+                                                            <mask id="mask0_616_69308" maskUnits="userSpaceOnUse" x="2"
+                                                                  y="1" width="14" height="17">
+                                                                <path d="M10.8221 2.86252C11.2949 1.87015 12.5126 1.49054 13.4656 2.03844C14.4078 2.58015 14.6986 3.80385 14.1009 4.71152L7.13894 15.2832L5.38506 14.2748L10.8221 2.86252Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M3.57553 12.9957L7.0483 13.167L5.71508 15.4858L2.58081 14.7258L3.57553 12.9957Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M8.94369 16.0822L7.04847 13.1671L5.71524 15.4859L7.94897 17.8123L8.94369 16.0822Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M15.1069 13.1929L12.0233 7.08196L10.3247 10.0363L14.1122 14.923L15.1069 13.1929Z"
+                                                                      fill="#0042C1"></path>
+                                                            </mask>
+                                                            <g mask="url(#mask0_616_69308)">
+                                                                <rect x="14.1167" y="1.86926" width="6.9856"
+                                                                      height="17.257"
+                                                                      transform="rotate(31.5716 14.1167 1.86926)"
+                                                                      fill="#fff"></rect>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text"><span>13개</span>의 여행 상품</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide swiper-slide-active">
+                                    <div class="image-container">
+                                        <img src="https://dripsorda-s3-1.s3.ap-northeast-2.amazonaws.com/%EB%AA%BD%EA%B3%A8.webp">
+                                    </div>
+                                    <div class="travel-swiper-text-container">
+                                        <div class="travel-swiper-text">
+                                            <div class="top-text">
+                                                <p class="text">태국</p></div>
+                                            <div class="middle-text">
+                                                <div class="middle-text-container">
+                                                    <div class="svg-container">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M15.6925 12C17.7317 12 19.3848 10.3469 19.3848 8.30769C19.3848 6.26849 17.7317 4.61539 15.6925 4.61539C13.6533 4.61539 12.0002 6.26849 12.0002 8.30769C12.0002 10.3469 13.6533 12 15.6925 12ZM24.0002 18.9231C24.0002 19.0783 23.992 19.2322 23.9759 19.3845H7.40897C7.39293 19.2322 7.38477 19.0783 7.38477 18.9231C7.38477 15.6094 11.1042 12.9231 15.6925 12.9231C20.2807 12.9231 24.0002 15.6094 24.0002 18.9231Z"
+                                                                  fill="#fff"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M11.3075 10.3666C10.6732 11.0852 9.74518 11.5385 8.71131 11.5385C6.79956 11.5385 5.24977 9.98868 5.24977 8.07692C5.24977 6.16517 6.79956 4.61539 8.71131 4.61539C9.74518 4.61539 10.6732 5.06864 11.3075 5.78727C10.7689 6.39748 10.4421 7.19904 10.4421 8.07692C10.4421 8.95481 10.7689 9.75637 11.3075 10.3666ZM11.3075 12.7239C8.28245 13.4961 6.11516 15.5797 6.11516 18.0288C6.11516 18.1744 6.12282 18.3187 6.13785 18.4615H0.945544C0.930507 18.3187 0.922852 18.1744 0.922852 18.0288C0.922852 14.9222 4.40986 12.4038 8.71131 12.4038C9.62162 12.4038 10.4954 12.5166 11.3075 12.7239Z"
+                                                                  fill="#fff"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text">
+                                                        <span>123명</span>의 여행 동행</p>
+                                                </div>
+                                                <div class="bottom-text">
+                                                    <div class="bottom-text-container">
+                                                        <svg width="20" height="20" viewBox="0 0 18 18" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M13.465 2.03889C12.5121 1.49098 11.2944 1.8706 10.8216 2.86297L9.3715 5.90667L3.27304 6.27228L2.27832 8.00238L8.01008 8.76425L5.93836 13.1127L3.57497 12.9962L2.58025 14.7263L5.71452 15.4863L6.15584 14.7187L6.15619 14.7189L5.71493 15.4864L7.94866 17.8127L8.94338 16.0826L7.78529 14.3013L10.4927 10.1901L14.0372 14.7634L15.0319 13.0333L12.2504 7.52101L14.1003 4.71197C14.698 3.8043 14.4072 2.58059 13.465 2.03889Z"
+                                                                  fill="#fff"></path>
+                                                            <mask id="mask0_616_69308" maskUnits="userSpaceOnUse" x="2"
+                                                                  y="1" width="14" height="17">
+                                                                <path d="M10.8221 2.86252C11.2949 1.87015 12.5126 1.49054 13.4656 2.03844C14.4078 2.58015 14.6986 3.80385 14.1009 4.71152L7.13894 15.2832L5.38506 14.2748L10.8221 2.86252Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M3.57553 12.9957L7.0483 13.167L5.71508 15.4858L2.58081 14.7258L3.57553 12.9957Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M8.94369 16.0822L7.04847 13.1671L5.71524 15.4859L7.94897 17.8123L8.94369 16.0822Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M15.1069 13.1929L12.0233 7.08196L10.3247 10.0363L14.1122 14.923L15.1069 13.1929Z"
+                                                                      fill="#0042C1"></path>
+                                                            </mask>
+                                                            <g mask="url(#mask0_616_69308)">
+                                                                <rect x="14.1167" y="1.86926" width="6.9856"
+                                                                      height="17.257"
+                                                                      transform="rotate(31.5716 14.1167 1.86926)"
+                                                                      fill="#fff"></rect>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text"><span>5개</span>의 여행 상품</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide swiper-slide-active">
+                                    <div class="image-container">
+                                        <img src="https://dripsorda-s3-1.s3.ap-northeast-2.amazonaws.com/%EB%B2%A0%ED%8A%B8%EB%82%A8.webp">
+                                    </div>
+                                    <div class="travel-swiper-text-container">
+                                        <div class="travel-swiper-text">
+                                            <div class="top-text">
+                                                <p class="text">미국</p></div>
+                                            <div class="middle-text">
+                                                <div class="middle-text-container">
+                                                    <div class="svg-container">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M15.6925 12C17.7317 12 19.3848 10.3469 19.3848 8.30769C19.3848 6.26849 17.7317 4.61539 15.6925 4.61539C13.6533 4.61539 12.0002 6.26849 12.0002 8.30769C12.0002 10.3469 13.6533 12 15.6925 12ZM24.0002 18.9231C24.0002 19.0783 23.992 19.2322 23.9759 19.3845H7.40897C7.39293 19.2322 7.38477 19.0783 7.38477 18.9231C7.38477 15.6094 11.1042 12.9231 15.6925 12.9231C20.2807 12.9231 24.0002 15.6094 24.0002 18.9231Z"
+                                                                  fill="#fff"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M11.3075 10.3666C10.6732 11.0852 9.74518 11.5385 8.71131 11.5385C6.79956 11.5385 5.24977 9.98868 5.24977 8.07692C5.24977 6.16517 6.79956 4.61539 8.71131 4.61539C9.74518 4.61539 10.6732 5.06864 11.3075 5.78727C10.7689 6.39748 10.4421 7.19904 10.4421 8.07692C10.4421 8.95481 10.7689 9.75637 11.3075 10.3666ZM11.3075 12.7239C8.28245 13.4961 6.11516 15.5797 6.11516 18.0288C6.11516 18.1744 6.12282 18.3187 6.13785 18.4615H0.945544C0.930507 18.3187 0.922852 18.1744 0.922852 18.0288C0.922852 14.9222 4.40986 12.4038 8.71131 12.4038C9.62162 12.4038 10.4954 12.5166 11.3075 12.7239Z"
+                                                                  fill="#fff"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text">
+                                                        <span>114명</span>의 여행 동행</p>
+                                                </div>
+                                                <div class="bottom-text">
+                                                    <div class="bottom-text-container">
+                                                        <svg width="20" height="20" viewBox="0 0 18 18" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M13.465 2.03889C12.5121 1.49098 11.2944 1.8706 10.8216 2.86297L9.3715 5.90667L3.27304 6.27228L2.27832 8.00238L8.01008 8.76425L5.93836 13.1127L3.57497 12.9962L2.58025 14.7263L5.71452 15.4863L6.15584 14.7187L6.15619 14.7189L5.71493 15.4864L7.94866 17.8127L8.94338 16.0826L7.78529 14.3013L10.4927 10.1901L14.0372 14.7634L15.0319 13.0333L12.2504 7.52101L14.1003 4.71197C14.698 3.8043 14.4072 2.58059 13.465 2.03889Z"
+                                                                  fill="#fff"></path>
+                                                            <mask id="mask0_616_69308" maskUnits="userSpaceOnUse" x="2"
+                                                                  y="1" width="14" height="17">
+                                                                <path d="M10.8221 2.86252C11.2949 1.87015 12.5126 1.49054 13.4656 2.03844C14.4078 2.58015 14.6986 3.80385 14.1009 4.71152L7.13894 15.2832L5.38506 14.2748L10.8221 2.86252Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M3.57553 12.9957L7.0483 13.167L5.71508 15.4858L2.58081 14.7258L3.57553 12.9957Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M8.94369 16.0822L7.04847 13.1671L5.71524 15.4859L7.94897 17.8123L8.94369 16.0822Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M15.1069 13.1929L12.0233 7.08196L10.3247 10.0363L14.1122 14.923L15.1069 13.1929Z"
+                                                                      fill="#0042C1"></path>
+                                                            </mask>
+                                                            <g mask="url(#mask0_616_69308)">
+                                                                <rect x="14.1167" y="1.86926" width="6.9856"
+                                                                      height="17.257"
+                                                                      transform="rotate(31.5716 14.1167 1.86926)"
+                                                                      fill="#fff"></rect>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text"><span>7개</span>의 여행 상품</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide swiper-slide-active">
+                                    <div class="image-container">
+                                        <img
+                                                src="https://dripsorda-s3-1.s3.ap-northeast-2.amazonaws.com/%ED%83%9C%EA%B5%AD.webp">
+                                    </div>
+                                    <div class="travel-swiper-text-container">
+                                        <div class="travel-swiper-text">
+                                            <div class="top-text">
+                                                <p class="text">필리핀</p></div>
+                                            <div class="middle-text">
+                                                <div class="middle-text-container">
+                                                    <div class="svg-container">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M15.6925 12C17.7317 12 19.3848 10.3469 19.3848 8.30769C19.3848 6.26849 17.7317 4.61539 15.6925 4.61539C13.6533 4.61539 12.0002 6.26849 12.0002 8.30769C12.0002 10.3469 13.6533 12 15.6925 12ZM24.0002 18.9231C24.0002 19.0783 23.992 19.2322 23.9759 19.3845H7.40897C7.39293 19.2322 7.38477 19.0783 7.38477 18.9231C7.38477 15.6094 11.1042 12.9231 15.6925 12.9231C20.2807 12.9231 24.0002 15.6094 24.0002 18.9231Z"
+                                                                  fill="#fff"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M11.3075 10.3666C10.6732 11.0852 9.74518 11.5385 8.71131 11.5385C6.79956 11.5385 5.24977 9.98868 5.24977 8.07692C5.24977 6.16517 6.79956 4.61539 8.71131 4.61539C9.74518 4.61539 10.6732 5.06864 11.3075 5.78727C10.7689 6.39748 10.4421 7.19904 10.4421 8.07692C10.4421 8.95481 10.7689 9.75637 11.3075 10.3666ZM11.3075 12.7239C8.28245 13.4961 6.11516 15.5797 6.11516 18.0288C6.11516 18.1744 6.12282 18.3187 6.13785 18.4615H0.945544C0.930507 18.3187 0.922852 18.1744 0.922852 18.0288C0.922852 14.9222 4.40986 12.4038 8.71131 12.4038C9.62162 12.4038 10.4954 12.5166 11.3075 12.7239Z"
+                                                                  fill="#fff"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text">
+                                                        <span>107명</span>의 여행 동행</p>
+                                                </div>
+                                                <div class="bottom-text">
+                                                    <div class="bottom-text-container">
+                                                        <svg width="20" height="20" viewBox="0 0 18 18" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M13.465 2.03889C12.5121 1.49098 11.2944 1.8706 10.8216 2.86297L9.3715 5.90667L3.27304 6.27228L2.27832 8.00238L8.01008 8.76425L5.93836 13.1127L3.57497 12.9962L2.58025 14.7263L5.71452 15.4863L6.15584 14.7187L6.15619 14.7189L5.71493 15.4864L7.94866 17.8127L8.94338 16.0826L7.78529 14.3013L10.4927 10.1901L14.0372 14.7634L15.0319 13.0333L12.2504 7.52101L14.1003 4.71197C14.698 3.8043 14.4072 2.58059 13.465 2.03889Z"
+                                                                  fill="#fff"></path>
+                                                            <mask id="mask0_616_69308" maskUnits="userSpaceOnUse" x="2"
+                                                                  y="1" width="14" height="17">
+                                                                <path d="M10.8221 2.86252C11.2949 1.87015 12.5126 1.49054 13.4656 2.03844C14.4078 2.58015 14.6986 3.80385 14.1009 4.71152L7.13894 15.2832L5.38506 14.2748L10.8221 2.86252Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M3.57553 12.9957L7.0483 13.167L5.71508 15.4858L2.58081 14.7258L3.57553 12.9957Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M8.94369 16.0822L7.04847 13.1671L5.71524 15.4859L7.94897 17.8123L8.94369 16.0822Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M15.1069 13.1929L12.0233 7.08196L10.3247 10.0363L14.1122 14.923L15.1069 13.1929Z"
+                                                                      fill="#0042C1"></path>
+                                                            </mask>
+                                                            <g mask="url(#mask0_616_69308)">
+                                                                <rect x="14.1167" y="1.86926" width="6.9856"
+                                                                      height="17.257"
+                                                                      transform="rotate(31.5716 14.1167 1.86926)"
+                                                                      fill="#fff"></rect>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text"><span>1개</span>의 여행 상품</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide swiper-slide-active">
+                                    <div class="image-container">
+                                        <img src="https://dripsorda-s3-1.s3.ap-northeast-2.amazonaws.com/%ED%94%84%EB%9E%91%EC%8A%A4.webp">
+                                    </div>
+                                    <div class="travel-swiper-text-container">
+                                        <div class="travel-swiper-text">
+                                            <div class="top-text">
+                                                <p class="text">홍콩</p></div>
+                                            <div class="middle-text">
+                                                <div class="middle-text-container">
+                                                    <div class="svg-container">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M15.6925 12C17.7317 12 19.3848 10.3469 19.3848 8.30769C19.3848 6.26849 17.7317 4.61539 15.6925 4.61539C13.6533 4.61539 12.0002 6.26849 12.0002 8.30769C12.0002 10.3469 13.6533 12 15.6925 12ZM24.0002 18.9231C24.0002 19.0783 23.992 19.2322 23.9759 19.3845H7.40897C7.39293 19.2322 7.38477 19.0783 7.38477 18.9231C7.38477 15.6094 11.1042 12.9231 15.6925 12.9231C20.2807 12.9231 24.0002 15.6094 24.0002 18.9231Z"
+                                                                  fill="#fff"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M11.3075 10.3666C10.6732 11.0852 9.74518 11.5385 8.71131 11.5385C6.79956 11.5385 5.24977 9.98868 5.24977 8.07692C5.24977 6.16517 6.79956 4.61539 8.71131 4.61539C9.74518 4.61539 10.6732 5.06864 11.3075 5.78727C10.7689 6.39748 10.4421 7.19904 10.4421 8.07692C10.4421 8.95481 10.7689 9.75637 11.3075 10.3666ZM11.3075 12.7239C8.28245 13.4961 6.11516 15.5797 6.11516 18.0288C6.11516 18.1744 6.12282 18.3187 6.13785 18.4615H0.945544C0.930507 18.3187 0.922852 18.1744 0.922852 18.0288C0.922852 14.9222 4.40986 12.4038 8.71131 12.4038C9.62162 12.4038 10.4954 12.5166 11.3075 12.7239Z"
+                                                                  fill="#fff"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text">
+                                                        <span>104명</span>의 여행 동행</p>
+                                                </div>
+                                                <div class="bottom-text">
+                                                    <div class="bottom-text-container">
+                                                        <svg width="20" height="20" viewBox="0 0 18 18" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M13.465 2.03889C12.5121 1.49098 11.2944 1.8706 10.8216 2.86297L9.3715 5.90667L3.27304 6.27228L2.27832 8.00238L8.01008 8.76425L5.93836 13.1127L3.57497 12.9962L2.58025 14.7263L5.71452 15.4863L6.15584 14.7187L6.15619 14.7189L5.71493 15.4864L7.94866 17.8127L8.94338 16.0826L7.78529 14.3013L10.4927 10.1901L14.0372 14.7634L15.0319 13.0333L12.2504 7.52101L14.1003 4.71197C14.698 3.8043 14.4072 2.58059 13.465 2.03889Z"
+                                                                  fill="#fff"></path>
+                                                            <mask id="mask0_616_69308" maskUnits="userSpaceOnUse" x="2"
+                                                                  y="1" width="14" height="17">
+                                                                <path d="M10.8221 2.86252C11.2949 1.87015 12.5126 1.49054 13.4656 2.03844C14.4078 2.58015 14.6986 3.80385 14.1009 4.71152L7.13894 15.2832L5.38506 14.2748L10.8221 2.86252Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M3.57553 12.9957L7.0483 13.167L5.71508 15.4858L2.58081 14.7258L3.57553 12.9957Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M8.94369 16.0822L7.04847 13.1671L5.71524 15.4859L7.94897 17.8123L8.94369 16.0822Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M15.1069 13.1929L12.0233 7.08196L10.3247 10.0363L14.1122 14.923L15.1069 13.1929Z"
+                                                                      fill="#0042C1"></path>
+                                                            </mask>
+                                                            <g mask="url(#mask0_616_69308)">
+                                                                <rect x="14.1167" y="1.86926" width="6.9856"
+                                                                      height="17.257"
+                                                                      transform="rotate(31.5716 14.1167 1.86926)"
+                                                                      fill="#fff"></rect>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text"><span>1개</span>의 여행 상품</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide swiper-slide-active">
+                                    <div class="image-container">
+                                        <img src="https://dripsorda-s3-1.s3.ap-northeast-2.amazonaws.com/%ED%95%84%EB%A6%AC%ED%95%80.webp">
+                                    </div>
+                                    <div class="travel-swiper-text-container">
+                                        <div class="travel-swiper-text">
+                                            <div class="top-text">
+                                                <p class="text">대만</p></div>
+                                            <div class="middle-text">
+                                                <div class="middle-text-container">
+                                                    <div class="svg-container">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M15.6925 12C17.7317 12 19.3848 10.3469 19.3848 8.30769C19.3848 6.26849 17.7317 4.61539 15.6925 4.61539C13.6533 4.61539 12.0002 6.26849 12.0002 8.30769C12.0002 10.3469 13.6533 12 15.6925 12ZM24.0002 18.9231C24.0002 19.0783 23.992 19.2322 23.9759 19.3845H7.40897C7.39293 19.2322 7.38477 19.0783 7.38477 18.9231C7.38477 15.6094 11.1042 12.9231 15.6925 12.9231C20.2807 12.9231 24.0002 15.6094 24.0002 18.9231Z"
+                                                                  fill="#fff"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M11.3075 10.3666C10.6732 11.0852 9.74518 11.5385 8.71131 11.5385C6.79956 11.5385 5.24977 9.98868 5.24977 8.07692C5.24977 6.16517 6.79956 4.61539 8.71131 4.61539C9.74518 4.61539 10.6732 5.06864 11.3075 5.78727C10.7689 6.39748 10.4421 7.19904 10.4421 8.07692C10.4421 8.95481 10.7689 9.75637 11.3075 10.3666ZM11.3075 12.7239C8.28245 13.4961 6.11516 15.5797 6.11516 18.0288C6.11516 18.1744 6.12282 18.3187 6.13785 18.4615H0.945544C0.930507 18.3187 0.922852 18.1744 0.922852 18.0288C0.922852 14.9222 4.40986 12.4038 8.71131 12.4038C9.62162 12.4038 10.4954 12.5166 11.3075 12.7239Z"
+                                                                  fill="#fff"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text">
+                                                        <span>73명</span>의 여행 동행</p>
+                                                </div>
+                                                <div class="bottom-text">
+                                                    <div class="bottom-text-container">
+                                                        <svg width="20" height="20" viewBox="0 0 18 18" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M13.465 2.03889C12.5121 1.49098 11.2944 1.8706 10.8216 2.86297L9.3715 5.90667L3.27304 6.27228L2.27832 8.00238L8.01008 8.76425L5.93836 13.1127L3.57497 12.9962L2.58025 14.7263L5.71452 15.4863L6.15584 14.7187L6.15619 14.7189L5.71493 15.4864L7.94866 17.8127L8.94338 16.0826L7.78529 14.3013L10.4927 10.1901L14.0372 14.7634L15.0319 13.0333L12.2504 7.52101L14.1003 4.71197C14.698 3.8043 14.4072 2.58059 13.465 2.03889Z"
+                                                                  fill="#fff"></path>
+                                                            <mask id="mask0_616_69308" maskUnits="userSpaceOnUse" x="2"
+                                                                  y="1" width="14" height="17">
+                                                                <path d="M10.8221 2.86252C11.2949 1.87015 12.5126 1.49054 13.4656 2.03844C14.4078 2.58015 14.6986 3.80385 14.1009 4.71152L7.13894 15.2832L5.38506 14.2748L10.8221 2.86252Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M3.57553 12.9957L7.0483 13.167L5.71508 15.4858L2.58081 14.7258L3.57553 12.9957Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M8.94369 16.0822L7.04847 13.1671L5.71524 15.4859L7.94897 17.8123L8.94369 16.0822Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M15.1069 13.1929L12.0233 7.08196L10.3247 10.0363L14.1122 14.923L15.1069 13.1929Z"
+                                                                      fill="#0042C1"></path>
+                                                            </mask>
+                                                            <g mask="url(#mask0_616_69308)">
+                                                                <rect x="14.1167" y="1.86926" width="6.9856"
+                                                                      height="17.257"
+                                                                      transform="rotate(31.5716 14.1167 1.86926)"
+                                                                      fill="#fff"></rect>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text"><span>1개</span>의 여행 상품</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide swiper-slide-active">
+                                    <div class="image-container">
+                                        <img src="https://dripsorda-s3-1.s3.ap-northeast-2.amazonaws.com/%ED%99%8D%EC%BD%A9.webp">
+                                    </div>
+                                    <div class="travel-swiper-text-container">
+                                        <div class="travel-swiper-text">
+                                            <div class="top-text">
+                                                <p class="text">프랑스</p></div>
+                                            <div class="middle-text">
+                                                <div class="middle-text-container">
+                                                    <div class="svg-container">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M15.6925 12C17.7317 12 19.3848 10.3469 19.3848 8.30769C19.3848 6.26849 17.7317 4.61539 15.6925 4.61539C13.6533 4.61539 12.0002 6.26849 12.0002 8.30769C12.0002 10.3469 13.6533 12 15.6925 12ZM24.0002 18.9231C24.0002 19.0783 23.992 19.2322 23.9759 19.3845H7.40897C7.39293 19.2322 7.38477 19.0783 7.38477 18.9231C7.38477 15.6094 11.1042 12.9231 15.6925 12.9231C20.2807 12.9231 24.0002 15.6094 24.0002 18.9231Z"
+                                                                  fill="#fff"></path>
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M11.3075 10.3666C10.6732 11.0852 9.74518 11.5385 8.71131 11.5385C6.79956 11.5385 5.24977 9.98868 5.24977 8.07692C5.24977 6.16517 6.79956 4.61539 8.71131 4.61539C9.74518 4.61539 10.6732 5.06864 11.3075 5.78727C10.7689 6.39748 10.4421 7.19904 10.4421 8.07692C10.4421 8.95481 10.7689 9.75637 11.3075 10.3666ZM11.3075 12.7239C8.28245 13.4961 6.11516 15.5797 6.11516 18.0288C6.11516 18.1744 6.12282 18.3187 6.13785 18.4615H0.945544C0.930507 18.3187 0.922852 18.1744 0.922852 18.0288C0.922852 14.9222 4.40986 12.4038 8.71131 12.4038C9.62162 12.4038 10.4954 12.5166 11.3075 12.7239Z"
+                                                                  fill="#fff"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text">
+                                                        <span>52명</span>의 여행 동행</p>
+                                                </div>
+                                                <div class="bottom-text">
+                                                    <div class="bottom-text-container">
+                                                        <svg width="20" height="20" viewBox="0 0 18 18" fill="none"
+                                                             xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                  d="M13.465 2.03889C12.5121 1.49098 11.2944 1.8706 10.8216 2.86297L9.3715 5.90667L3.27304 6.27228L2.27832 8.00238L8.01008 8.76425L5.93836 13.1127L3.57497 12.9962L2.58025 14.7263L5.71452 15.4863L6.15584 14.7187L6.15619 14.7189L5.71493 15.4864L7.94866 17.8127L8.94338 16.0826L7.78529 14.3013L10.4927 10.1901L14.0372 14.7634L15.0319 13.0333L12.2504 7.52101L14.1003 4.71197C14.698 3.8043 14.4072 2.58059 13.465 2.03889Z"
+                                                                  fill="#fff"></path>
+                                                            <mask id="mask0_616_69308" maskUnits="userSpaceOnUse" x="2"
+                                                                  y="1" width="14" height="17">
+                                                                <path d="M10.8221 2.86252C11.2949 1.87015 12.5126 1.49054 13.4656 2.03844C14.4078 2.58015 14.6986 3.80385 14.1009 4.71152L7.13894 15.2832L5.38506 14.2748L10.8221 2.86252Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M3.57553 12.9957L7.0483 13.167L5.71508 15.4858L2.58081 14.7258L3.57553 12.9957Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M8.94369 16.0822L7.04847 13.1671L5.71524 15.4859L7.94897 17.8123L8.94369 16.0822Z"
+                                                                      fill="#1766FF"></path>
+                                                                <path d="M15.1069 13.1929L12.0233 7.08196L10.3247 10.0363L14.1122 14.923L15.1069 13.1929Z"
+                                                                      fill="#0042C1"></path>
+                                                            </mask>
+                                                            <g mask="url(#mask0_616_69308)">
+                                                                <rect x="14.1167" y="1.86926" width="6.9856"
+                                                                      height="17.257"
+                                                                      transform="rotate(31.5716 14.1167 1.86926)"
+                                                                      fill="#fff"></rect>
+                                                            </g>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text"><span>10개</span>의 여행 상품</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <button class="swiper-button-prev ">
                                 <img class="left_button" alt="left button"
@@ -197,7 +747,8 @@
             <div class="_recent_best_travel_top">
                 <div class="_recent_best_travel_icon_container">
                     <div class="_recent_best_travel_icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"
+                             fill="none">
                             <path fill-rule="evenodd" clip-rule="evenodd"
                                   d="M17.7699 14.0002C20.149 14.0002 22.0776 12.0715 22.0776 9.69246C22.0776 7.31339 20.149 5.38477 17.7699 5.38477C15.3909 5.38477 13.4623 7.31339 13.4623 9.69246C13.4623 12.0715 15.3909 14.0002 17.7699 14.0002ZM27.4623 22.0771C27.4623 22.2582 27.4527 22.4377 27.434 22.6154H8.10587C8.08716 22.4377 8.07764 22.2582 8.07764 22.0771C8.07764 18.2111 12.417 15.0771 17.7699 15.0771C23.1229 15.0771 27.4623 18.2111 27.4623 22.0771Z"
                                   fill="#008FF6"></path>
@@ -215,7 +766,8 @@
                             <p>여행 동행 더 보러가기</p>
                         </a>
                         <div class="_recent_best_travel_more_icon">
-                            <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            <svg width="8" height="14" viewBox="0 0 8 14" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg"
                                  style="cursor: pointer;">
                                 <path d="M1 1L7 7L1 13" stroke="#00CE7C" stroke-width="1"
                                       stroke-linecap="square"></path>
@@ -224,13 +776,13 @@
                     </div>
                 </div>
             </div>
-            <div class="_recent_best_travel_menu_container" id="recentBestTravelMenuContainer"
-                 th:each="articleRecentListDto : ${accompanyArticles}">
-                <a class="accompany" th:data-index="${articleRecentListDto.getIndex()}"
-                   th:href="'./accompany/read/' + ${articleRecentListDto.getIndex()}">
-                    <img class="cover-image" alt="" src="./cover-image/1"
-                         th:src="'./accompany/cover-image/' + ${articleRecentListDto.getIndex()}">
-                    <span class="location-container" id="locationContainer">
+            <div class="_recent_best_travel_menu_container" id="recentBestTravelMenuContainer">
+                <div class="_recent_best_travel_menu"  th:each="articleRecentListDto : ${accompanyArticles}">
+                    <a class="accompany" th:data-index="${articleRecentListDto.getIndex()}"
+                       th:href="'./accompany/read/' + ${articleRecentListDto.getIndex()}">
+                        <img class="cover-image" alt="" src="./cover-image/1"
+                             th:src="'./accompany/cover-image/' + ${articleRecentListDto.getIndex()}">
+                        <span class="location-container" id="locationContainer">
                         <span class="icon-container"></span>
                         <span class="text" th:text="${articleRecentListDto.getRegionText()+ '&nbsp;'}"></span>
                         <span class="duration date-From"
@@ -239,17 +791,16 @@
                         <span class="duration date-to"
                               th:text="${#dates.format(articleRecentListDto.getDateTo(), 'MM-dd')}"></span>
                     </span>
-                    <span class="title-container">
+                        <span class="title-container">
 <!--                        <span class="status">모집중</span>-->
                         <span class="title" th:text="${articleRecentListDto.getTitle()}">홍콩으로 가는 그브</span>
                     </span>
-                    <span class="content" th:utext="${articleRecentListDto.getContent()}">그레이브즈</span>
-                    <span class="nickname" th:text="'닉네임  ' + ${articleRecentListDto.getUserNickname()}"></span>
-                </a>
+                        <span class="content" th:utext="${articleRecentListDto.getContent()}">그레이브즈</span>
+                        <span class="nickname" th:text="'닉네임  ' + ${articleRecentListDto.getUserNickname()}"></span>
+                    </a>
 
+                </div>
             </div>
-
-        </div>
         </div>
     </nav>
     <nav th:if="${session.memberUser != null}" class="right-bottom-nav">
@@ -272,7 +823,8 @@
                 </li>
                 <li class="item qna">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
-                         foundation="[object Object]" class="Iconstyled__Icon-sc-1iqwu2g-0 dKyOtd" data-testid="bezier-react-icon"
+                         foundation="[object Object]" class="Iconstyled__Icon-sc-1iqwu2g-0 dKyOtd"
+                         data-testid="bezier-react-icon"
                          color="txt-black-dark" margintop="0" marginright="0" marginbottom="0" marginleft="0">
                         <path fill="currentColor" fill-rule="evenodd"
                               d="M20.138 2.018a.86.86 0 0 0-.427.115l-6.51 3.727a.86.86 0 0 1-.428.114H4a1 1 0 0 0-1 1V15a1 1 0 0 0 1 1h2.668l-.908 4.4a.5.5 0 0 0 .49.6h3.321a.8.8 0 0 0 .783-.638L11.255 16h1.518a.86.86 0 0 1 .428.114l6.51 3.727a.86.86 0 0 0 1.29-.747V2.88a.862.862 0 0 0-.863-.862Z"
@@ -308,19 +860,16 @@
                         <span>어떻게 도와드릴까요?</span>
                     </div>
                 </li>
-                <li class="item user" th:each="userChats : ${userChat}">
-                    <span th:text="${userChats.getContent()}"></span>
+                <li th:each="chat : ${allChat}"
+                    th:class="${chat.room == 1 ? 'item manager' : 'item user'}">
+                    <span th:text="${chat.content}"></span>
                 </li>
-
-                <Li class="item manager" th:each="adminChats : ${adminChat}">
-                    <span th:text="${adminChats.getContent()}"></span>
-                </Li>
                 <form class="_object-button chatForm" id="chatMessageForm">
                     <label>
                         <textarea name="content" placeholder="메시지를 입력해주세요."></textarea>
                     </label>
                     <label>
-                        <input hidden name="rid"  th:value="${session.memberUser.isAdmin() ? 1 : 2}" >
+                        <input hidden name="rid" th:value="${session.memberUser.isAdmin() ? 1 : 2}">
                     </label>
                     <input class="_object-button" type="submit" value="보내기">
                 </form>
@@ -353,7 +902,8 @@
             <div class="x-button" id="xButton">
                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="none" viewBox="0 0 24 24"
                      foundation="[object Object]" class="Iconstyled__Icon-sc-1iqwu2g-0 pJGcx"
-                     data-testid="bezier-react-icon" color="txt-black-darker" margintop="0" marginright="0" marginbottom="0"
+                     data-testid="bezier-react-icon" color="txt-black-darker" margintop="0" marginright="0"
+                     marginbottom="0"
                      marginleft="0" aria-hidden="true">
                     <path fill="currentColor" fill-rule="evenodd"
                           d="M16.95 8.464a1 1 0 1 0-1.414-1.414L12 10.586 8.465 7.051A1 1 0 0 0 7.05 8.464L10.586 12 7.05 15.535a1 1 0 1 0 1.414 1.414L12 13.414l3.536 3.536a1 1 0 0 0 1.414-1.415L13.414 12l3.536-3.536Z"

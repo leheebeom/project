@@ -15,7 +15,7 @@ body > .main > .form {
     justify-content: flex-start;
 }
 body > .main > .form > h1 {
-    font-size: 30px;
+    font-size: 1.875rem;
     font-weight: 700;
 }
 

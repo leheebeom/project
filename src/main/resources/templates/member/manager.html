@@ -39,15 +39,62 @@
     <th:block th:switch="${#request.getParameter('tab')}">
         <section class="content box accompany" th:case="'accompany'">
             <h2 class="title">동행 게시글</h2>
+            <div class="no-comment" th:if="${accompanyArticles.isEmpty() || accompanyArticles == null}">
+                <span>등록된 게시글이 없습니다.</span>
+            </div>
+            <div class="accompany_container"
+                 id="accompanyContainer">
+                <div class="accompany_menu" th:each="userArticleDto : ${accompanyArticles}">
+                    <a class="accompany" th:data-index="${userArticleDto.getIndex()}"
+                       th:href="'/accompany/read/' + ${userArticleDto.getIndex()}">
+                        <img class="cover-image" alt=""
+                             th:src="'/accompany/cover-image/' + ${userArticleDto.getIndex()}">
+                        <span class="location-container" id="locationContainer">
+                        <span class="icon-container"></span>
+                        <span class="text" th:text="${userArticleDto.getRegionText()+ '&nbsp;'}"></span>
+                        <span class="duration date-From"
+                              th:text="${#dates.format(userArticleDto.getDateFrom(), 'MM-dd')}"></span>
+                        <span class="duration">&nbsp;~&nbsp;</span>
+                        <span class="duration date-to"
+                              th:text="${#dates.format(userArticleDto.getDateTo(), 'MM-dd')}"></span>
+                    </span>
+                        <span class="title-container">
+                        <span class="title" th:text="${userArticleDto.getTitle()}">홍콩으로 가는 그브</span>
+                    </span>
+                        <span class="content" th:utext="${userArticleDto.getContent()}">그레이브즈</span>
+                        <span class="nickname" th:text="'닉네임  ' + ${userArticleDto.getUserNickname()}"></span>
+                    </a>
+                </div>
+            </div>
         </section>
         <section class="content box comment" th:case="'comment'">
             <h2 class="title">댓글</h2>
+            <table class="board-table">
+                <thead>
+                <tr>
+                    <th>이메일</th>
+                    <th>게시글 번호</th>
+                    <th>내용</th>
+                    <th>작성 날짜</th>
+                    <th>좋아요 수</th>
+                </tr>
+                </thead>
+                <tbody class="table-text" th:each="commentList : ${accompanyComments}">
+                <tr>
+                    <td th:text="${commentList.getUserEmail()}"></td>
+                    <td th:text="${commentList.getArticleIndex()}"></td>
+                    <td th:text="${commentList.getContent()}"></td>
+                    <td th:text="${#dates.format(commentList.getCreatedAt(),'yyyy-MM-dd')}"></td>
+                    <td th:text="${commentList.getLikes()}"></td>
+                </tr>
+                </tbody>
+            </table>
         </section>
         <section class="content box qna" th:case="'qna'">
             <h2 class="title">qna</h2>
             <a class="_object-button" th:href="@{./manager/write}">공지사항 쓰기</a>
             <h2 class="title">문의 사항</h2>
-            <table class="board-table" >
+            <table class="board-table">
                 <thead>
                 <tr>
                     <th>이메일</th>
@@ -59,8 +106,8 @@
                 </thead>
                 <tbody class="table-text" th:each="userChatList : ${memberChats}">
                 <tr>
-                    <td th:text="${userChatList.getSendUserEmail()}"></td>
-                    <td th:text="${userChatList.getContent()}"></td>
+                    <td class="userEmail" th:text="${userChatList.getSendUserEmail()}"></td>
+                    <td class="content" th:text="${userChatList.getContent()}"></td>
                     <td th:text="${#dates.format(userChatList.getSendTime(), 'yyyy-MM-dd : HH:mm:ss')}"></td>
                     <td th:text="${userChatList.readChecked}"></td>
                     <td class="send">
@@ -75,7 +122,7 @@
         </section>
         <section class="content box user" th:case="*">
             <h2 class="title">회원</h2>
-            <table class="board-table" >
+            <table class="board-table">
                 <thead>
                 <tr>
                     <th>이메일</th>
@@ -96,9 +143,7 @@
                     <td th:text="${#dates.format(memberList.getRegisteredAt(), 'yyyy-MM-dd')}"></td>
                 </tr>
                 </tbody>
-
             </table>
-            <table></table>
         </section>
     </th:block>
 </main>

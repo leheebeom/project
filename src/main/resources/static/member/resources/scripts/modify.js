@@ -54,7 +54,7 @@ const form = window.document.getElementById('form');
 
 loadQnaArticle();
 form['back'].addEventListener('click', () => {
-    window.location.href = './';
+    history.back();
 });
 form.onsubmit = e => {
     e.preventDefault();

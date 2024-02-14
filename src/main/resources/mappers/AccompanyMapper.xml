@@ -9,12 +9,34 @@
         LIMIT 1
     </delete>
 
+
     <delete id="deleteComment">
         DELETE
         FROM `dripsoda_accompany`.`comment`
         WHERE `article_index` = #{id}
           and `index` = #{commentIndex}
     </delete>
+    <delete id="deleteLike">
+        DELETE
+        FROM `dripsoda_accompany`.`comment_likes`
+        WHERE `article_index` = #{id}
+          and `comment_index` = #{commentIndex}
+    </delete>
+
+    <delete id="deleteRequest">
+        DELETE
+        FROM `dripsoda_accompany`.`requests`
+        WHERE  `requester_user_email` = #{userEmail}
+        and `article_index` = #{id}
+    </delete>
+    <delete id="deleteCommentLike">
+        DELETE
+        FROM `dripsoda_accompany`.`comment_likes`
+        WHERE `article_index` = #{id}
+          and `comment_index` = #{commentIndex}
+        and `user_email` = #{userEmail}
+    </delete>
+
 
     <insert id="insertImage"
             parameterType="com.dripsoda.community.entities.accompany.ImageEntity"
@@ -81,6 +103,17 @@
                 #{isDeleted})
     </insert>
 
+    <select id="selectCommentLikeByIndexAndCommentIndex"
+    resultType="com.dripsoda.community.entities.accompany.CommentLikeEntity">
+        select `index` as `index`,
+               `comment_index` as `commentIndex` ,
+               `article_index` as `articleIndex` ,
+               `user_email` as `userEmail`,
+               `checked_flag` as `isChecked`
+            from `dripsoda_accompany`.`comment_likes`
+        where `article_index` = #{id}
+        and `comment_index` = #{commentIndex}
+    </select>
     <select id="selectArticleByIndex"
             resultType="com.dripsoda.community.entities.accompany.ArticleEntity">
         select `index`            as `index`,
@@ -155,6 +188,32 @@
                `user`.`nickname` LIKE '%' #{keyword} '%')
         ORDER BY `article`.`index` DESC
     </select>
+
+    <select id="selectArticlesForUserMy"
+            resultType="com.dripsoda.community.dtos.accompany.ArticleUserMyDto">
+        SELECT `article`.`index`              AS `index`,
+               `article`.`user_email`         AS `userEmail`,
+               `article`.`created_at`         AS `createdAt`,
+               `article`.`continent_value`    AS `continentValue`,
+               `article`.`country_value`      AS `countryValue`,
+               `article`.`region_value`       AS `regionValue`,
+               `article`.`capacity`           AS `capacity`,
+               `article`.`date_from`          AS `dateFrom`,
+               `article`.`date_to`            AS `dateTo`,
+               `article`.`title`              AS `title`,
+               LEFT(`article`.`content`, 100) AS `content`,
+               `article`.view_count           as `viewCount`,
+               `user`.`name`                  AS `userName`,
+               `user`.`nickname`              AS `userNickname`,
+               `user`.`profile_id`            as `userProfileId`,
+               `user`.`profile_data`          as `userProfileData`,
+               `region`.`text`                as `regionText`
+        FROM `dripsoda_accompany`.`articles` AS `article`
+                 LEFT JOIN `dripsoda_member`.`users` AS `user` ON `article`.`user_email` = `user`.`email`
+                 LEFT JOIN `dripsoda_accompany`.`regions` AS `region` ON `article`.`region_value` = `region`.`value`
+        WHERE `user_email` = #{userEmail}
+        ORDER BY `article`.`index` DESC
+    </select>
     <select id="selectArticlesForHome"
             resultType="com.dripsoda.community.dtos.accompany.ArticleRecentListDto"><![CDATA[
         SELECT `article`.`index`              AS `index`,
@@ -181,6 +240,33 @@
         LIMIT 8;
         ]]></select>
 
+    <select id="selectArticlesForManager"
+            resultType="com.dripsoda.community.dtos.accompany.ArticleManagerDto"><![CDATA[
+        SELECT `article`.`index`              AS `index`,
+               `article`.`user_email`         AS `userEmail`,
+               `article`.`created_at`         AS `createdAt`,
+               `article`.`continent_value`    AS `continentValue`,
+               `article`.`country_value`      AS `countryValue`,
+               `article`.`region_value`       AS `regionValue`,
+               `article`.`capacity`           AS `capacity`,
+               `article`.`date_from`          AS `dateFrom`,
+               `article`.`date_to`            AS `dateTo`,
+               `article`.`title`              AS `title`,
+               LEFT(`article`.`content`, 100) AS `content`,
+               `article`.`view_count`         AS `viewCount`,
+               `user`.`name`                  AS `userName`,
+               `user`.`nickname`              AS `userNickname`,
+               `region`.`text`                as `regionText`
+        FROM `dripsoda_accompany`.`articles` AS `article`
+                 LEFT JOIN
+             `dripsoda_member`.`users` AS `user` ON `article`.`user_email` = `user`.`email`
+                 LEFT JOIN `dripsoda_accompany`.`regions` AS `region` ON `article`.`region_value` = `region`.`value`
+        ORDER BY `article`.`created_at` DESC,
+                 `article`.`view_count`
+        ]]></select>
+
+
+
     <select id="selectArticlesForRecent"
             resultType="com.dripsoda.community.dtos.accompany.ArticleBestTravleDto">
         select article.`region_value`                          as `regionValue`,
@@ -191,6 +277,11 @@
                  LEFT JOIN `dripsoda_accompany`.`regions` AS `region` ON `article`.`region_value` = `region`.`value`
         order by `articleRegionCount`
         limit 10
+    </select>
+    <select id="SelectCountArticle"
+    resultType="int">
+        select count(*)
+        from `dripsoda_accompany`.`articles`
     </select>
 
     <select id="selectContinents"
@@ -273,6 +364,16 @@
         where c.`article_index` = #{id}
         order by parent.`index` IS NULL, c.`created_at`;
     </select>
+    <select id="selectCommentLikeForRead"
+            resultType="com.dripsoda.community.entities.accompany.CommentLikeEntity">
+        SELECT `index`         as `index`,
+               `comment_index` as `commentIndex`,
+               `article_index` as `articleIndex`,
+               `user_email`    as `userEmail`,
+               `checked_flag`  as `isChecked`
+        FROM `dripsoda_accompany`.`comment_likes`
+        where `user_email` = #{email}
+    </select>
 
     <select id="selectRequestByRequesterArticleIndex"
             resultType="com.dripsoda.community.entities.accompany.RequestEntity">
@@ -341,6 +442,42 @@
         WHERE `article_index` = #{articleIndex}
         order by `orderNumber`
     </select>
+    <select id="selectCommentsByUserEmail"
+            resultType="com.dripsoda.community.entities.accompany.CommentEntity">
+        SELECT `index`                AS `index`,
+               `article_index`        AS `articleIndex`,
+               `comment_parent_index` AS `commentParentIndex`,
+               `user_email`           AS `userEamail`,
+               `created_at`           AS `createdAt`,
+               `content`              AS `content`,
+               `modified_at`          AS `modifiedAt`,
+               `comment_is_deleted`   AS `isDeleted`,
+               `comment_flag`         AS `isComment`,
+               `depth`                AS `depth`,
+               `likes`                AS `likes`,
+               `orderNumber`          AS `orderNumber`
+        FROM `dripsoda_accompany`.`comment`
+        WHERE `user_email` = #{userEmail}
+        order by `orderNumber`
+    </select>
+
+    <select id="selectComments"
+            resultType="com.dripsoda.community.entities.accompany.CommentEntity">
+        SELECT `index`                AS `index`,
+               `article_index`        AS `articleIndex`,
+               `comment_parent_index` AS `commentParentIndex`,
+               `user_email`           AS `userEamail`,
+               `created_at`           AS `createdAt`,
+               `content`              AS `content`,
+               `modified_at`          AS `modifiedAt`,
+               `comment_is_deleted`   AS `isDeleted`,
+               `comment_flag`         AS `isComment`,
+               `depth`                AS `depth`,
+               `likes`                AS `likes`,
+               `orderNumber`          AS `orderNumber`
+        FROM `dripsoda_accompany`.`comment`
+    </select>
+
     <select id="selectArticleCommentsByArticleIndex"
             resultType="com.dripsoda.community.dtos.accompany.ArticleCommentDto"><![CDATA[
         SELECT c.`index`                AS `index`,

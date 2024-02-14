@@ -31,20 +31,31 @@
             </div>
             <div class="list-container">
                 <div class="list-next">
-                <span class="next">다음글
-                    <a th:href="@{'/qna/read/' + ${pageMove.getNext()}}"></a>
-                </span>
+                    <div class="next">
+                    <span th:if="${pageMove.getNext() != 0}">
+                    <a th:href="@{'/qna/read/' + ${pageMove.getNext()}}">다음글</a>
+                        </span>
+                        <span th:if="${pageMove.getNext() == 0}">다음글</span>
+                    </div>
                     <strong th:text="${pageMove.getNextTitle()}"></strong>
                 </div>
-            </div>
-            <div class="go-to-list"><a href="">
-                <button class="go">목록으로</button>
-            </a>
-            </div>
-                <div class="modify"  th:if="${session.memberUser != null and session.memberUser.isAdmin()}"><a
-                        th:href="@{'/member/manager/modify/' + ${qnaArticle.getIndex()}}">수정하러가기</a>
-                    <button class="_object-button delete" id="deleteButton">삭제하기</button>
+                <div class="list-prev">
+                    <div class="prev">
+                    <span th:if="${pageMove.getPrev() != 0}">
+                    <a th:href="@{'/qna/read/' + ${pageMove.getPrev()}}">이전글</a>
+                        </span>
+                        <span th:if="${pageMove.getPrev() == 0}">이전글</span>
+                    </div>
+                    <strong th:text="${pageMove.getPrevTitle()}"></strong>
                 </div>
+            </div>
+            <div class="go-to-list _object-button">
+                <a th:href="@{'/qna/'}">목록으로</a>
+            </div>
+            <div class="modify" th:if="${session.memberUser != null and session.memberUser.isAdmin()}">
+                <a class="_object-button modify" th:href="@{'/member/manager/modify/' + ${qnaArticle.getIndex()}}">수정하러가기</a>
+                <button class="_object-button delete" id="deleteButton">삭제하기</button>
+            </div>
 </main>
 <th:block th:replace="~{fragments/footer.html :: content}"></th:block>
 </body>

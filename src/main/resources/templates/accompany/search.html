@@ -42,11 +42,12 @@
             </div>
         </div>
     <div class="travel_menu_container"
-         id="travelMenuContainer" th:each="articleKeywordDto : ${articlesForKeyword}">
-        <a class="accompany" th:data-index="${articleKeywordDto.getIndex()}"
-           th:href="'./read/' + ${articleKeywordDto.getIndex()}">
-            <img class="cover-image" alt="" th:src="'./cover-image/' + ${articleKeywordDto.getIndex()}">
-            <span class="location-container" id="locationContainer">
+         id="travelMenuContainer">
+      <div  class="travel_menu" th:each="articleKeywordDto : ${articlesForKeyword}">
+          <a class="accompany" th:data-index="${articleKeywordDto.getIndex()}"
+             th:href="'./read/' + ${articleKeywordDto.getIndex()}">
+              <img class="cover-image" alt="" th:src="'./cover-image/' + ${articleKeywordDto.getIndex()}">
+              <span class="location-container" id="locationContainer">
                         <span class="icon-container"></span>
                         <span class="text" th:text="${articleKeywordDto.getRegionText()+ '&nbsp;'}"></span>
                         <span class="duration date-From"
@@ -55,13 +56,14 @@
                         <span class="duration date-to"
                               th:text="${#dates.format(articleKeywordDto.getDateTo(), 'MM-dd')}"></span>
                     </span>
-            <span class="title-container">
+              <span class="title-container">
 <!--                        <span class="status">모집중</span>-->
                         <span class="title" th:text="${articleKeywordDto.getTitle()}">홍콩으로 가는 그브</span>
                     </span>
-            <span class="content" th:utext="${articleKeywordDto.getContent()}">그레이브즈</span>
-            <span class="nickname" th:text="'닉네임  ' + ${articleKeywordDto.getUserNickname()}"></span>
-        </a>
+              <span class="content" th:utext="${articleKeywordDto.getContent()}">그레이브즈</span>
+              <span class="nickname" th:text="'닉네임  ' + ${articleKeywordDto.getUserNickname()}"></span>
+          </a>
+      </div>
     </div>
 </main>
 <th:block th:replace="~{fragments/footer.html :: content}"></th:block>

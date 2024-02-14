@@ -6,17 +6,19 @@ import com.dripsoda.community.entities.member.UserEntity;
 import com.dripsoda.community.enums.CommonResult;
 import com.dripsoda.community.enums.accompany.CommentResult;
 import com.dripsoda.community.enums.accompany.RequestResult;
+import com.dripsoda.community.exceptions.RollbackException;
 import com.dripsoda.community.interfaces.IResult;
 import com.dripsoda.community.mappers.IAccompanyMapper;
 import com.dripsoda.community.mappers.IMemberMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service(value = "com.dripsoda.community.services.AccompanyService")
 public class AccompanyService {
@@ -54,6 +56,8 @@ public class AccompanyService {
         // 조회된 댓글 목록 반환
         return comments;
     }
+
+
 
     public IResult modifyComment(CommentEntity comment) {
         CommentEntity oldComment = this.accompanyMapper.selectCommentByIndex(comment.getIndex());
@@ -102,13 +106,68 @@ public class AccompanyService {
     }
 
     public IResult deleteArticle(int index) {
+
         return this.accompanyMapper.deleteArticle(index) > 0
                 ? CommonResult.SUCCESS
                 : CommonResult.FAILURE;
     }
 
+    public IResult deleteCommentLike(UserEntity user, Integer id, Integer commentId) {
+        ArticleEntity article = this.accompanyMapper.selectArticleByIndex(id);
+        CommentEntity comment = this.accompanyMapper.selectCommentByArticleIndexAndIndex(id, commentId);
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
+            return CommentResult.NOT_SIGNED;
+        }
+        if (article == null || article.getIndex() == 0) {
+            return CommentResult.NOT_FOUND;
+        }
+
+        if (comment == null || comment.getIndex() == 0) {
+            return CommentResult.NOT_FOUND;
+        }
+
+        comment.setLikes(comment.getLikes() - 1);
+        int likeInsertResult = this.accompanyMapper.deleteCommentLike(user.getEmail(), id, commentId);
+        if (likeInsertResult > 0) {
+            int updateResult = this.accompanyMapper.updateCommentLikes(comment.getLikes(), comment.getArticleIndex(), comment.getIndex());
+
+            if (updateResult > 0) {
+                logger.info("Comment like deleted successfully");
+                return CommonResult.SUCCESS;
+            } else {
+                logger.error(" updateResult failure");
+                // updateResult 실패 시 CommonResult.FAILURE 반환
+                return CommonResult.FAILURE;
+            }
+        } else {
+            logger.error("likeDeleted failure");
+            // likeInsertResult 실패 시 CommonResult.FAILURE 반환
+            return CommonResult.FAILURE;
+        }
+
+    }
+
+    @Transactional
     public IResult deleteComment(Integer id, Integer commentId) {
+        //좋아요를 먼저 삭제해줘야됨.
+        CommentLikeEntity commentLike = this.accompanyMapper.selectCommentLikeByIndexAndCommentIndex(id, commentId);
+        if (commentLike != null) {
+            this.accompanyMapper.deleteLike(id, commentId);
+        }
         return this.accompanyMapper.deleteComment(id, commentId) > 0
+                ? CommonResult.SUCCESS
+                : CommonResult.FAILURE;
+    }
+
+    public IResult deleteRequest(UserEntity user, int id) throws RollbackException {
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
+            return RequestResult.NOT_SIGNED;
+        }
+        ArticleEntity article = this.accompanyMapper.selectArticleByIndex(id);
+        if (article == null) {
+            return RequestResult.NOT_FOUND;
+        }
+        return this.accompanyMapper.deleteRequest(user.getEmail(), article.getIndex()) > 0
                 ? CommonResult.SUCCESS
                 : CommonResult.FAILURE;
     }
@@ -159,17 +218,17 @@ public class AccompanyService {
     }
 
     @Transactional
-    public IResult addCommentLike(UserEntity user,Integer id, Integer commentId) {
+    public IResult addCommentLike(UserEntity user, Integer id, Integer commentId) {
         ArticleEntity article = this.accompanyMapper.selectArticleByIndex(id);
-        CommentEntity comment = this.accompanyMapper.selectCommentByArticleIndexAndIndex(id,commentId);
-        if(user == null || !user.getEmail().equals(comment.getUserEmail())) {
+        CommentEntity comment = this.accompanyMapper.selectCommentByArticleIndexAndIndex(id, commentId);
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
             return CommentResult.NOT_SIGNED;
         }
         if (article == null || article.getIndex() == 0) {
             return CommentResult.NOT_FOUND;
         }
 
-        if(comment == null || comment.getIndex() == 0) {
+        if (comment == null || comment.getIndex() == 0) {
             return CommentResult.NOT_FOUND;
         }
 
@@ -198,6 +257,7 @@ public class AccompanyService {
         }
     }
 
+
     public boolean checkRequest(UserEntity requester, int articleIndex) {
         if (requester == null) {
             return false;
@@ -220,7 +280,7 @@ public class AccompanyService {
         if (article == null) {
             return CommentResult.NOT_FOUND;
         }
-        if (user == null || !user.isAdmin() && !user.getEmail().equals(article.getUserEmail())) {
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
             return CommentResult.NOT_SIGNED;
         }
         long totalComment = accompanyMapper.SelectCountCommentsByArticleIndex(articleIndex) + 1;
@@ -249,7 +309,7 @@ public class AccompanyService {
         if (article == null) {
             return CommentResult.NOT_FOUND;
         }
-        if (user == null || !user.isAdmin() && !user.getEmail().equals(article.getUserEmail())) {
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
             return CommentResult.NOT_SIGNED;
         }
         if (comment == null) {
@@ -284,6 +344,14 @@ public class AccompanyService {
         return this.accompanyMapper.selectArticleCommentsByArticleIndex(articleIndex);
     }
 
+    public List<ArticleUserMyDto> getArticleForUserMy(String userEmail) {
+        return this.accompanyMapper.selectArticlesForUserMy(userEmail);
+    }
+
+    public List<CommentEntity> getCommentsByUserEmail(String userEmail) {
+        return this.accompanyMapper.selectCommentsByUserEmail(userEmail);
+    }
+
     public List<ArticleEntity> getArticlesForAll() {
         return this.accompanyMapper.selectArticles();
     }
@@ -299,6 +367,24 @@ public class AccompanyService {
     public List<ArticleRecentListDto> getArticles() {
         return this.accompanyMapper.selectArticlesForHome();
     }
+
+    public List<CommentEntity> getComments() {
+        return this.accompanyMapper.selectComments();
+    }
+
+    public List<ArticleManagerDto> getArticlesForManager() {
+        return this.accompanyMapper.selectArticlesForManager();
+    }
+
+    public List<CommentLikeEntity> getCommentLikeByUserEmail(String email) {
+        return this.accompanyMapper.selectCommentLikeForRead(email);
+    }
+
+    public int getCountArticles() {
+        return this.accompanyMapper.SelectCountArticle();
+    }
+
+
     //모든 게시판 최신 게시글 8개 불러오
 //    public  List<ArticleSearchDto> getNewArticlesForAll() {
 //

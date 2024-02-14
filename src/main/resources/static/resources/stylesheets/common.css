@@ -103,7 +103,7 @@ svg:not(:root) {
 
 .aucF > .swiper-slide {
     text-align: center;
-    font-size: 18px;
+    font-size: 1.125rem;
     background: #fff;
 
     /* Center slide text vertically */
@@ -123,8 +123,8 @@ svg:not(:root) {
 
 .swiper-slide img {
     display: block;
-    width: 55px;
-    height: 55px;
+    width: 3.4375rem;
+    height: 3.4375rem;
     object-fit: cover;
 }
 
@@ -325,6 +325,18 @@ body._covering > ._object-cover {
     position: relative;
 }
 
+._header > .content-container > .button-menu {
+    top: calc(100% - 0.5rem);
+    right: 0;
+    background-color: rgb(255, 255, 255);
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0.5rem 0.0625rem rgba(0, 0, 0, 15%);
+    display: none;
+    padding: 1.25rem 1.75rem;
+    position: absolute;
+    z-index: 1;
+}
+
 ._header > .content-container > .write-menu {
     top: calc(100% - 0.5rem);
     right: 0;
@@ -437,7 +449,7 @@ body._covering > ._object-cover {
 }
 
 ._header > .content-container > .search-form-container > .search-form > .input-container > .input {
-    width: 18.75rem;
+    width: 15.75rem;
     border: 0.0625rem solid rgb(233, 233, 233);
     border-radius: 999rem;
     box-sizing: border-box;
@@ -448,6 +460,10 @@ body._covering > ._object-cover {
 ._header > .content-container > .search-form-container > .search-form > .input-container > .input:focus {
     border: 0.0625rem solid rgb(var(--concept-color-green));
     box-shadow: inset 0 0 0 0.0625rem rgb(var(--concept-color-green));
+}
+
+._header > .content-container > .menu-toggle {
+    display: none;
 }
 
 ._header > .content-container > .side-menu {
@@ -509,14 +525,14 @@ body._covering > ._object-cover {
     box-sizing: border-box;
     width: 100%;
     height: auto;
-    margin: 100px 0 0;
+    margin: 6.25rem 0 0;
 }
 
 ._main > .category > ._best_travel_container > ._best_travel_top {
     box-sizing: border-box;
     width: 100%;
-    min-height: 57px;
-    margin-bottom: 24px;
+    min-height: 3.5625rem;
+    margin-bottom: 3.5625rem;
 }
 
 
@@ -525,15 +541,15 @@ body._covering > ._object-cover {
     -webkit-box-align: center;
     align-items: center;
     width: 100%;
-    min-height: 30px;
+    min-height: 1.875rem;
 }
 
 ._main > .category > ._best_travel_container > ._best_travel_top > ._travel_icon_container > ._best_travel_greeting {
     user-select: none;
     -webkit-user-drag: none;
-    min-height: 30px;
-    font-size: 24px;
-    line-height: 30px;
+    min-height: 1.875rem;
+    font-size: 1.5rem;
+    line-height: 1.875rem;
     color: rgb(37, 37, 37);
     letter-spacing: -0.48px;
 }
@@ -551,20 +567,20 @@ body._covering > ._object-cover {
     user-select: none;
     -webkit-user-drag: none;
     width: 100%;
-    height: 21px;
-    margin-top: 6px;
-    font-size: 16px;
+    height: 1.3125rem;
+    margin-top: 0.375rem;
+    font-size: 1rem;
     font-weight: 300;
-    line-height: 21px;
+    line-height: 1.3125rem;
     color: rgb(0, 206, 124);
     letter-spacing: -0.32px;
 }
 
 ._main > .category > ._best_travel_container > ._best_travel_top > ._travel_icon_container > ._travel_icon {
     cursor: pointer;
-    width: 24px;
-    height: 24px;
-    margin: 0 6px 0 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 0 0.375rem 0 0;
     display: flex;
     -webkit-box-pack: center;
     justify-content: center;
@@ -577,31 +593,196 @@ body._covering > ._object-cover {
     box-sizing: border-box;
     width: 100%;
     height: auto;
-    margin-top: 12px;
+    margin-top: 0.75rem;
 }
 
 ._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC {
     position: relative;
     display: flex;
-    gap: 18px;
+    gap: 1.125rem;
     box-sizing: border-box;
     width: 100%;
-    height: 343px;
+    height: 21.4375rem;
+
 }
 
 ._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container {
     width: auto;
 }
 
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide {
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .image-container {
+    width: 100%;
+    height: 100%;
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .image-container > img {
+    width: 100%;
+    height: 100%;
+    border-radius: 1.25rem;
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .travel-swiper-text-container {
+
+    border-radius: 1.25rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .travel-swiper-text-container > .travel-swiper-text {
+    display: flex;
+    flex-direction: column;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+    box-sizing: border-box;
+    width: 100%;
+    max-height: 7.875rem;
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .travel-swiper-text-container > .travel-swiper-text > .top-text {
+    padding: 0.875rem;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    width: 100%;
+    height: 2.75rem;
+    margin-bottom: 0.375rem;
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .travel-swiper-text-container > .travel-swiper-text > .top-text > .text {
+    width: auto;
+    height: 2.25rem;
+    margin-right: 1.125rem;
+    margin-bottom: 0.375rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 2.25rem;
+    color: rgb(255, 255, 255);
+    letter-spacing: -0.48px;
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .travel-swiper-text-container > .travel-swiper-text > .middle-text {
+    padding: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+    width: 100%;
+    max-height: calc(100% - 2.625rem);
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .travel-swiper-text-container > .travel-swiper-text > .middle-text > .middle-text-container {
+    display: flex;
+    gap: 0.5rem;
+    -webkit-box-align: center;
+    align-items: center;
+    width: 100%;
+    height: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .travel-swiper-text-container > .travel-swiper-text > .middle-text > .middle-text-container > .svg-container {
+    cursor: pointer;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 0;
+    display: flex;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+    transition: transform 0.25s ease-in-out 0s;
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .travel-swiper-text-container > .travel-swiper-text > .middle-text > .middle-text-container > .text {
+    user-select: none;
+    -webkit-user-drag: none;
+    height: 1.5rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+    color: rgb(255, 255, 255);
+    letter-spacing: -0.32px;
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .travel-swiper-text-container > .travel-swiper-text > .middle-text > .middle-text-container > .text > span {
+    user-select: none;
+    -webkit-user-drag: none;
+    height: 1.5rem;
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+    color: rgb(0, 206, 124);
+    letter-spacing: -0.32px;
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .travel-swiper-text-container > .travel-swiper-text > .middle-text > .bottom-text {
+    display: flex;
+    gap: 0.5rem;
+    -webkit-box-align: center;
+    align-items: center;
+    width: 100%;
+    height: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .travel-swiper-text-container > .travel-swiper-text > .middle-text > .bottom-text > .bottom-text-container {
+    cursor: pointer;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 0;
+    display: flex;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+    transition: transform 0.25s ease-in-out 0s;
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .travel-swiper-text-container > .travel-swiper-text > .middle-text > .bottom-text > .text {
+    user-select: none;
+    -webkit-user-drag: none;
+    height: 1.5rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+    color: rgb(255, 255, 255);
+    letter-spacing: -0.32px;
+}
+
+._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-wrapper > .swiper-slide > .travel-swiper-text-container > .travel-swiper-text > .middle-text > .bottom-text > .text > span {
+    user-select: none;
+    -webkit-user-drag: none;
+    height: 1.5rem;
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+    color: rgb(0, 206, 124);
+    letter-spacing: -0.32px;
+}
+
+
 ._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-button-prev {
     position: absolute;
     z-index: 1;
-    left: -20px;
+    left: -1.25rem;
     transform: translateY(-50%);
-    width: 48px;
-    height: 48px;
+    width: 3rem;
+    height: 3rem;
     background-color: rgb(255, 255, 255);
-    border: 1px solid rgb(211, 211, 211);
+    border: 0.0625rem solid rgb(211, 211, 211);
     border-radius: 50%;
 }
 
@@ -613,12 +794,12 @@ body._covering > ._object-cover {
 ._main > .category > ._best_travel_container > ._best_travel_top > ._best_travel_category > .btC > .travel-swiper-container > .swiper-button-next {
     position: absolute;
     z-index: 1;
-    right: -20px;
+    right: -1.25rem;
     transform: translateY(-50%);
-    width: 48px;
-    height: 48px;
+    width: 3rem;
+    height: 3rem;
     background-color: rgb(255, 255, 255);
-    border: 1px solid rgb(211, 211, 211);
+    border: 0.0625rem solid rgb(211, 211, 211);
     border-radius: 50%;
 }
 
@@ -650,6 +831,16 @@ body._covering > ._object-cover {
     padding: 0 0 0 0;
 }
 
+.tBtn1 > ._menu_accompany {
+    position: absolute;
+    top: 1rem;
+    left: 1.25rem;
+    font-size: 1.25rem;
+    color: rgb(233, 233, 233);
+    text-align: left;
+    letter-spacing: -0.4px;
+}
+
 .tBtn2 {
     position: relative;
     overflow: hidden;
@@ -660,6 +851,16 @@ body._covering > ._object-cover {
     padding: 0 0 0 0;
 }
 
+.tBtn2 > ._menu_schedule {
+    position: absolute;
+    top: 1rem;
+    left: 1.25rem;
+    font-size: 1.25rem;
+    color: rgb(233, 233, 233);
+    text-align: left;
+    letter-spacing: -0.4px;
+}
+
 .tBtn3 {
     position: relative;
     overflow: hidden;
@@ -668,6 +869,32 @@ body._covering > ._object-cover {
     height: 25.5rem;
     border-radius: 1.25rem;
     padding: 0 0 0 0;
+}
+
+.tBtn3 > ._menu_goods {
+    position: absolute;
+    top: 1rem;
+    left: 1.25rem;
+    font-size: 1.25rem;
+    color: rgb(233, 233, 233);
+    text-align: left;
+    letter-spacing: -0.4px;
+}
+
+
+.tBtn1 > ._menu_accompany > h1, .tBtn2 > ._menu_schedule > h1, .tBtn3 > ._menu_goods > h1 {
+    margin: 0 0 0.25rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: rgb(255, 255, 255);
+    text-align: left;
+    letter-spacing: -0.6px;
+}
+
+.tBtn1 > ._menu_accompany > span, .tBtn2 > ._menu_schedule > span, .tBtn3 > ._menu_goods > span {
+    font-size: 1.25rem;
+    color: rgb(80, 235, 173);
+    text-align: left;
 }
 
 .mImg {
@@ -686,37 +913,37 @@ body._covering > ._object-cover {
 
 ._main > .category > ._travel_view > ._right_top {
     display: flex;
-    gap: 20px;
+    gap: 1.25rem;
     -webkit-box-align: center;
     -webkit-box-pack: center;
-    margin: 0 0 20px;
+    margin: 0 0 1.25rem;
 }
 
 ._main > .category > ._travel_view > ._right_top > ._right_top_left {
     display: flex;
     flex-direction: column;
-    gap: 38px;
+    gap: 2.375rem;
     box-sizing: border-box;
-    width: 243px;
-    height: 169px;
-    padding: 18px 14px;
+    width: 15.1875rem;
+    height: 10.5625rem;
+    padding: 1.125rem 0.875rem;
     background-color: rgb(255, 255, 255);
-    border-radius: 20px;
-    box-shadow: rgba(25, 25, 25, 0.1) 0 0 10px 0;
+    border-radius: 1.25rem;
+    box-shadow: rgba(25, 25, 25, 0.1) 0 0 0.625rem 0;
 }
 
 ._main > .category > ._travel_view > ._right_top > ._right_top_right {
     cursor: pointer;
     position: relative;
-    width: 320px;
-    height: 169px;
+    width: 20rem;
+    height: 10.5625rem;
 }
 
 ._main > .category > ._travel_view > ._right_top > ._right_top_right > .rtrF {
     box-sizing: border-box;
     width: 100%;
     height: 100%;
-    margin-bottom: 24px;
+    margin-bottom: 1.5rem;
 }
 
 ._main > .category > ._travel_view > ._right_top > ._right_top_right > .rtrF > .rtrS {
@@ -728,24 +955,24 @@ body._covering > ._object-cover {
     box-sizing: border-box;
     width: 100%;
     height: 100%;
-    padding: 10px 14px;
+    padding: 0.625rem 0.875rem;
     background: rgb(255, 255, 255);
-    border: 1px dashed rgb(0, 206, 124);
-    border-radius: 20px;
+    border: 0.0625rem dashed rgb(0, 206, 124);
+    border-radius: 1.25rem;
 }
 
 ._main > .category > ._travel_view > ._right_top > ._right_top_right > .rtrF > .rtrS > ._trip_schedule {
-    width: calc(100% - 44px);
-    min-height: 43px;
+    width: calc(100% - 2.75rem);
+    min-height: 2.6875rem;
 }
 
 ._main > .category > ._travel_view > ._right_top > ._right_top_right > .rtrF > .rtrS > ._trip_schedule > .tsT1 {
     user-select: none;
     -webkit-user-drag: none;
-    min-height: 22px;
+    min-height: 1.375rem;
     margin: 0;
-    font-size: 18px;
-    line-height: 22px;
+    font-size: 1.125rem;
+    line-height: 1.375rem;
     color: rgb(0, 206, 124);
     letter-spacing: -0.3px;
 }
@@ -753,21 +980,21 @@ body._covering > ._object-cover {
 ._main > .category > ._travel_view > ._right_top > ._right_top_right > .rtrF > .rtrS > ._trip_schedule > .tsT2 {
     user-select: none;
     -webkit-user-drag: none;
-    min-height: 19px;
+    min-height: 1.1875rem;
     margin: 0;
-    font-size: 15px;
-    line-height: 19px;
+    font-size: 0.9375rem;
+    line-height: 1.1875rem;
     color: rgb(154, 154, 154);
     letter-spacing: -0.26px;
 
 }
 
 ._main > .category > ._travel_view > ._right_top > ._right_top_right > .rtrF > .rtrS > ._trip_schedule_button {
-    width: 44px;
-    height: 44px;
+    width: 2.75rem;
+    height: 2.75rem;
     background-color: rgb(255, 255, 255);
-    border: 1px solid rgb(181, 234, 213);
-    border-radius: 44px;
+    border: 0.0625rem solid rgb(181, 234, 213);
+    border-radius: 2.75rem;
     display: flex;
     -webkit-box-pack: center;
     justify-content: center;
@@ -783,22 +1010,22 @@ body._covering > ._object-cover {
     justify-content: center;
     -webkit-box-align: center;
     align-items: center;
-    gap: 10px;
+    gap: 0.625rem;
 }
 
 ._main > .category > ._travel_view > ._right_top > ._right_top_left > ._my_button {
     cursor: pointer;
     width: 100%;
-    height: 40px;
+    height: 2.5rem;
     color: rgb(255, 255, 255);
     background-color: rgb(0, 206, 124);
-    border-radius: 14px;
+    border-radius: 0.875rem;
 }
 
 ._main > .category > ._travel_view > ._right_top > ._right_top_left > ._my_profile_container > ._my_profile_img_container {
     position: relative;
-    width: 50px;
-    height: 50px;
+    width: 3.125rem;
+    height: 3.125rem;
     display: flex;
     -webkit-box-pack: center;
     justify-content: center;
@@ -813,11 +1040,17 @@ body._covering > ._object-cover {
     right: 0;
     bottom: 0;
     display: block;
-    width: 8.824px;
-    height: 8.824px;
+    width: 0.5515rem;
+    height: 0.5515rem;
     background-color: rgb(0, 206, 124);
-    border: 2px solid rgb(255, 255, 255);
+    border: 0.125rem solid rgb(255, 255, 255);
     border-radius: 50%;
+}
+
+
+._main > .category > ._travel_view > ._right_top > ._right_top_left > ._my_profile_container > ._my_profile_img_container > ._my_profile_img {
+    width: 100%;
+    height: 100%;
 }
 
 
@@ -827,14 +1060,14 @@ body._covering > ._object-cover {
     align-items: flex-start;
     -webkit-box-pack: center;
     justify-content: center;
-    width: 454px;
-    height: 54px;
+    width: 28.375rem;
+    height: 3.375rem;
 }
 
 ._main > .category > ._travel_view > ._right_top > ._right_top_left > ._my_profile_container > ._greetings > .gP {
     user-select: none;
     -webkit-user-drag: none;
-    font-size: 18px;
+    font-size: 1.125rem;
     line-height: normal;
     color: rgb(37, 37, 37);
     letter-spacing: -0.48px;
@@ -844,14 +1077,14 @@ body._covering > ._object-cover {
 
 ._main > .category > ._travel_view > ._right_top > ._right_top_left > ._my_profile_container > ._my_profile_img_container > ._my_profile_img {
     box-sizing: border-box;
-    width: 50px;
-    height: 50px;
-    border: 2px solid rgb(0, 206, 124);
+    width: 3.125rem;
+    height: 3.125rem;
+    border: 0.125rem solid rgb(0, 206, 124);
     border-radius: 50%;
 }
 
 ._main > .category > ._travel_view > ._right_bottom {
-    width: 586px;
+    width: 36.625rem;
 }
 
 ._main > .category > ._travel_view > ._right_bottom > .rbF {
@@ -859,27 +1092,27 @@ body._covering > ._object-cover {
     box-sizing: border-box;
     width: 100%;
     height: auto;
-    margin: 0px;
+    margin: 0;
 }
 
 ._main > .category > ._travel_view > ._right_bottom > .rbF > .rbFT {
     box-sizing: border-box;
     width: 100%;
-    min-height: 57px;
-    margin-bottom: 24px;
+    min-height: 3.5625rem;
+    margin-bottom: 1.5rem;
 }
 
 ._main > .category > ._travel_view > ._right_bottom > .rbF > ._accompany_users_container {
     box-sizing: border-box;
     width: 100%;
     height: auto;
-    margin-top: 12px;
+    margin-top: 0.75rem;
 }
 
 ._main > .category > ._travel_view > ._right_bottom > .rbF > ._accompany_users_container > .aucF {
     box-sizing: border-box;
     width: 100%;
-    height: 94px;
+    height: 5.875rem;
 }
 
 ._main > .category > ._travel_view > ._right_bottom > .rbF > ._accompany_users_container > .aucF > .swiper-container {
@@ -903,21 +1136,25 @@ body._covering > ._object-cover {
     -webkit-box-pack: center;
     justify-content: center;
     width: 100%;
-    height: 40px;
+    height: 2.5rem;
     text-align: center;
+}
+
+._main > .category > ._travel_view > ._right_bottom > .rbF > ._accompany_users_container > .aucF > .swiper-container > .swiper-wrapper > .swiper-slide > img {
+    border-radius: 3.125rem;
 }
 
 ._main > .category > ._travel_view > ._right_bottom > .rbF > ._accompany_users_container > .aucF > .swiper-container > .swiper-wrapper > .swiper-slide > .text-container > span {
     user-select: none;
     -webkit-user-drag: none;
-    height: 21px;
+    height: 1.3125rem;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    font-size: 14px;
-    line-height: 21px;
+    font-size: 0.875rem;
+    line-height: 1.3125rem;
     letter-spacing: -0.28px;
 }
 
@@ -926,14 +1163,14 @@ body._covering > ._object-cover {
     -webkit-box-align: center;
     align-items: center;
     width: 100%;
-    min-height: 30px;
+    min-height: 1.875rem;
 }
 
 ._main > .category > ._travel_view > ._right_bottom > .rbF > .rbFT > ._traveler_container > ._traveler_icon {
     cursor: pointer;
-    width: 24px;
-    height: 24px;
-    margin: 0px 6px 0px 0px;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 0 0.375rem 0 0;
     display: flex;
     -webkit-box-pack: center;
     justify-content: center;
@@ -955,11 +1192,11 @@ body._covering > ._object-cover {
     user-select: none;
     -webkit-user-drag: none;
     width: 100%;
-    height: 21px;
-    margin-top: 6px;
-    font-size: 16px;
+    height: 1.3125rem;
+    margin-top: 0.375rem;
+    font-size: 1rem;
     font-weight: 300;
-    line-height: 21px;
+    line-height: 1.3125rem;
     color: rgb(0, 206, 124);
     letter-spacing: -0.32px;
 }
@@ -967,11 +1204,11 @@ body._covering > ._object-cover {
 ._main > .category > ._travel_view > ._right_bottom > .rbF > .rbFT > ._traveler_container > ._traveler_greeting {
     user-select: none;
     -webkit-user-drag: none;
-    min-height: 30px;
-    font-size: 24px;
-    line-height: 30px;
+    min-height: 1.875rem;
+    font-size: 1.5rem;
+    line-height: 1.875rem;
     color: rgb(37, 37, 37);
-    letter-spacing: -0.48px;
+    letter-spacing: -0.03rem;
     margin: 0;
 }
 
@@ -984,14 +1221,14 @@ body._covering > ._object-cover {
     box-sizing: border-box;
     width: 100%;
     height: auto;
-    margin: 100px 0 0;
+    margin: 6.25rem 0 3.125rem;
 }
 
 ._main > .category > ._recent_best_travel_container > ._recent_best_travel_top {
     box-sizing: border-box;
     width: 100%;
-    min-height: 57px;
-    margin-bottom: 24px;
+    min-height: 3.5625rem;
+    margin-bottom: 1.5rem;
 }
 
 ._main > .category > ._recent_best_travel_container > ._recent_best_travel_top > ._recent_best_travel_icon_container {
@@ -999,14 +1236,14 @@ body._covering > ._object-cover {
     -webkit-box-align: center;
     align-items: center;
     width: 100%;
-    min-height: 30px;
+    min-height: 1.875rem;
 }
 
 ._main > .category > ._recent_best_travel_container > ._recent_best_travel_top > ._recent_best_travel_icon_container > ._recent_best_travel_icon {
     cursor: pointer;
-    width: 24px;
-    height: 24px;
-    margin: 0px 6px 0px 0px;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 0 0.375rem 0 0;
     display: flex;
     -webkit-box-pack: center;
     justify-content: center;
@@ -1018,9 +1255,9 @@ body._covering > ._object-cover {
 ._main > .category > ._recent_best_travel_container > ._recent_best_travel_top > ._recent_best_travel_icon_container > ._recent_best_travel_greeting {
     user-select: none;
     -webkit-user-drag: none;
-    min-height: 30px;
-    font-size: 24px;
-    line-height: 30px;
+    min-height: 1.875rem;
+    font-size: 1.5rem;
+    line-height: 1.875rem;
     color: rgb(37, 37, 37);
     letter-spacing: -0.48px;
 }
@@ -1038,11 +1275,11 @@ body._covering > ._object-cover {
     user-select: none;
     -webkit-user-drag: none;
     width: 100%;
-    height: 21px;
-    margin-top: 6px;
-    font-size: 16px;
+    height: 1.3125rem;
+    margin-top: 0.375rem;
+    font-size: 1rem;
     font-weight: 300;
-    line-height: 21px;
+    line-height: 1.3125rem;
     color: rgb(0, 206, 124);
     letter-spacing: -0.32px;
 }
@@ -1056,18 +1293,18 @@ body._covering > ._object-cover {
     -webkit-box-pack: end;
     justify-content: flex-end;
     width: max-content;
-    min-width: 160px;
+    min-width: 10rem;
     height: auto;
 }
 
 ._main > .category > ._recent_best_travel_container > ._recent_best_travel_top > ._recent_best_travel_bottom > ._recent_best_travel_more > a > p {
     position: relative;
     z-index: 100;
-    top: 0px;
-    margin-right: 0px;
-    font-size: 15px;
+    top: 0;
+    margin-right: 0;
+    font-size: 0.9375rem;
     font-weight: 400;
-    line-height: 22px;
+    line-height: 1.375rem;
     color: rgb(0, 206, 124);
     background: rgb(255, 255, 255);
     transition: margin-right 0.15s ease-in-out 0s;
@@ -1076,11 +1313,11 @@ body._covering > ._object-cover {
 ._main > .category > ._recent_best_travel_container > ._recent_best_travel_top > ._recent_best_travel_bottom > ._recent_best_travel_more > a > p:hover {
     position: relative;
     z-index: 100;
-    top: 0px;
-    margin-right: 24px;
-    font-size: 15px;
+    top: 0;
+    margin-right: 1.5rem;
+    font-size: 0.9375rem;
     font-weight: 400;
-    line-height: 22px;
+    line-height: 1.375rem;
     color: rgb(0, 206, 124);
     background: rgb(255, 255, 255);
     transition: margin-right 0.15s ease-in-out 0s;
@@ -1090,14 +1327,14 @@ body._covering > ._object-cover {
 ._main > .category > ._recent_best_travel_container > ._recent_best_travel_top > ._recent_best_travel_bottom > ._recent_best_travel_more ._recent_best_travel_more_icon {
     position: absolute;
     z-index: 1;
-    top: 0px;
-    right: 0px;
+    top: 0;
+    right: 0;
     display: flex;
     -webkit-box-align: center;
     align-items: center;
     -webkit-box-pack: center;
     justify-content: center;
-    width: 20px;
+    width: 1.25rem;
     height: 100%;
 }
 
@@ -1111,6 +1348,10 @@ body._covering > ._object-cover {
     margin-top: 2rem;
 }
 
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > ._recent_best_travel_menu {
+    position: relative;
+}
+
 ._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany {
     display: flex;
     flex-direction: column;
@@ -1119,12 +1360,12 @@ body._covering > ._object-cover {
     position: relative;
 }
 
-._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany > * + * {
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > * + * {
     margin-top: 0.75rem;
 }
 
 
-._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany > .cover-image {
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > .cover-image {
     width: 100%;
     aspect-ratio: 1 / 1;
     object-fit: cover;
@@ -1132,7 +1373,7 @@ body._covering > ._object-cover {
     border-radius: 0.5rem;
 }
 
-._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany > .location-container {
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > .location-container {
     top: 0.75rem;
     left: 0.75rem;
     background-color: rgba(0, 0, 0, 62.5%);
@@ -1151,7 +1392,7 @@ body._covering > ._object-cover {
     pointer-events: none;
 }
 
-._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany > .location-container > .icon-container {
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > .location-container > .icon-container {
     width: 1.5rem;
     height: 1.5rem;
     background-color: rgb(255, 255, 255);
@@ -1159,20 +1400,20 @@ body._covering > ._object-cover {
     margin-right: 0.425rem;
 }
 
-._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany > .location-container > .text {
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > .location-container > .text {
     margin-left: 0.5rem;
 }
 
-._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany > .location-container > .duration {
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > .location-container > .duration {
     display: none;
     margin-left: 0.5rem;
 }
 
-._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany > .cover-image:hover ~ .location-container > .duration {
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > .cover-image:hover ~ .location-container > .duration {
     display: inline-block;
 }
 
-._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany > .title-container {
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > .title-container {
     font-weight: 500;
     font-size: 1.1rem;
     display: flex;
@@ -1182,30 +1423,36 @@ body._covering > ._object-cover {
 
 }
 
-._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany > .title-container > .status {
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > .title-container > .status {
     color: rgb(var(--concept-color-green));
     white-space: nowrap;
     margin-right: 0.5rem;
 }
 
-._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany > .title-container > .status.expired {
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > .title-container > .status.expired {
     color: rgb(231, 76, 60);
 }
 
-._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany > .title-container > .title {
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > .title-container > .title {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
 }
 
-._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany > .content {
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > .content {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
 }
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > .content > p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container > .accompany > .nickname {
+._main > .category > ._recent_best_travel_container > ._recent_best_travel_menu_container .accompany > .nickname {
+    color: rgb(0, 143, 246);
     font-size: 0.9rem;
+    font-weight: 500;
 }
 
 
@@ -1217,15 +1464,16 @@ body._covering > ._object-cover {
     width: auto;
     overflow: visible;
     background: transparent;
-    bottom: 80px;
-    right: 46px;
+    bottom: 5rem;
+    right: 2.875rem;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list {
     top: calc(100% - 45rem);
     width: 22.5rem;
     height: 43.5rem;
     right: 0;
-    background-color: rgb(255,255,255);
+    background-color: rgb(255, 255, 255);
     overflow: auto;
     border-radius: 2.5rem;
     box-shadow: 0 0 0.5rem 0.0625rem rgba(0, 0, 0, 15%);
@@ -1250,10 +1498,11 @@ body._covering > ._object-cover {
 
 
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.top > .logo-img-container {
-    width: 25px;
-    height: 25px;
-    margin-right: 40px;
+    width: 1.5625rem;
+    height: 1.5625rem;
+    margin-right: 2.5rem;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.top > .logo-img-container > svg {
     width: 100%;
     height: 100%;
@@ -1266,21 +1515,23 @@ body._covering > ._object-cover {
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.qna {
     display: flex;
     flex-direction: row;
-    padding: 12px;
+    padding: 0.75rem;
     align-items: flex-start;
     justify-content: flex-start;
     background-color: #F7F7F8;
-    border-radius: 8px;
+    border-radius: 0.5rem;
     font-size: 0.8rem;
     font-weight: 400;
     line-height: 1.8rem;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.qna > svg {
     margin-right: 0.625rem;
-    width: 20px;
-    height: 20px;
+    width: 1.25rem;
+    height: 1.25rem;
     color: rgba(0, 0, 0, 0.4);
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.qna > .text-container > p {
     white-space: pre-line;
 }
@@ -1291,34 +1542,38 @@ body._covering > ._object-cover {
     align-items: center;
     justify-content: center;
     gap: 0.625rem;
-    padding: 30px 24px 8px
+    padding: 1.875rem 1.5rem 0.5rem
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.logo > .logo-img-container {
-    width: 72px;
-    height: 72px;
+    width: 4.5rem;
+    height: 4.5rem;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.logo > .logo-img-container > img {
     width: 100%;
     height: 100%;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.logo > .text-container {
     text-align: center;
     font-weight: 700;
-    font-size: 18px;
+    font-size: 1.125rem;
 }
 
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.logo > ._object-button {
     width: 85%;
     text-align: center;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.time {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 16px 14px 8px;
+    padding: 1rem 0.875rem 0.5rem;
     line-height: 1.6rem;
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.name {
@@ -1326,76 +1581,86 @@ body._covering > ._object-cover {
     -webkit-box-align: center;
     align-items: center;
     margin-right: 20%;
-    margin-left: 52px;
+    margin-left: 3.25rem;
     color: rgba(0, 0, 0, 0.4);
     line-height: 1.6rem;
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.manager {
     display: flex;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.manager > img {
     margin-right: 0.625rem;
-    width: 36px;
-    height: 36px;
+    width: 2.25rem;
+    height: 2.25rem;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.manager > .text-container {
     background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 16px;
-    padding: 10px 12px
+    border-radius: 1rem;
+    padding: 0.625rem 0.75rem
 }
-._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.user  {
+
+._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.user {
     -webkit-box-pack: end;
     display: flex;
     justify-content: flex-end;
-    padding-right: 10px;
-    padding-left: 64px;
+    padding-right: 0.625rem;
+    padding-left: 4rem;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.user > span {
     margin-top: 0.75rem;
     color: rgb(255, 255, 255);
     background-color: rgb(0, 199, 67);
-    border-radius: 16px;
-    padding: 10px 12px
+    border-radius: 1rem;
+    padding: 0.625rem 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > .item.manager > span {
+    margin-bottom: 0.75rem;
     margin-top: 0.75rem;
     background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 16px;
-    padding: 10px 12px;
+    border-radius: 1rem;
+    padding: 0.625rem 0.75rem;
 
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > ._object-button.chatForm {
     background: linear-gradient(92.34deg, rgba(239, 239, 240, 0.8) 48.04%, rgba(247, 247, 248, 0.8) 100%);
     position: relative;
     display: flex;
     -webkit-box-align: center;
     align-items: center;
-    min-height: 50px;
-    padding: 0px 6px 0px 14px;
-    border-radius: 18px;
-    backdrop-filter: blur(60px);
+    min-height: 3.125rem;
+    padding: 0 0.375rem 0 0.875rem;
+    border-radius: 1.125rem;
+    backdrop-filter: blur(3.75rem);
     margin-top: auto;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > ._object-button.chatForm > label {
     width: 100%;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > ._object-button.chatForm > label > textarea {
     width: 100%;
-    min-width: 0px;
-    padding: 14px 10px 0px 0px;
+    min-width: 0;
+    padding: 0.875rem 0.625rem 0 0;
     margin: auto;
     overflow: hidden;
     color: rgba(0, 0, 0, 0.85);
     resize: none;
     background-color: transparent;
     border: none;
-    font-size: 15px;
+    font-size: 0.9375rem;
     line-height: 1rem;
     letter-spacing: -0.1px;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message-list > ._object-button.chatForm > label > textarea:focus {
     outline: none;
 }
@@ -1416,6 +1681,7 @@ body._covering > ._object-cover {
     opacity: 0;
     flex-direction: column;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message.visible {
     display: flex;
     transition: opacity 1s ease;
@@ -1437,13 +1703,14 @@ body._covering > ._object-cover {
     justify-content: flex-start;
     margin-bottom: 0.625rem;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message > .item.top > .logo-img-container {
-    width: 56px;
-    height: 56px;
+    width: 3.5rem;
+    height: 3.5rem;
 }
 
 ._main > .right-bottom-nav > .chat-button-container > .chat-message > .item.top > .text-container {
-    font-size: 20px;
+    font-size: 1.25rem;
     font-weight: 700;
 }
 
@@ -1458,22 +1725,26 @@ body._covering > ._object-cover {
     align-items: flex-start;
     justify-content: flex-start;
     margin-bottom: 1.5rem;
-    background-color: rgb(255,255,255);
-    border-radius: 20px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 1.25rem;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message > .item.manager > img {
     margin-right: 0.625rem;
-    width: 36px;
-    height: 36px;
+    width: 2.25rem;
+    height: 2.25rem;
 }
-._main > .right-bottom-nav > .chat-button-container > .chat-message > .item.qna{
+
+._main > .right-bottom-nav > .chat-button-container > .chat-message > .item.qna {
     margin-top: auto;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-message > .item.qna > ._object-button {
     width: 85%;
     text-align: center;
 
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .x-button {
     position: absolute;
     display: none;
@@ -1485,12 +1756,12 @@ body._covering > ._object-cover {
     will-change: opacity, visibility;
     visibility: visible;
     background-color: rgba(247, 247, 248, 0.9);
-    border-radius: 24px;
+    border-radius: 1.5rem;
     transition: visibility 400ms ease 0s;
     animation: 400ms cubic-bezier(0.36, 0, 0, 1) 0s 1 normal both running jBcSpD;
-    box-shadow: rgba(255, 255, 255, 0.2) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.1) 0px 4px 6px, rgba(0, 0, 0, 0.15) 0px 8px 30px;
-    bottom: -60px;
-    right: 46px;
+    box-shadow: rgba(255, 255, 255, 0.2) 0 0 0 0.0625rem inset, rgba(0, 0, 0, 0.1) 0 0.25rem 0.375rem, rgba(0, 0, 0, 0.15) 0 0.5rem 1.875rem;
+    bottom: -3.75rem;
+    right: 2.875rem;
     opacity: 0;
 }
 
@@ -1502,13 +1773,14 @@ body._covering > ._object-cover {
 
 ._main > .right-bottom-nav > .chat-button-container > .x-button > svg {
     flex: 0 0 auto;
-    margin: 0px;
+    margin: 0;
     color: rgba(0, 0, 0, 0.6);
     transition-delay: 0ms;
     transition-timing-function: cubic-bezier(0.3, 0, 0, 1);
     transition-duration: 150ms;
     transition-property: color;
 }
+
 ._main > .right-bottom-nav > .chat-button-container > .chat-button {
     position: relative;
     display: flex;
@@ -1520,8 +1792,8 @@ body._covering > ._object-cover {
     cursor: pointer;
     box-sizing: border-box;
     width: auto;
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
     font-style: inherit;
     font-variant: inherit;
     font-weight: inherit;
@@ -1534,26 +1806,26 @@ body._covering > ._object-cover {
     font-family: NotoSansKR, -apple-system, BlinkMacSystemFont, "Helvetica Neue", "맑은 고딕", "Segoe UI", Roboto, "system-ui", "sans-serif";
     line-height: inherit;
     color: inherit;
-    text-shadow: transparent 0px 0px 0px;
+    text-shadow: transparent 0 0 0;
     letter-spacing: inherit;
     background: transparent;
-    border: 0px solid transparent;
-    box-shadow: transparent 0px 0px 0px;
+    border: 0 solid transparent;
+    box-shadow: transparent 0 0 0;
 }
 
 ._main > .right-bottom-nav > .chat-button-container > .chat-button > .a11y-hidden {
     position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
+    width: 0.0625rem;
+    height: 0.0625rem;
+    margin: -0.0625rem;
     overflow: hidden;
-    clip: rect(0px, 0px, 0px, 0px);
-    clip-path: polygon(0px 0px, 0px 0px, 0px 0px);
+    clip: rect(0, 0, 0, 0);
+    clip-path: polygon(0 0, 0 0, 0 0);
 }
 
 ._main > .right-bottom-nav > .chat-button-container > .chat-button > .chat-img {
-    width: 185px;
-    height: 100px;
+    width: 11.5625rem;
+    height: 6.25rem;
 }
 
 
@@ -1626,11 +1898,11 @@ body._covering > ._object-cover {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    width: 282px;
-    height: 286px;
+    width: 17.625rem;
+    height: 17.875rem;
     background: rgb(255, 255, 255);
-    border-radius: 14px;
-    box-shadow: rgba(25, 25, 25, 0.2) 0px 6px 10px;
+    border-radius: 0.875rem;
+    box-shadow: rgba(25, 25, 25, 0.2) 0 0.375rem 0.625rem;
 }
 
 @keyframes anim-cover-image {
@@ -1642,7 +1914,7 @@ body._covering > ._object-cover {
     }
 }
 
-@media (max-width: 74.9375rem) {
+@media (max-width: 80rem) {
     ._layout-hmf > ._main {
         width: var(--content-width-default-1199);
     }
@@ -1659,7 +1931,7 @@ body._covering > ._object-cover {
         position: relative;
         /* box-sizing: border-box; */
         width: 100%;
-        height: calc(292px + 0rem);
+        height: calc(18.25rem);
     }
 
 
@@ -1690,3 +1962,66 @@ body._covering > ._object-cover {
 
 }
 
+@media (max-width: 48rem) {
+    ._layout-hmf > ._main {
+        width: 100%;
+    }
+
+    ._header > .content-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    ._header > .content-container > .menu {
+        display: none;
+
+    }
+
+    ._header > .content-container > .menu-toggle {
+        display: block;
+        margin-right: 1.25rem;
+
+    }
+
+    ._header > .content-container > .side-menu {
+        display: none;
+    }
+
+    ._header > .content-container > .button-menu.visible {
+        display: block;
+    }
+
+    ._header > .content-container > .button-menu.visible > .item {
+        border-bottom: 0.0625rem solid #e8e8e8;
+        color: rgb(var(--concept-color-green));
+        font-size: 1.25rem;
+        font-weight: 500;
+        margin-top: 0.625rem;
+    }
+
+    ._main > .category > ._sliding-view {
+        margin: 0;
+    }
+
+    ._main > .category > ._sliding-view > ._sliding-image-container ._slide-first {
+        height: 12rem;
+    }
+
+    ._main > .category > ._travel_view {
+        margin-top: 1.5rem;
+    }
+
+    ._main > .category > ._travel_view > ._right_top {
+        width: 100%;
+    }
+
+    ._main > .category > ._travel_view > ._right_top > ._right_top_left,
+    ._main > .category > ._travel_view > ._right_top > ._right_top_right {
+        width: 50%;
+    }
+
+    ._content-wrapper > ._content-container {
+        width: 100%;
+    }
+}

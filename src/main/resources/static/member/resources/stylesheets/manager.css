@@ -46,7 +46,7 @@ body > .main > .nav > .item > .link {
 }
 
 body > .main > .nav > .item > .link > .text {
-    font-size: 20px;
+    font-size: 1.25rem;
 }
 
 
@@ -58,7 +58,22 @@ body > .main > .nav > .item[selected] > .link > .text {
 body > .main > .content {
     width: 71.25rem;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
 
+body > .main > .content.qna > ._object-button {
+    font-weight: 500;
+    text-align: center;
+}
+body > .main > .content.qna > .board-table > .table-text > tr > .userEmail {
+    font-weight: 500;
+    color: rgb(0, 143, 246);
+}
+body > .main > .content.qna > .board-table > .table-text > tr > .content {
+    font-weight: 500;
+    color: rgb(231, 76, 60);
 }
 
 body > .main > .content > .title {
@@ -84,8 +99,8 @@ body > .main > .content > .user > .board-table {
 
 body > .main > .content > .user > .board-table > tr > th,
 body > .main > .content > .user > .board-table > tr > td {
-    border: 1px solid rgb(230, 230, 230);
-    padding: 10px;
+    border: 0.0625rem solid rgb(230, 230, 230);
+    padding: 0.625rem;
     text-align: center;
 }
 .send {
@@ -99,5 +114,143 @@ body > .main > .content > .user > .board-table > tr > th {
 
 body > .main > .content > .user > .board-table tbody {
     text-align: center;
+}
+
+.accompany_container {
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.accompany_container > .travel_menu {
+    position: relative;
+}
+
+.accompany_container .accompany {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    position: relative;
+}
+
+.accompany_container .accompany > * + * {
+    margin-top: 0.75rem;
+}
+
+
+.accompany_container .accompany > .cover-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 0.5rem;
+}
+
+.accompany_container .accompany > .location-container {
+    top: 0.75rem;
+    left: 0.75rem;
+    background-color: rgba(0, 0, 0, 62.5%);
+    border-radius: 999rem;
+    color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 0.9rem;
+    font-weight: 400;
+    margin-top: 0;
+    position: absolute;
+    z-index: 1;
+    padding: 0.375rem 0.75rem 0.375rem 0.375rem;
+    pointer-events: none;
+}
+
+.accompany_container .accompany > .location-container > .icon-container {
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: rgb(255, 255, 255);
+    border-radius: 50%;
+    margin-right: 0.425rem;
+}
+
+.accompany_container .accompany > .location-container > .text {
+    margin-left: 0.5rem;
+}
+
+.accompany_container .accompany > .location-container > .duration {
+    display: none;
+    margin-left: 0.5rem;
+}
+
+.accompany_container .accompany > .cover-image:hover ~ .location-container > .duration {
+    display: inline-block;
+}
+
+.accompany_container .accompany > .title-container {
+    font-weight: 500;
+    font-size: 1.1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+
+}
+
+.accompany_container .accompany > .title-container > .status {
+    color: rgb(var(--concept-color-green));
+    white-space: nowrap;
+    margin-right: 0.5rem;
+}
+
+.accompany_container .accompany > .title-container > .status.expired {
+    color: rgb(231, 76, 60);
+}
+
+.accompany_container .accompany > .title-container > .title {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.accompany_container .accompany > .content {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.accompany_container .accompany > .nickname {
+    color: rgb(0, 143, 246);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+
+
+@media (max-width: 80rem) {
+    body > .main > .nav {
+        width: 100%;
+    }
+
+    body > .main > .box {
+        padding: 0;
+    }
+    body > .main > .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    body > .main > .content > .title {
+        margin-top: 1rem;
+        width: 100%;
+    }
+
 }
 

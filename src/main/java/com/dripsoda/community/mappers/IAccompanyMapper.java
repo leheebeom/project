@@ -10,6 +10,12 @@ import java.util.Map;
 
 @Mapper
 public interface IAccompanyMapper {
+    int deleteLike(@Param(value = "id") Integer id, @Param("commentIndex") Integer commentIndex);
+
+    int deleteCommentLike(@Param(value = "userEmail") String userEmail, @Param(value = "id") Integer id, @Param("commentIndex") Integer commentIndex);
+
+    int deleteRequest(@Param(value = "userEmail") String userEmail, @Param(value = "id") int id);
+
     int deleteArticle(@Param(value = "index") int index);
 
     int deleteComment(@Param(value = "id") Integer id, @Param("commentIndex") Integer commentIndex);
@@ -22,12 +28,17 @@ public interface IAccompanyMapper {
 
     int insertRequest(RequestEntity request);
 
+
+    List<CommentLikeEntity> selectCommentLikeForRead(@Param(value = "email") String email);
     ArticleEntity selectArticleByIndex(@Param(value = "index") int index);
 
     ArticleSearchDto[] selectArticlesForSearch(@Param(value = "region") RegionEntity region,
                                                @Param(value = "lastArticleIndex") int lastArticleIndex);
 
+    CommentLikeEntity selectCommentLikeByIndexAndCommentIndex(@Param(value = "id") Integer id, @Param("commentIndex") Integer commentIndex);
+
     List<ArticleKeywordDto> selectArticlesForKeyword(@Param(value = "keyword") String keyword);
+
     ContinentEntity[] selectContinents();
 
     CountryEntity[] selectCountries();
@@ -36,7 +47,10 @@ public interface IAccompanyMapper {
 
     List<ArticleEntity> selectArticles();
 
+    List<CommentEntity> selectCommentsByUserEmail(@Param(value = "userEmail") String userEmail);
+    List<CommentEntity> selectComments();
     List<ArticleRecentListDto> selectArticlesForHome();
+    List<ArticleManagerDto> selectArticlesForManager();
 
     List<ArticleBestTravleDto> selectArticlesForRecent();
 
@@ -54,9 +68,13 @@ public interface IAccompanyMapper {
 
     int insertReplyComment(CommentEntity comment);
 
+    List<ArticleUserMyDto> selectArticlesForUserMy(@Param(value = "userEmail") String userEmail);
+
     List<CommentEntity> selectCommentsByArticleIndex(@Param("articleIndex") Integer articleIndex);
 
     List<ArticleCommentDto> selectArticleCommentsByArticleIndex(@Param("articleIndex") Integer articleIndex);
+
+    int SelectCountArticle();
 
     long SelectCountCommentsByArticleIndex(@Param("articleIndex") Integer articleIndex);
 
@@ -64,7 +82,7 @@ public interface IAccompanyMapper {
 
     void createComment(Map<String, Object> paramMap);
 
-    List<CommentEntity> findCommentByArticle(  @Param(value = "id") Integer id);
+    List<CommentEntity> findCommentByArticle(@Param(value = "id") Integer id);
 
     CommentEntity selectCommentByIndex(@Param(value = "index") int index);
 
@@ -73,10 +91,12 @@ public interface IAccompanyMapper {
     int readCommentsCountByParentCommentIndex(int parentCommentIndex);
 
     int updateComment(CommentEntity comment);
+
     int updateArticle(ArticleEntity article);
-    int updateCommentLikes( @Param(value = "like") int like,
-                            @Param(value = "id") Integer id,
-                            @Param(value = "commentId") Integer commentId);
+
+    int updateCommentLikes(@Param(value = "like") int like,
+                           @Param(value = "id") Integer id,
+                           @Param(value = "commentId") Integer commentId);
 
 
     //댓글이 자기자신인지 아닌지

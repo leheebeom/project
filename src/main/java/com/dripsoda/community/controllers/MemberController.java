@@ -1,6 +1,8 @@
 package com.dripsoda.community.controllers;
 
+import com.dripsoda.community.dtos.member.ChatSendUserContactDto;
 import com.dripsoda.community.entities.accompany.ArticleEntity;
+import com.dripsoda.community.entities.accompany.CommentEntity;
 import com.dripsoda.community.entities.accompany.ImageEntity;
 import com.dripsoda.community.entities.member.*;
 import com.dripsoda.community.entities.qna.CategoryEntity;
@@ -278,7 +280,7 @@ public class MemberController {
                 .setStatusValue("OKY")
                 .setRegisteredAt(new Date())
                 .setAdmin(false)
-                .setProfileId(null)
+                .setProfileId("no")
                 .setProfileData(readyByte);
         IResult result;
         try {
@@ -369,9 +371,9 @@ public class MemberController {
             modelAndView.addObject(ContactCountryEntity.ATTRIBUTE_NAME_PLURAL, this.memberService.getContactCountries());
         }
         modelAndView.addObject(UserEntity.ATTRIBUTE_NAME_PLURAL, this.memberService.getUsers());
-        modelAndView.addObject(ArticleEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getArticles());
+        modelAndView.addObject(ArticleEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getArticlesForManager());
         modelAndView.addObject(ChatEntity.ATTRIBUTE_NAME_PLURAL, this.memberService.getChats());
-//        modelAndView.addObject(QnaArticleEntity.ATTRIBUTE_NAME_PLURAL,  this.qnaService.get)
+        modelAndView.addObject(CommentEntity.ATTRIBUTE_NAME_PLURAL,this.accompanyService.getComments());
         modelAndView.setViewName("member/manager");
         return modelAndView;
     }
@@ -552,6 +554,11 @@ public class MemberController {
         if (tab == null || tab.equals("info") || (!tab.equals("trip") && !tab.equals("book") && !tab.equals("comment") && !tab.equals("accompany") && !tab.equals("truncate"))) {
             modelAndView.addObject(ContactCountryEntity.ATTRIBUTE_NAME_PLURAL, this.memberService.getContactCountries());
         }
+
+        //내댓글
+        modelAndView.addObject(CommentEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getCommentsByUserEmail(user.getEmail()));
+        //내동행게시글
+        modelAndView.addObject(ArticleEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getArticleForUserMy(user.getEmail()));
         modelAndView.addObject(UserEntity.ATTRIBUTE_NAME, this.memberService.getUser(user.getEmail()));
 
         modelAndView.setViewName("member/userMy");
@@ -575,7 +582,6 @@ public class MemberController {
         if (changeContactOptional.orElse(false)) {
             newUser.setContact(newContact);
         }
-
         ContactAuthEntity contactAuth = ContactAuthEntity.build()
                 .setContact(newContact)
                 .setCode(newContactAuthCode)
@@ -613,6 +619,27 @@ public class MemberController {
         }
         IResult result = this.memberService.modifyUserProfileImage(user);
         JSONObject responseJson = new JSONObject();
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
+
+    @RequestMapping(value = "userMyInfoNickname", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String postUserMyInfoNickname(@RequestParam(value = "profileNickname", required = false) String profileNickname,
+                                         @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity currentUser) {
+
+        UserEntity newUser = UserEntity.build();
+        if (profileNickname != null) {
+            newUser.setNickname(profileNickname);
+        }
+        JSONObject responseJson = new JSONObject();
+        IResult result;
+        try {
+            result = this.memberService.modifyUserProfileNickname(currentUser,newUser);
+        } catch (RollbackException ex) {
+            result = ex.result;
+        }
+        System.out.println(result);
         responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
         return responseJson.toString();
     }
@@ -753,7 +780,7 @@ public class MemberController {
     ) {
         UserEntity user = (UserEntity) session.getAttribute(UserEntity.ATTRIBUTE_NAME);
         ChatEntity chat = this.memberService.getChatbyIndex(id);
-        if(chat == null) {
+        if (chat == null) {
             response.setStatus(404);
             modelAndView.setViewName("error/error"); // 커스텀 에러 페이지로 이동하도록 설정
             return modelAndView;
@@ -767,15 +794,16 @@ public class MemberController {
         modelAndView.setViewName("member/managerChat");
         return modelAndView;
     }
+
     @RequestMapping(value = "managerMessage/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String  postManagerMessage(
+    public String postManagerMessage(
             @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user,
             @PathVariable(value = "id") int id,
             @RequestParam(value = "content") String content
     ) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM--dd");
-        ChatEntity chat = this.memberService.getChatbyIndex(id);
+        ChatSendUserContactDto chat = this.memberService.getChatbyIndex(id);
         IResult result = this.memberService.putMnagerChat(chat, user, content);
         JSONObject responseJson = new JSONObject();
         responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());

@@ -57,7 +57,6 @@
             </form>
 
 
-
             <div class="comment-list" id="commentList" th:each="accompanyComment : ${accompanyComments}">
                 <div class="comment-container">
                     <div class="comment-content"
@@ -81,7 +80,8 @@
                                       th:text="${#dates.format(accompanyComment.getCreatedAt(),('yyyy-MM-dd'))}">작성일시</span>
                             </div>
                         </div>
-                        <p class="comment" th:data-comment="${accompanyComment.getIndex()}" th:text="${accompanyComment.getContent()}">
+                        <p class="comment" th:data-comment="${accompanyComment.getIndex()}"
+                           th:text="${accompanyComment.getContent()}">
                             <span></span>작성내용
                         </p>
                         <div class="feedback-container">
@@ -89,10 +89,10 @@
                                 <button class="reply-button"
                                         th:data-index="${accompanyComment.getIndex()}">답글 달기
                                 </button>
-                               <button class="modify-button"
-                                       th:if="${session.memberUser != null and accompanyComment.getUserEmail() !=null and session.memberUser.getEmail().equals(accompanyComment.getUserEmail())}"
-                                       th:data-index="${accompanyComment.getIndex()}">수정
-                               </button>
+                                <button class="modify-button"
+                                        th:if="${session.memberUser != null and accompanyComment.getUserEmail() !=null and session.memberUser.getEmail().equals(accompanyComment.getUserEmail())}"
+                                        th:data-index="${accompanyComment.getIndex()}">수정
+                                </button>
                                 <button class="delete-button"
                                         th:if="${session.memberUser != null and accompanyComment.getUserEmail() !=null and session.memberUser.getEmail().equals(accompanyComment.getUserEmail())}"
                                         th:data-index="${accompanyComment.getIndex()}">삭제
@@ -102,11 +102,23 @@
                             <div class="great-container">
                                 <p class="great" th:text="'좋아요 '+${accompanyComment.getLikes()}+'개'">좋아요</p>
                                 <svg width="13" height="13" viewBox="0 0 20 20" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg" class="great-button" th:data-index="${accompanyComment.getIndex()}">
+                                     xmlns="http://www.w3.org/2000/svg"
+                                     th:with="index = ${accompanyComment.getIndex()}, pathD = ${!#lists.isEmpty(likedCommentIndices) && likedCommentIndices.contains(index) ? 'M1.65346 2.62939C-0.551152 4.80192 -0.551153 8.32428 1.65346 10.4968L2.01647 10.8545L2.01636 10.8546L9.28769 18.0201C9.68107 18.4078 10.3189 18.4078 10.7122 18.0201L18.3465 10.497C20.5511 8.3245 20.5511 4.80214 18.3465 2.62962C16.1418 0.457092 12.5675 0.45709 10.3629 2.62962L10.0001 2.98712L9.63706 2.62939C7.43245 0.456868 3.85807 0.456869 1.65346 2.62939Z' : 'M1.40632 10.2375C-0.547821 8.05243 -0.465441 4.71746 1.65346 2.62939C3.85807 0.456869 7.43245 0.456868 9.63706 2.62939L10.0001 2.98712L10.3629 2.62962L11.4157 3.69802L10.0001 5.09306L8.5842 3.6978C6.96355 2.10073 4.32697 2.10073 2.70632 3.6978C1.0979 5.28281 1.0979 7.84339 2.70631 9.4284L4.15169 10.8527L9.99996 16.6161L17.2936 9.42862C18.902 7.84361 18.902 5.28303 17.2936 3.69802L18.3465 2.62962C20.5511 4.80214 20.5511 8.3245 18.3465 10.497L10.7122 18.0201C10.3189 18.4078 9.68107 18.4078 9.28769 18.0201L2.01636 10.8546L1.65346 10.4968C1.56847 10.4131 1.48676 10.3273 1.40832 10.2397C1.40765 10.2389 1.40699 10.2382 1.40632 10.2375ZM18.3465 2.62962C16.1418 0.457092 12.5675 0.45709 10.3629 2.62962L11.4157 3.69802C13.0364 2.10096 15.6729 2.10096 17.2936 3.69802L18.3465 2.62962Z'}"
+                                     th:attr="d=${pathD}"
+                                     th:data-index="${index}"
+                                     th:class="${!#lists.isEmpty(likedCommentIndices) && likedCommentIndices.contains(index) ? 'great-hit-button' :  'great-button'}">
                                     <path fill-rule="evenodd" clip-rule="evenodd"
+                                          th:attr="d=${pathD}"
                                           d="M1.40632 10.2375C-0.547821 8.05243 -0.465441 4.71746 1.65346 2.62939C3.85807 0.456869 7.43245 0.456868 9.63706 2.62939L10.0001 2.98712L10.3629 2.62962L11.4157 3.69802L10.0001 5.09306L8.5842 3.6978C6.96355 2.10073 4.32697 2.10073 2.70632 3.6978C1.0979 5.28281 1.0979 7.84339 2.70631 9.4284L4.15169 10.8527L9.99996 16.6161L17.2936 9.42862C18.902 7.84361 18.902 5.28303 17.2936 3.69802L18.3465 2.62962C20.5511 4.80214 20.5511 8.3245 18.3465 10.497L10.7122 18.0201C10.3189 18.4078 9.68107 18.4078 9.28769 18.0201L2.01636 10.8546L1.65346 10.4968C1.56847 10.4131 1.48676 10.3273 1.40832 10.2397C1.40765 10.2389 1.40699 10.2382 1.40632 10.2375ZM18.3465 2.62962C16.1418 0.457092 12.5675 0.45709 10.3629 2.62962L11.4157 3.69802C13.0364 2.10096 15.6729 2.10096 17.2936 3.69802L18.3465 2.62962Z"
                                           fill="#6a6a6a"></path>
                                 </svg>
+<!--                                <svg width="13" height="13" viewBox="0 0 20 20" fill="none"-->
+<!--                                     xmlns="http://www.w3.org/2000/svg" class="great-hit-button"-->
+<!--                                     th:data-index="${accompanyComment.getIndex()}">-->
+<!--                                    <path fill-rule="evenodd" clip-rule="evenodd"-->
+<!--                                          d="M1.65346 2.62939C-0.551152 4.80192 -0.551153 8.32428 1.65346 10.4968L2.01647 10.8545L2.01636 10.8546L9.28769 18.0201C9.68107 18.4078 10.3189 18.4078 10.7122 18.0201L18.3465 10.497C20.5511 8.3245 20.5511 4.80214 18.3465 2.62962C16.1418 0.457092 12.5675 0.45709 10.3629 2.62962L10.0001 2.98712L9.63706 2.62939C7.43245 0.456868 3.85807 0.456869 1.65346 2.62939Z"-->
+<!--                                          fill="#E98670"></path>-->
+<!--                                </svg>-->
                             </div>
                         </div>
                     </div>
