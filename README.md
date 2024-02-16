@@ -9,7 +9,7 @@
 
 #### Project URL :  
 
-#### Project PPT : 
+#### Project PPT : https://o365gnu-my.sharepoint.com/:p:/g/personal/2017011008_stu_gnu_ac_kr/EeNRVvR5CMBOqSBGLK8TSd8BVyv9uJ9l0sCGyf0PbWRarg
 
 ----------------
 
