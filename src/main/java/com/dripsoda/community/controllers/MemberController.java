@@ -352,6 +352,279 @@ public class MemberController {
         return modelAndView;
     }
 
+    @RequestMapping(value = "userMy", method = RequestMethod.GET)
+    public ModelAndView getUserMy(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+                                  @RequestParam(value = "tab", required = false, defaultValue = "info") String tab,
+                                  ModelAndView modelAndView) {
+        if (user == null) {
+            modelAndView.setViewName("redirect:/member/userLogin");
+            return modelAndView;
+        }
+        if (tab == null || tab.equals("info") || (!tab.equals("trip") && !tab.equals("book") && !tab.equals("comment") && !tab.equals("accompany") && !tab.equals("truncate"))) {
+            modelAndView.addObject(ContactCountryEntity.ATTRIBUTE_NAME_PLURAL, this.memberService.getContactCountries());
+        }
+
+        //내댓글
+        modelAndView.addObject(CommentEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getCommentsByUserEmail(user.getEmail()));
+        //내동행게시글
+        modelAndView.addObject(ArticleEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getArticleForUserMy(user.getEmail()));
+        modelAndView.addObject(UserEntity.ATTRIBUTE_NAME, this.memberService.getUser(user.getEmail()));
+
+        modelAndView.setViewName("member/userMy");
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "userMyInfo", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String postUserMyInfo(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity currentUser,
+                                 @RequestParam(value = "oldPassword") String oldPassword,
+                                 @RequestParam(value = "changePassword") Optional<Boolean> changePasswordOptional,
+                                 @RequestParam(value = "changeContact") Optional<Boolean> changeContactOptional,
+                                 @RequestParam(value = "newPassword", required = false, defaultValue = "") String newPassword,
+                                 @RequestParam(value = "newContact", required = false, defaultValue = "") String newContact,
+                                 @RequestParam(value = "newContactAuthCode", required = false, defaultValue = "") String newContactAuthCode,
+                                 @RequestParam(value = "newContactAuthSalt", required = false, defaultValue = "") String newContactAuthSalt) throws MessagingException, IOException {
+        UserEntity newUser = UserEntity.build();
+        if (changePasswordOptional.orElse(false)) {
+            newUser.setPassword(newPassword);
+        }
+        if (changeContactOptional.orElse(false)) {
+            newUser.setContact(newContact);
+        }
+        ContactAuthEntity contactAuth = ContactAuthEntity.build()
+                .setContact(newContact)
+                .setCode(newContactAuthCode)
+                .setSalt(newContactAuthSalt);
+        IResult result;
+        try {
+            result = this.memberService.modifyUser(currentUser, newUser, oldPassword, contactAuth);
+        } catch (RollbackException ex) {
+            result = ex.result;
+        }
+        JSONObject responseJson = new JSONObject();
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
+
+    @RequestMapping(value = "profile-id", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getProfileId(@RequestParam(value = "profileId", required = true) String profileId,
+                                               HttpServletResponse response) {
+        UserEntity profileUser = this.memberService.getProfileImage(profileId);
+
+
+        if (profileUser.getProfileId() == null) {
+            response.setStatus(404);
+            return null;
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpStatus status = HttpStatus.OK;
+        headers.add("Content-Length", String.valueOf(profileUser.getProfileData().length));
+        headers.add("Content-Type", "image/png");
+        return new ResponseEntity<>(profileUser.getProfileData(), headers, status);
+    }
+
+
+    @RequestMapping(value = "userMyInfoProfileImage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String postUserMyInfoProfileImage(@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+                                             @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user) throws IOException {
+
+        String resourcePath = "static/resources/images/vector_profile_default.svg";
+        byte[] readyByte = FileUtil.getBytes(resourcePath);
+
+        if (profileImage == null) {
+            user.setProfileData(readyByte);
+            user.setProfileId("no");
+        } else {
+            String profileId = String.format("%s%f%f", new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()),
+                    Math.random(),
+                    Math.random());
+            profileId = CryptoUtils.hashSha512(profileId);
+            user.setProfileData(profileImage.getBytes());
+            user.setProfileId(profileId);
+        }
+        IResult result = this.memberService.modifyUserProfileImage(user);
+        JSONObject responseJson = new JSONObject();
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
+
+    @RequestMapping(value = "userMyInfoNickname", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String postUserMyInfoNickname(@RequestParam(value = "profileNickname", required = false) String profileNickname,
+                                         @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity currentUser) {
+
+        UserEntity newUser = UserEntity.build();
+        if (profileNickname != null) {
+            newUser.setNickname(profileNickname);
+        }
+        JSONObject responseJson = new JSONObject();
+        IResult result;
+        try {
+            result = this.memberService.modifyUserProfileNickname(currentUser,newUser);
+        } catch (RollbackException ex) {
+            result = ex.result;
+        }
+        System.out.println(result);
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
+
+
+    @RequestMapping(value = "userMyInfoAuth", method = RequestMethod.GET, produces = "application/json")
+    @ResponseBody
+    public String getUserMyInfoAuth(@RequestParam(value = "newContact") String newContact) throws
+            InvalidKeyException,
+            IOException,
+            NoSuchAlgorithmException {
+        ContactAuthEntity contactAuth = ContactAuthEntity.build().setContact(newContact);
+        IResult result;
+        try {
+            result = this.memberService.modifyUserContactAuth(contactAuth);
+        } catch (RollbackException ex) {
+            result = ex.result;
+        }
+        JSONObject responseJson = new JSONObject();
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        if (result == CommonResult.SUCCESS) {
+            responseJson.put("salt", contactAuth.getSalt());
+        }
+        return responseJson.toString();
+    }
+
+    @RequestMapping(value = "userMyInfoAuth", method = RequestMethod.POST, produces = "application/json")
+    @ResponseBody
+    public String postUserMyInfoAuth(@RequestParam(value = "newContact") String newContact,
+                                     @RequestParam(value = "newContactAuthCode") String newContactAuthCode,
+                                     @RequestParam(value = "newContactAuthSalt") String newContactAuthSalt) throws
+            RollbackException {
+        ContactAuthEntity contactAuth = ContactAuthEntity.build()
+                .setContact(newContact)
+                .setCode(newContactAuthCode)
+                .setSalt(newContactAuthSalt);
+        IResult result = this.memberService.checkContactAuth(contactAuth);
+        JSONObject responseJson = new JSONObject();
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
+
+
+
+
+    @RequestMapping(value = "userMyInfoDelete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String deleteUserMyInfoDelete(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+                                         @RequestParam(value = "findAccompany", required = false) Optional<Boolean> findAccompanyOptional,
+                                         @RequestParam(value = "tripEnds", required = false) Optional<Boolean> tripEndsOptional,
+                                         @RequestParam(value = "travelProducts", required = false) Optional<Boolean> travelProductsOptional,
+                                         @RequestParam(value = "badManners", required = false) Optional<Boolean> badMannersOptional,
+                                         @RequestParam(value = "inconvenience", required = false) Optional<Boolean> inconvenienceOptional,
+                                         @RequestParam(value = "new", required = false) Optional<Boolean> newOptional,
+                                         @RequestParam(value = "useful", required = false) Optional<Boolean> usefulOptional,
+                                         @RequestParam(value = "content") String content,
+                                         HttpSession session) {
+
+        JSONObject responseJson = new JSONObject();
+        FeedbackEntity feedback = FeedbackEntity.build()
+                .setUserEmail(user.getEmail())
+                .setCreatedAt(new Date())
+                .setContent(content);
+
+        feedback.setFind(findAccompanyOptional.orElse(false));
+        feedback.setTrip(tripEndsOptional.orElse(false));
+        feedback.setProduct(travelProductsOptional.orElse(false));
+        feedback.setManner(badMannersOptional.orElse(false));
+        feedback.setConvenience(inconvenienceOptional.orElse(false));
+        feedback.setNew(newOptional.orElse(false));
+        feedback.setUseful(usefulOptional.orElse(false));
+        this.memberService.createFeedback(feedback);
+        IResult result;
+        try {
+            result = this.memberService.deleteUser(user);
+        } catch (RollbackException ex) {
+            result = ex.result;
+        }
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        session.removeAttribute(UserEntity.ATTRIBUTE_NAME);
+        return responseJson.toString();
+    }
+
+
+    @RequestMapping(value = "chatMessage/{rid}", method = RequestMethod.GET)
+    @ResponseBody
+    public String getChatMessage(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+                                 @PathVariable(value = "rid", required = false) int rid) {
+        JSONObject responseJson = new JSONObject();
+        if (user == null) {
+            responseJson.put(IResult.ATTRIBUTE_NAME, false);
+        }
+        if (!(rid == 1 || rid == 2)) {
+            responseJson.put(IResult.ATTRIBUTE_NAME, false);
+        }
+        return responseJson.toString();
+    }
+
+    @RequestMapping(value = "chatMessage/{rid}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String postChatMessage(
+            @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user,
+            @RequestParam(value = "rid", required = false) int rid,
+            @RequestParam(value = "content") String content
+    ) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
+        JSONObject responseJson = new JSONObject();
+        IResult result = this.memberService.putChat(user, rid, content);
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        if (result == CommonResult.SUCCESS) {
+            responseJson.put("rid", rid);
+        }
+        return responseJson.toString();
+    }
+
+    //관리자가 채팅 보냄 - 보낸 사람의 인덱스 번호로  답변하기 -
+    @RequestMapping(value = "managerMessage/{id}", method = RequestMethod.GET)
+    public ModelAndView getManagerMessage(
+            HttpServletResponse response,
+            HttpSession session,
+            @PathVariable(value = "id") int id,
+            ModelAndView modelAndView
+    ) {
+        UserEntity user = (UserEntity) session.getAttribute(UserEntity.ATTRIBUTE_NAME);
+        ChatEntity chat = this.memberService.getChatbyIndex(id);
+        if (chat == null) {
+            response.setStatus(404);
+            modelAndView.setViewName("error/error"); // 커스텀 에러 페이지로 이동하도록 설정
+            return modelAndView;
+        }
+        if (user == null || !user.isAdmin()) {
+            // 유저가 로그인하지 않았거나, 관리자 권한이 없는 경우 404 Forbidden 응답 반환
+            response.setStatus(404);
+            modelAndView.setViewName("error/error"); // 커스텀 에러 페이지로 이동하도록 설정
+            return modelAndView;
+        }
+        modelAndView.setViewName("member/managerChat");
+        return modelAndView;
+    }
+
+
+    @RequestMapping(value = "managerMessage/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String postManagerMessage(
+            @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user,
+            @PathVariable(value = "id") int id,
+            @RequestParam(value = "content") String content
+    ) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM--dd");
+        ChatSendUserContactDto chat = this.memberService.getChatbyIndex(id);
+        IResult result = this.memberService.putMnagerChat(chat, user, content);
+        JSONObject responseJson = new JSONObject();
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        if (result == CommonResult.SUCCESS) {
+//            responseJson.put("id", qnaArticle.getIndex());
+        }
+        return responseJson.toString();
+    }
+
     @RequestMapping(value = "manager", method = RequestMethod.GET)
     public ModelAndView getManager(ModelAndView modelAndView,
                                    HttpSession session,
@@ -424,26 +697,7 @@ public class MemberController {
     //qna 게시판의 종류는 - 공지사항, 이벤트, qna 총 3가지 category설정해야됨. 인덱스 값 주고 value 값으로 3가지만 주면 될듯.
 // read의 경우 /member/manage/write가 아니라 /qna/read가 되어야 되기 때문 //
 
-    @RequestMapping(value = "manager/read/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public String deleteRead(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
-                             @PathVariable(value = "id") int id) {
-        JSONObject responseJson = new JSONObject();
-        int categoryId = this.qnaService.getCategoryId(id);
-        QnaArticleEntity qnaArticle = this.qnaService.getArticle(id, categoryId);
-        if (qnaArticle == null) {
-            responseJson.put(IResult.ATTRIBUTE_NAME, CommonResult.FAILURE);
-            return responseJson.toString();
-        }
-        //i라는 이름은 inaccessible 보여지는 이름을 완전히 보여주는건 올바르지 않다고 생각.
-        if (user == null || !user.isAdmin() && !user.getEmail().equals(qnaArticle.getUserEmail())) {
-            responseJson.put(IResult.ATTRIBUTE_NAME, "i");
-            return responseJson.toString();
-        }
-        IResult result = this.qnaService.deleteQnaArticle(id);
-        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
-        return responseJson.toString();
-    }
+
 
     @RequestMapping(value = "manager/image/{id}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getImage(@PathVariable(value = "id") int id) {
@@ -542,276 +796,27 @@ public class MemberController {
         return responseJson.toString();
     }
 
-
-    @RequestMapping(value = "userMy", method = RequestMethod.GET)
-    public ModelAndView getUserMy(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
-                                  @RequestParam(value = "tab", required = false, defaultValue = "info") String tab,
-                                  ModelAndView modelAndView) {
-        if (user == null) {
-            modelAndView.setViewName("redirect:/member/userLogin");
-            return modelAndView;
-        }
-        if (tab == null || tab.equals("info") || (!tab.equals("trip") && !tab.equals("book") && !tab.equals("comment") && !tab.equals("accompany") && !tab.equals("truncate"))) {
-            modelAndView.addObject(ContactCountryEntity.ATTRIBUTE_NAME_PLURAL, this.memberService.getContactCountries());
-        }
-
-        //내댓글
-        modelAndView.addObject(CommentEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getCommentsByUserEmail(user.getEmail()));
-        //내동행게시글
-        modelAndView.addObject(ArticleEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getArticleForUserMy(user.getEmail()));
-        modelAndView.addObject(UserEntity.ATTRIBUTE_NAME, this.memberService.getUser(user.getEmail()));
-
-        modelAndView.setViewName("member/userMy");
-        return modelAndView;
-    }
-
-    @RequestMapping(value = "userMyInfo", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "manager/read/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String postUserMyInfo(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity currentUser,
-                                 @RequestParam(value = "oldPassword") String oldPassword,
-                                 @RequestParam(value = "changePassword") Optional<Boolean> changePasswordOptional,
-                                 @RequestParam(value = "changeContact") Optional<Boolean> changeContactOptional,
-                                 @RequestParam(value = "newPassword", required = false, defaultValue = "") String newPassword,
-                                 @RequestParam(value = "newContact", required = false, defaultValue = "") String newContact,
-                                 @RequestParam(value = "newContactAuthCode", required = false, defaultValue = "") String newContactAuthCode,
-                                 @RequestParam(value = "newContactAuthSalt", required = false, defaultValue = "") String newContactAuthSalt) throws MessagingException, IOException {
-        UserEntity newUser = UserEntity.build();
-        if (changePasswordOptional.orElse(false)) {
-            newUser.setPassword(newPassword);
-        }
-        if (changeContactOptional.orElse(false)) {
-            newUser.setContact(newContact);
-        }
-        ContactAuthEntity contactAuth = ContactAuthEntity.build()
-                .setContact(newContact)
-                .setCode(newContactAuthCode)
-                .setSalt(newContactAuthSalt);
-        IResult result;
-        try {
-            result = this.memberService.modifyUser(currentUser, newUser, oldPassword, contactAuth);
-        } catch (RollbackException ex) {
-            result = ex.result;
-        }
+    public String deleteRead(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+                             @PathVariable(value = "id") int id) {
         JSONObject responseJson = new JSONObject();
+        int categoryId = this.qnaService.getCategoryId(id);
+        QnaArticleEntity qnaArticle = this.qnaService.getArticle(id, categoryId);
+        if (qnaArticle == null) {
+            responseJson.put(IResult.ATTRIBUTE_NAME, CommonResult.FAILURE);
+            return responseJson.toString();
+        }
+        //i라는 이름은 inaccessible 보여지는 이름을 완전히 보여주는건 올바르지 않다고 생각.
+        if (user == null || !user.isAdmin() && !user.getEmail().equals(qnaArticle.getUserEmail())) {
+            responseJson.put(IResult.ATTRIBUTE_NAME, "i");
+            return responseJson.toString();
+        }
+        IResult result = this.qnaService.deleteQnaArticle(id);
         responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
         return responseJson.toString();
     }
 
-
-    @RequestMapping(value = "userMyInfoProfileImage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public String postUserMyInfoProfileImage(@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
-                                             @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user) throws IOException {
-
-        String resourcePath = "static/resources/images/vector_profile_default.svg";
-        byte[] readyByte = FileUtil.getBytes(resourcePath);
-
-        if (profileImage == null) {
-            user.setProfileData(readyByte);
-            user.setProfileId("no");
-        } else {
-            String profileId = String.format("%s%f%f", new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()),
-                    Math.random(),
-                    Math.random());
-            profileId = CryptoUtils.hashSha512(profileId);
-            user.setProfileData(profileImage.getBytes());
-            user.setProfileId(profileId);
-        }
-        IResult result = this.memberService.modifyUserProfileImage(user);
-        JSONObject responseJson = new JSONObject();
-        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
-        return responseJson.toString();
-    }
-
-    @RequestMapping(value = "userMyInfoNickname", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public String postUserMyInfoNickname(@RequestParam(value = "profileNickname", required = false) String profileNickname,
-                                         @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity currentUser) {
-
-        UserEntity newUser = UserEntity.build();
-        if (profileNickname != null) {
-            newUser.setNickname(profileNickname);
-        }
-        JSONObject responseJson = new JSONObject();
-        IResult result;
-        try {
-            result = this.memberService.modifyUserProfileNickname(currentUser,newUser);
-        } catch (RollbackException ex) {
-            result = ex.result;
-        }
-        System.out.println(result);
-        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
-        return responseJson.toString();
-    }
-
-
-    @RequestMapping(value = "userMyInfoAuth", method = RequestMethod.GET, produces = "application/json")
-    @ResponseBody
-    public String getUserMyInfoAuth(@RequestParam(value = "newContact") String newContact) throws
-            InvalidKeyException,
-            IOException,
-            NoSuchAlgorithmException {
-        ContactAuthEntity contactAuth = ContactAuthEntity.build().setContact(newContact);
-        IResult result;
-        try {
-            result = this.memberService.modifyUserContactAuth(contactAuth);
-        } catch (RollbackException ex) {
-            result = ex.result;
-        }
-        JSONObject responseJson = new JSONObject();
-        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
-        if (result == CommonResult.SUCCESS) {
-            responseJson.put("salt", contactAuth.getSalt());
-        }
-        return responseJson.toString();
-    }
-
-    @RequestMapping(value = "userMyInfoAuth", method = RequestMethod.POST, produces = "application/json")
-    @ResponseBody
-    public String postUserMyInfoAuth(@RequestParam(value = "newContact") String newContact,
-                                     @RequestParam(value = "newContactAuthCode") String newContactAuthCode,
-                                     @RequestParam(value = "newContactAuthSalt") String newContactAuthSalt) throws
-            RollbackException {
-        ContactAuthEntity contactAuth = ContactAuthEntity.build()
-                .setContact(newContact)
-                .setCode(newContactAuthCode)
-                .setSalt(newContactAuthSalt);
-        IResult result = this.memberService.checkContactAuth(contactAuth);
-        JSONObject responseJson = new JSONObject();
-        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
-        return responseJson.toString();
-    }
-
-    @RequestMapping(value = "profile-id", method = RequestMethod.GET)
-    public ResponseEntity<byte[]> getProfileId(@RequestParam(value = "profileId", required = true) String profileId,
-                                               HttpServletResponse response) {
-        UserEntity profileUser = this.memberService.getProfileImage(profileId);
-
-
-        if (profileUser.getProfileId() == null) {
-            response.setStatus(404);
-            return null;
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        HttpStatus status = HttpStatus.OK;
-        headers.add("Content-Length", String.valueOf(profileUser.getProfileData().length));
-        headers.add("Content-Type", "image/png");
-        return new ResponseEntity<>(profileUser.getProfileData(), headers, status);
-    }
-
-
-    @RequestMapping(value = "userMyInfoDelete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public String deleteUserMyInfoDelete(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
-                                         @RequestParam(value = "findAccompany", required = false) Optional<Boolean> findAccompanyOptional,
-                                         @RequestParam(value = "tripEnds", required = false) Optional<Boolean> tripEndsOptional,
-                                         @RequestParam(value = "travelProducts", required = false) Optional<Boolean> travelProductsOptional,
-                                         @RequestParam(value = "badManners", required = false) Optional<Boolean> badMannersOptional,
-                                         @RequestParam(value = "inconvenience", required = false) Optional<Boolean> inconvenienceOptional,
-                                         @RequestParam(value = "new", required = false) Optional<Boolean> newOptional,
-                                         @RequestParam(value = "useful", required = false) Optional<Boolean> usefulOptional,
-                                         @RequestParam(value = "content") String content,
-                                         HttpSession session) {
-
-        JSONObject responseJson = new JSONObject();
-        FeedbackEntity feedback = FeedbackEntity.build()
-                .setUserEmail(user.getEmail())
-                .setCreatedAt(new Date())
-                .setContent(content);
-
-        feedback.setFind(findAccompanyOptional.orElse(false));
-        feedback.setTrip(tripEndsOptional.orElse(false));
-        feedback.setProduct(travelProductsOptional.orElse(false));
-        feedback.setManner(badMannersOptional.orElse(false));
-        feedback.setConvenience(inconvenienceOptional.orElse(false));
-        feedback.setNew(newOptional.orElse(false));
-        feedback.setUseful(usefulOptional.orElse(false));
-        this.memberService.createFeedback(feedback);
-        IResult result;
-        try {
-            result = this.memberService.deleteUser(user);
-        } catch (RollbackException ex) {
-            result = ex.result;
-        }
-        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
-        session.removeAttribute(UserEntity.ATTRIBUTE_NAME);
-        return responseJson.toString();
-    }
-
-
-    @RequestMapping(value = "chatMessage/{rid}", method = RequestMethod.GET)
-    @ResponseBody
-    public String getChatMessage(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
-                                 @PathVariable(value = "rid", required = false) int rid) {
-        JSONObject responseJson = new JSONObject();
-        if (user == null) {
-            responseJson.put(IResult.ATTRIBUTE_NAME, false);
-        }
-        if (!(rid == 1 || rid == 2)) {
-            responseJson.put(IResult.ATTRIBUTE_NAME, false);
-        }
-        return responseJson.toString();
-    }
-
-    @RequestMapping(value = "chatMessage/{rid}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public String postChatMessage(
-            @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user,
-            @RequestParam(value = "rid", required = false) int rid,
-            @RequestParam(value = "content") String content
-    ) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
-        JSONObject responseJson = new JSONObject();
-        IResult result = this.memberService.putChat(user, rid, content);
-        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
-        if (result == CommonResult.SUCCESS) {
-            responseJson.put("rid", rid);
-        }
-        return responseJson.toString();
-    }
-
-    //관리자가 채팅 보냄 - 보낸 사람의 인덱스 번호로  답변하기 -
-    @RequestMapping(value = "managerMessage/{id}", method = RequestMethod.GET)
-    public ModelAndView getManagerMessage(
-            HttpServletResponse response,
-            HttpSession session,
-            @PathVariable(value = "id") int id,
-            ModelAndView modelAndView
-    ) {
-        UserEntity user = (UserEntity) session.getAttribute(UserEntity.ATTRIBUTE_NAME);
-        ChatEntity chat = this.memberService.getChatbyIndex(id);
-        if (chat == null) {
-            response.setStatus(404);
-            modelAndView.setViewName("error/error"); // 커스텀 에러 페이지로 이동하도록 설정
-            return modelAndView;
-        }
-        if (user == null || !user.isAdmin()) {
-            // 유저가 로그인하지 않았거나, 관리자 권한이 없는 경우 404 Forbidden 응답 반환
-            response.setStatus(404);
-            modelAndView.setViewName("error/error"); // 커스텀 에러 페이지로 이동하도록 설정
-            return modelAndView;
-        }
-        modelAndView.setViewName("member/managerChat");
-        return modelAndView;
-    }
-
-    @RequestMapping(value = "managerMessage/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public String postManagerMessage(
-            @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME) UserEntity user,
-            @PathVariable(value = "id") int id,
-            @RequestParam(value = "content") String content
-    ) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM--dd");
-        ChatSendUserContactDto chat = this.memberService.getChatbyIndex(id);
-        IResult result = this.memberService.putMnagerChat(chat, user, content);
-        JSONObject responseJson = new JSONObject();
-        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
-        if (result == CommonResult.SUCCESS) {
-//            responseJson.put("id", qnaArticle.getIndex());
-        }
-        return responseJson.toString();
-    }
 
 }
 

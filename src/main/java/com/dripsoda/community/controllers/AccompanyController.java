@@ -197,7 +197,7 @@ public class AccompanyController {
 
 
     //    다운로드용 맵핑
-    @RequestMapping(value = "image/{id}", method = RequestMethod.GET)
+        @RequestMapping(value = "image/{id}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getImage(@PathVariable(value = "id") int id) {
         ImageEntity image = this.accompanyService.getImage(id);
         if (image == null) {
@@ -211,24 +211,6 @@ public class AccompanyController {
         headers.setContentType(new MediaType(mimeType, mimeSubType, StandardCharsets.UTF_8));
         return new ResponseEntity<>(image.getData(), headers, HttpStatus.OK);
     }
-
-
-//    // s3이미지 다운로드 - s3 이미지를 단순히 보여주는 목적이기 떄문에 html에서 처리.
-//    @GetMapping("/s3/{imageName}")
-//    public ResponseEntity<byte[]> getS3Images(@PathVariable String imageName) {
-//        try {
-//            // S3에서 이미지 다운로드
-//            S3Object s3Object = s3Client.getObject(storageConfig.getBucketName(), imageName);
-//            // 이미지 데이터를 byte 배열로 변환하여 반환
-//            InputStream inputStream = s3Object.getObjectContent();
-//            byte[] imageBytes = IOUtils.toByteArray(inputStream);
-//            inputStream.close();
-//            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageBytes);
-//        } catch (IOException e) {
-//            logger.error("Error downloading image from S3: {}", e.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-//        }
-//    }
 
     @RequestMapping(value = "image", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -335,7 +317,7 @@ public class AccompanyController {
     //읽는 페이지에서 댓글수정이 이루어져야됨.
     @RequestMapping(value = "read/{id}", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String patchModify(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+    public String patchRead(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
                               @PathVariable(value = "id") Integer id,
                               HttpServletResponse response,
                               @RequestParam(value = "commentIndex", required = false) Integer commentIndex,
@@ -356,6 +338,28 @@ public class AccompanyController {
         }
         return new ObjectMapper().writeValueAsString(comment);
     }
+
+
+    @RequestMapping(value = "read/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String deleteRead(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
+                             @PathVariable(value = "id") int id) {
+        JSONObject responseJson = new JSONObject();
+        ArticleEntity article = this.accompanyService.getArticle(id);
+        if (article == null) {
+            responseJson.put(IResult.ATTRIBUTE_NAME, CommonResult.FAILURE);
+            return responseJson.toString();
+        }
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS") && !user.getEmail().equals(article.getUserEmail())) {
+            responseJson.put(IResult.ATTRIBUTE_NAME, "k");
+            return responseJson.toString();
+        }
+        IResult result = this.accompanyService.deleteArticle(id);
+        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
+        return responseJson.toString();
+    }
+
+
 
     //관리자 볼 수 있는 전체 댓글 http로 던짐.
 
@@ -519,24 +523,6 @@ public class AccompanyController {
         return responseJson.toString();
     }
 
-    @RequestMapping(value = "read/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public String deleteRead(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
-                             @PathVariable(value = "id") int id) {
-        JSONObject responseJson = new JSONObject();
-        ArticleEntity article = this.accompanyService.getArticle(id);
-        if (article == null) {
-            responseJson.put(IResult.ATTRIBUTE_NAME, CommonResult.FAILURE);
-            return responseJson.toString();
-        }
-        if (user == null || Objects.equals(user.getStatusValue(), "SUS") && !user.getEmail().equals(article.getUserEmail())) {
-            responseJson.put(IResult.ATTRIBUTE_NAME, "k");
-            return responseJson.toString();
-        }
-        IResult result = this.accompanyService.deleteArticle(id);
-        responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
-        return responseJson.toString();
-    }
 
     @RequestMapping(value = "modify/{id}", method = RequestMethod.GET)
     public ModelAndView getModify(

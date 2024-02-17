@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Controller(value = "com.dripsoda.community.contollers.QnaController")
-@RequestMapping(value = "/qna/")
+@RequestMapping(value = "/qna")
 public class QnaController {
     private final AccompanyService accompanyService;
     private final MemberService memberService;
@@ -80,7 +80,7 @@ public class QnaController {
     }
     //read 할떄 1번 - 공지사항 / 2번 이벤트 / 3번 qna로 select해서 read 하면됨.
 
-    @RequestMapping(value = "read/{id}", method = RequestMethod.GET)
+        @RequestMapping(value = "read/{id}", method = RequestMethod.GET)
     public ModelAndView getRead(@PathVariable(value = "id") Integer id, ModelAndView modelAndView,
                                 HttpServletResponse response,
                                 HttpServletRequest request) {
