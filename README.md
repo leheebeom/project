@@ -3,7 +3,7 @@
   -  ### 트립소다(tripsoda)는 개별 여행자들의 관심사와 취향을 맞춰 함께 동행할 수 있는 국내 여행 플랫폼입니다.
 
 #### Project Nickname : 트립소다 프로젝트
-#### Project Execution period : 2023.11.30~2022.02.15 
+#### Project Execution Period : 2023.11.30~2022.02.15 
 
 #### Project URL :  [Tripsoda Clone](https://dripsoda.co.kr:8080/)
 
