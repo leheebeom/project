@@ -5,7 +5,7 @@
 #### Project Nickname : 트립소다 프로젝트
 #### Project Execution Period : 2023.11.30~2022.02.15 
 
-#### Project URL :  [Tripsoda Clone](https://dripsoda.co.kr/)
+#### Project URL :  [Tripsoda Clone](https://dripsoda.co.kr/) - (2024.02.18 ~ 2024.02.19 서버 점검화 마무리 작업을 통해 일시적 중단입니다. 19일 오전 9시쯤 서버를 다시 열도록 하겠습니다.)
 
 #### Project PPT :  [PPT](https://o365gnu-my.sharepoint.com/:p:/g/personal/2017011008_stu_gnu_ac_kr/ET0RPEV_JxNFunZ7QYLLyyUB8U3hePKKM5yADDE1DIIE1g)
 
