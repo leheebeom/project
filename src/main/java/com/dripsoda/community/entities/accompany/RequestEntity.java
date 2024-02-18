@@ -1,9 +1,11 @@
 package com.dripsoda.community.entities.accompany;
 
+import com.dripsoda.community.interfaces.IEntity;
+
 import java.util.Date;
 import java.util.Objects;
 
-public class RequestEntity {
+public class RequestEntity implements IEntity<RequestEntity> {
 
 
     public static final String ATTRIBUTE_NAME = "request";
@@ -12,6 +14,7 @@ public class RequestEntity {
     public static RequestEntity build() {
         return new RequestEntity();
     }
+
     private int index;
     private String requesterUserEmail;
     private String requesteeUserEmail;
@@ -107,5 +110,29 @@ public class RequestEntity {
     @Override
     public int hashCode() {
         return Objects.hash(index);
+    }
+
+    @Override
+    public RequestEntity clone() {
+        RequestEntity requestEntity = new RequestEntity();
+        this.index = requestEntity.index;
+        this.requesterUserEmail = requestEntity.requesterUserEmail;
+        this.requesteeUserEmail = requestEntity.requesteeUserEmail;
+        this.articleIndex = requestEntity.articleIndex;
+        this.createdAt = requestEntity.createdAt;
+        this.isGranted = requestEntity.isGranted;
+        this.isDeclined = requestEntity.isDeclined;
+        return requestEntity;
+    }
+
+    @Override
+    public void copyValuesOf(RequestEntity requestEntity) {
+        requestEntity.index = this.index;
+        requestEntity.requesterUserEmail = this.requesterUserEmail;
+        requestEntity.requesteeUserEmail = this.requesteeUserEmail;
+        requestEntity.articleIndex = this.articleIndex;
+        requestEntity.createdAt = this.createdAt;
+        requestEntity.isGranted = this.isGranted;
+        requestEntity.isDeclined = this.isDeclined;
     }
 }

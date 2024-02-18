@@ -1,9 +1,11 @@
 package com.dripsoda.community.entities.accompany;
 
+import com.dripsoda.community.interfaces.IEntity;
+
 import java.util.Date;
 import java.util.Objects;
 
-public class ArticleEntity {
+public class ArticleEntity implements IEntity<ArticleEntity> {
 
     public static final String ATTRIBUTE_NAME = "accompanyArticle";
     public static final String ATTRIBUTE_NAME_PLURAL = "accompanyArticles";
@@ -184,5 +186,43 @@ public class ArticleEntity {
     @Override
     public int hashCode() {
         return Objects.hash(index);
+    }
+
+    @Override
+    public ArticleEntity clone() {
+        ArticleEntity articleEntity = new ArticleEntity();
+        this.index = articleEntity.index;
+        this.userEmail = articleEntity.userEmail;
+        this.createdAt = articleEntity.createdAt;
+        this.continentValue = articleEntity.continentValue;
+        this.countryValue = articleEntity.countryValue;
+        this.regionValue = articleEntity.regionValue;
+        this.capacity = articleEntity.capacity;
+        this.dateFrom = articleEntity.dateFrom;
+        this.dateTo = articleEntity.dateTo;
+        this.coverImage = articleEntity.coverImage;
+        this.coverImageMime = articleEntity.coverImageMime;
+        this.title = articleEntity.title;
+        this.content = articleEntity.content;
+        this.viewCount = articleEntity.viewCount;
+        return articleEntity;
+    }
+
+    @Override
+    public void copyValuesOf(ArticleEntity articleEntity) {
+        articleEntity.index = this.index;
+        articleEntity.userEmail = this.userEmail;
+        articleEntity.createdAt = this.createdAt;
+        articleEntity.continentValue = this.continentValue;
+        articleEntity.countryValue = this.countryValue;
+        articleEntity.regionValue = this.regionValue;
+        articleEntity.capacity = this.capacity;
+        articleEntity.dateFrom = this.dateFrom;
+        articleEntity.dateTo = this.dateTo;
+        articleEntity.coverImage = this.coverImage;
+        articleEntity.coverImageMime = this.coverImageMime;
+        articleEntity.title = this.title;
+        articleEntity.content = this.content;
+        articleEntity.viewCount = this.viewCount;
     }
 }

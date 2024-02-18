@@ -1,8 +1,10 @@
 package com.dripsoda.community.entities.accompany;
 
+import com.dripsoda.community.interfaces.IEntity;
+
 import java.util.Objects;
 
-public class RegionEntity {
+public class RegionEntity implements IEntity<RegionEntity> {
 
 
     public static final String ATTRIBUTE_NAME = "accompanyRegion";
@@ -74,5 +76,23 @@ public class RegionEntity {
     @Override
     public int hashCode() {
         return Objects.hash(continentValue, countryValue, value);
+    }
+
+    @Override
+    public RegionEntity clone() {
+        RegionEntity regionEntity = new RegionEntity();
+        this.continentValue = regionEntity.continentValue;
+        this.countryValue = regionEntity.countryValue;
+        this.value = regionEntity.value;
+        this.text = regionEntity.text;
+        return regionEntity;
+    }
+
+    @Override
+    public void copyValuesOf(RegionEntity regionEntity) {
+        regionEntity.continentValue = this.continentValue;
+        regionEntity.countryValue = this.countryValue;
+        regionEntity.value = this.value;
+        regionEntity.text = this.text;
     }
 }

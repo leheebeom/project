@@ -1,8 +1,10 @@
 package com.dripsoda.community.entities.member;
 
+import com.dripsoda.community.interfaces.IEntity;
+
 import java.util.Objects;
 
-public class StatusEntity {
+public class StatusEntity implements IEntity<StatusEntity> {
 
     public static final String ATTRIBUTE_NAME = "memberStatus";
     public static final String ATTRIBUTE_NAME_PLURAL = "memberStatuses";
@@ -50,5 +52,19 @@ public class StatusEntity {
     @Override
     public int hashCode() {
         return Objects.hash(value);
+    }
+
+    @Override
+    public StatusEntity clone() {
+        StatusEntity statusEntity = new StatusEntity();
+        this.value = statusEntity.value;
+        this.text = statusEntity.text;
+        return statusEntity;
+    }
+
+    @Override
+    public void copyValuesOf(StatusEntity statusEntity) {
+        statusEntity.value = this.value;
+        statusEntity.text = this.text;
     }
 }

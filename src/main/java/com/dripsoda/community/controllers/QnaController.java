@@ -64,7 +64,7 @@ public class QnaController {
         int page = optionalPage.orElse(1);
         int articleType = getArticleType(tab);
 
-        if(articleType == 0) {
+        if (articleType == 0) {
 
         }
 
@@ -73,14 +73,14 @@ public class QnaController {
         modelAndView.setViewName("qna/index");
         modelAndView.addObject("paging", paging);
         modelAndView.addObject("paging", paging);
-        modelAndView.addObject("helpQna", this.qnaService.getArticlesByTypeAndPaging(articleType,paging));
-        modelAndView.addObject("eventQna", this.qnaService.getArticlesByTypeAndPaging(articleType,paging));
-        modelAndView.addObject("qnaQna",this.qnaService.getArticlesByTypeAndPaging(articleType,paging));
+        modelAndView.addObject("helpQna", this.qnaService.getArticlesByTypeAndPaging(articleType, paging));
+        modelAndView.addObject("eventQna", this.qnaService.getArticlesByTypeAndPaging(articleType, paging));
+        modelAndView.addObject("qnaQna", this.qnaService.getArticlesByTypeAndPaging(articleType, paging));
         return modelAndView;
     }
-    //read 할떄 1번 - 공지사항 / 2번 이벤트 / 3번 qna로 select해서 read 하면됨.
 
-        @RequestMapping(value = "read/{id}", method = RequestMethod.GET)
+    //read 할떄 1번 - 공지사항 / 2번 이벤트 / 3번 qna로 select해서 read 하면됨.
+    @RequestMapping(value = "read/{id}", method = RequestMethod.GET)
     public ModelAndView getRead(@PathVariable(value = "id") Integer id, ModelAndView modelAndView,
                                 HttpServletResponse response,
                                 HttpServletRequest request) {

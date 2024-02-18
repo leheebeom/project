@@ -1,9 +1,11 @@
 package com.dripsoda.community.entities.accompany;
 
+import com.dripsoda.community.interfaces.IEntity;
+
 import java.util.Date;
 import java.util.Objects;
 
-public class CommentEntity {
+public class CommentEntity implements IEntity<CommentEntity> {
     public static final String ATTRIBUTE_NAME = "accompanyComment";
     public static final String ATTRIBUTE_NAME_PLURAL = "accompanyComments";
 
@@ -172,4 +174,37 @@ public class CommentEntity {
     }
 
 
+    @Override
+    public CommentEntity clone() {
+        CommentEntity commentEntity = new CommentEntity();
+        this.index = commentEntity.index;
+        this.articleIndex = commentEntity.articleIndex;
+        this.commentParentIndex = commentEntity.commentParentIndex;
+        this.userEmail = commentEntity.userEmail;
+        this.createdAt = commentEntity.createdAt;
+        this.content = commentEntity.content;
+        this.modifiedAt = commentEntity.modifiedAt;
+        this.isDeleted = commentEntity.isDeleted;
+        this.isComment = commentEntity.isComment;
+        this.depth = commentEntity.depth;
+        this.likes = commentEntity.likes;
+        this.orderNumber = commentEntity.orderNumber;
+        return commentEntity;
+    }
+
+    @Override
+    public void copyValuesOf(CommentEntity commentEntity) {
+        commentEntity.index = this.index;
+        commentEntity.articleIndex = this.articleIndex;
+        commentEntity.commentParentIndex = this.commentParentIndex;
+        commentEntity.userEmail = this.userEmail;
+        commentEntity.createdAt = this.createdAt;
+        commentEntity.content = this.content;
+        commentEntity.modifiedAt = this.modifiedAt;
+        commentEntity.isDeleted = this.isDeleted;
+        commentEntity.isComment = this.isComment;
+        commentEntity.depth = this.depth;
+        commentEntity.likes = this.likes;
+        commentEntity.orderNumber = this.orderNumber;
+    }
 }

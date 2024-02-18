@@ -46,17 +46,13 @@ import java.util.Objects;
 public class AccompanyController {
     private final AccompanyService accompanyService;
     private final MemberService memberService;
-
     private static final Logger logger = LoggerFactory.getLogger(AccompanyController.class);
-
-
 
     @Autowired
     public AccompanyController(AccompanyService accompanyService, MemberService memberService) {
         this.accompanyService = accompanyService;
         this.memberService = memberService;
     }
-
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView getIndex(ModelAndView modelAndView) {
@@ -75,7 +71,7 @@ public class AccompanyController {
             article.setContent(article.getContent()
                     .replaceAll("<[^>]*>", "")
                     .replaceAll("&[^;]*;", ""));
-//            <어쩌고> 형태를 다지워줌. 문제, &lt; &gt; &nbsp; 같은건 그대로 들어남.
+//            <어쩌고> 형태를 다지워줌. 문제, &lt; &gt; &nbsp; 같은건 그대로 들어남. -> 타임리프 utext 사용
         }
         responseJson.put(ArticleEntity.ATTRIBUTE_NAME_PLURAL, new JSONArray(objectMapper.writeValueAsString(articles)));
         return responseJson.toString();
@@ -137,8 +133,6 @@ public class AccompanyController {
         return modelAndView;
     }
 
-
-    //
     @RequestMapping(value = "cover-image/{id}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getCoverImage(
             @PathVariable(value = "id") int id) {
@@ -154,7 +148,6 @@ public class AccompanyController {
         headers.setContentType(new MediaType(mimeType, mimeSubType, StandardCharsets.UTF_8));
         return new ResponseEntity<>(article.getCoverImage(), headers, HttpStatus.OK);
     }
-
 
     @RequestMapping(value = "write", method = RequestMethod.GET)
     public ModelAndView getWrite(
@@ -195,9 +188,8 @@ public class AccompanyController {
         return responseJson.toString();
     }
 
-
     //    다운로드용 맵핑
-        @RequestMapping(value = "image/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "image/{id}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getImage(@PathVariable(value = "id") int id) {
         ImageEntity image = this.accompanyService.getImage(id);
         if (image == null) {
@@ -267,7 +259,6 @@ public class AccompanyController {
             newCookie.setMaxAge(60 * 60 * 24);                                // 쿠키 시간
             response.addCookie(newCookie);
         }
-
         //좋아요 판별.
         if (user != null) {
             List<CommentLikeEntity> commentLikeEntity = this.accompanyService.getCommentLikeByUserEmail(user.getEmail());
@@ -318,10 +309,10 @@ public class AccompanyController {
     @RequestMapping(value = "read/{id}", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public String patchRead(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
-                              @PathVariable(value = "id") Integer id,
-                              HttpServletResponse response,
-                              @RequestParam(value = "commentIndex", required = false) Integer commentIndex,
-                              @RequestParam(value = "content", required = false) String content) throws JsonProcessingException {
+                            @PathVariable(value = "id") Integer id,
+                            HttpServletResponse response,
+                            @RequestParam(value = "commentIndex", required = false) Integer commentIndex,
+                            @RequestParam(value = "content", required = false) String content) throws JsonProcessingException {
         ArticleEntity article = this.accompanyService.getArticle(id);
         CommentEntity comment = this.accompanyService.getCommentIndex(commentIndex);
         if (article == null) {
@@ -338,7 +329,6 @@ public class AccompanyController {
         }
         return new ObjectMapper().writeValueAsString(comment);
     }
-
 
     @RequestMapping(value = "read/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -359,10 +349,7 @@ public class AccompanyController {
         return responseJson.toString();
     }
 
-
-
     //관리자 볼 수 있는 전체 댓글 http로 던짐.
-
     @RequestMapping(value = "read/{id}/comments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CommentEntity>> getComment(
             @SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
@@ -392,17 +379,13 @@ public class AccompanyController {
             return null;
         }
         //comment 객체 빌드 - id 값은 path의 id 값, 세션의 유저 이메일 값. 만약 session의 유저 값이 없으면 로그인 화면 - 로그인 하고 오라고 하기,
-
         //reply 이 있으면 parentIndex 값이 commentIndex , 없으면 parentIndex 값이 null
         IResult result = accompanyService.createComment(user, id, newComment);
         JSONObject responseJson = new JSONObject();
         responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
-
         if (result == CommonResult.SUCCESS) {
-            System.out.println("값 석세스임 이제");
             responseJson.put("articleId", newComment.getArticleIndex());
             responseJson.put("id", newComment.getIndex());
-
         }
         // 댓글을 작성한 후 동일한 읽기 페이지로 리다이렉트
         return responseJson.toString();
@@ -621,6 +604,4 @@ public class AccompanyController {
         responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
         return responseJson.toString();
     }
-
-
 }

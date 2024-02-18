@@ -78,7 +78,6 @@ public class MemberService {
         return CommonResult.SUCCESS;
     }
 
-
     @Transactional
     public IResult checkContactAuth(ContactAuthEntity contactAuth) throws
             RollbackException {
@@ -215,85 +214,6 @@ public class MemberService {
         }
         user.setEmail(foundUser.getEmail());
         return CommonResult.SUCCESS;
-    }
-
-    @Transactional
-    public IResult putChat(UserEntity user, int roomIndex, String content) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
-        if (user == null) {
-            return ChatResult.NOT_SIGNED;
-        }
-        if (!(roomIndex == 1 || roomIndex == 2)) {
-            return ChatResult.NOT_FOUND;
-        }
-        // 나머지 로직
-        //관리자 아이디 찾기
-        UserEntity admin = this.memberMapper.selectUserByAdmin();
-        //readTime 의 경우 일단 현재 만들어진 시간 후에 update로 변경.
-        ChatEntity chat = ChatEntity.build()
-                .setSendUserEmail(user.getEmail())
-                .setReceiveUserEmail(!user.getEmail().equals(admin.getEmail()) ? admin.getEmail() : user.getEmail())
-                .setRoom(roomIndex)
-                .setSendTime(new Date())
-                .setReadTime(new Date())
-                .setReadChecked(0)
-                .setContent(content);
-
-        int insertChat = this.memberMapper.insertChat(chat);
-
-        if (insertChat > 0) {
-            String smsContent;
-            smsContent = "[드립소다] 고객님의 답변이 등록되었습니다.";
-            if (this.smsComponent.send(user.getContact(), smsContent) != 202) {
-                throw new RollbackException();
-            }
-            return CommonResult.SUCCESS;
-        } else {
-            return CommonResult.FAILURE;
-        }
-    }
-
-    @Transactional
-    public IResult putMnagerChat(ChatSendUserContactDto chat, UserEntity user, String content) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
-        if (chat == null) {
-            return ChatResult.NOT_FOUND;
-        }
-        if (user == null) {
-            return ChatResult.NOT_SIGNED;
-        }
-
-
-        //readTime 의 경우 일단 현재 만들어진 시간 후에 update로 변경.
-        ChatEntity mangerChat = ChatEntity.build()
-                .setSendUserEmail(user.getEmail())
-                .setReceiveUserEmail(chat.getSendUserEmail())
-                .setRoom(1)
-                .setSendTime(new Date())
-                .setReadTime(new Date())
-                .setReadChecked(0)
-                .setContent(content);
-
-        chat.setReadTime(new Date());
-        chat.setReadChecked(1);
-
-        int insertChat = this.memberMapper.insertChat(mangerChat);
-
-        if (insertChat > 0) {
-            int updateChat = this.memberMapper.updateChat(chat);
-            if (updateChat > 0) {
-
-                //chat유저의 contact
-                String smsContent;
-                smsContent = "[드립소다] 고객님이 등록해주신 질문에 대한 답변이 완료 되었습니다.";
-                if (this.smsComponent.send(chat.getSendUserContact(), smsContent) != 202) {
-                    throw new RollbackException();
-                }
-                return CommonResult.SUCCESS;
-            } else {
-                return CommonResult.FAILURE;
-            }
-        } else {
-            return CommonResult.FAILURE;
-        }
     }
 
     @Transactional
@@ -454,6 +374,24 @@ public class MemberService {
         return this.createContactAuth(contactAuth);
     }
 
+    public IResult modifyUserProfileNickname(UserEntity currentUser, UserEntity newUser) throws RollbackException {
+        if (currentUser == null || currentUser.getNickname() == null) {
+            return CommonResult.FAILURE;
+        }
+        String oldCurrentNickname = currentUser.getNickname();
+
+        if (newUser.getNickname() != null) {
+            currentUser.setNickname(newUser.getNickname());
+        }
+
+        int record = this.memberMapper.updateUser(currentUser);
+        if (record == 0) {
+            currentUser.setNickname(oldCurrentNickname);
+            throw new RollbackException();
+        }
+        return CommonResult.SUCCESS;
+    }
+
     public IResult modifyUserProfileImage(UserEntity user) {
         if (user.getProfileId() == null || user.getProfileData() == null) {
             return CommonResult.FAILURE;
@@ -464,23 +402,90 @@ public class MemberService {
 
     }
 
-    public IResult modifyUserProfileNickname(UserEntity currentUser, UserEntity newUser) throws RollbackException {
+    @Transactional
+    public IResult putChat(UserEntity user, int roomIndex, String content) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
+        if (user == null) {
+            return ChatResult.NOT_SIGNED;
+        }
+        if (!(roomIndex == 1 || roomIndex == 2)) {
+            return ChatResult.NOT_FOUND;
+        }
+        // 나머지 로직
+        //관리자 아이디 찾기
+        UserEntity admin = this.memberMapper.selectUserByAdmin();
+        //readTime 의 경우 일단 현재 만들어진 시간 후에 update로 변경.
+        ChatEntity chat = ChatEntity.build()
+                .setSendUserEmail(user.getEmail())
+                .setReceiveUserEmail(!user.getEmail().equals(admin.getEmail()) ? admin.getEmail() : user.getEmail())
+                .setRoom(roomIndex)
+                .setSendTime(new Date())
+                .setReadTime(new Date())
+                .setReadChecked(0)
+                .setContent(content);
 
-        if(currentUser == null || currentUser.getNickname() == null) {
+        int insertChat = this.memberMapper.insertChat(chat);
+
+        if (insertChat > 0) {
+            String smsContent;
+            smsContent = "[드립소다] 고객님의 답변이 등록되었습니다.";
+            if (this.smsComponent.send(user.getContact(), smsContent) != 202) {
+                throw new RollbackException();
+            }
+            return CommonResult.SUCCESS;
+        } else {
             return CommonResult.FAILURE;
         }
-        String oldCurrentNickname = currentUser.getNickname();
+    }
 
-        if (newUser.getNickname() != null) {
-            currentUser.setNickname(newUser.getNickname());
+    @Transactional
+    public IResult putMnagerChat(ChatSendUserContactDto chat, UserEntity user, String content) throws NoSuchAlgorithmException, IOException, InvalidKeyException, RollbackException {
+        if (chat == null) {
+            return ChatResult.NOT_FOUND;
         }
+        if (user == null) {
+            return ChatResult.NOT_SIGNED;
+        }
+        //readTime 의 경우 일단 현재 만들어진 시간 후에 update로 변경.
+        ChatEntity mangerChat = ChatEntity.build()
+                .setSendUserEmail(user.getEmail())
+                .setReceiveUserEmail(chat.getSendUserEmail())
+                .setRoom(1)
+                .setSendTime(new Date())
+                .setReadTime(new Date())
+                .setReadChecked(0)
+                .setContent(content);
 
-        int record = this.memberMapper.updateUser(currentUser);
-        if(record == 0) {
-            currentUser.setNickname(oldCurrentNickname);
-            throw new RollbackException();
+        chat.setReadTime(new Date());
+        chat.setReadChecked(1);
+        int insertChat = this.memberMapper.insertChat(mangerChat);
+        if (insertChat > 0) {
+            int updateChat = this.memberMapper.updateChat(chat);
+            if (updateChat > 0) {
+                //chat유저의 contact
+                String smsContent;
+                smsContent = "[드립소다] 고객님이 등록해주신 질문에 대한 답변이 완료 되었습니다.";
+                if (this.smsComponent.send(chat.getSendUserContact(), smsContent) != 202) {
+                    throw new RollbackException();
+                }
+                return CommonResult.SUCCESS;
+            } else {
+                return CommonResult.FAILURE;
+            }
+        } else {
+            return CommonResult.FAILURE;
         }
-        return CommonResult.SUCCESS;
+    }
+
+    public IResult createFeedback(FeedbackEntity feedback) {
+        return this.memberMapper.insertFeedback(feedback) > 0
+                ? CommonResult.SUCCESS
+                : CommonResult.FAILURE;
+    }
+
+    public IResult deleteUser(UserEntity user) throws RollbackException {
+        return this.memberMapper.deleteUser(user) > 0
+                ? CommonResult.SUCCESS
+                : CommonResult.FAILURE;
     }
 
     public List<ChatEntity> chatAdminCheckList(String email) {
@@ -510,19 +515,6 @@ public class MemberService {
     public List<UserEntity> getUsers() {
         return this.memberMapper.selectUsersForHome();
     }
-
-    public IResult createFeedback(FeedbackEntity feedback) {
-        return this.memberMapper.insertFeedback(feedback) > 0
-                ? CommonResult.SUCCESS
-                : CommonResult.FAILURE;
-    }
-
-    public IResult deleteUser(UserEntity user) throws RollbackException {
-        return this.memberMapper.deleteUser(user) > 0
-                ? CommonResult.SUCCESS
-                : CommonResult.FAILURE;
-    }
-
 }
 
 

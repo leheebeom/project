@@ -1,9 +1,11 @@
 package com.dripsoda.community.entities.member;
 
+import com.dripsoda.community.interfaces.IEntity;
+
 import java.util.Date;
 import java.util.Objects;
 
-public class EmailAuthEntity {
+public class EmailAuthEntity implements IEntity<EmailAuthEntity> {
     public static final String ATTRIBUTE_NAME = "memberEmailAuth";
     public static final String ATTRIBUTE_NAME_PLURAL = "memberEmailAuths";
 
@@ -95,5 +97,27 @@ public class EmailAuthEntity {
     @Override
     public int hashCode() {
         return Objects.hash(index);
+    }
+
+    @Override
+    public EmailAuthEntity clone() {
+        EmailAuthEntity emailAuthEntity = new EmailAuthEntity();
+        emailAuthEntity.index = this.index;
+        emailAuthEntity.email = this.email;
+        emailAuthEntity.code = this.code;
+        emailAuthEntity.createdAt = this.createdAt;
+        emailAuthEntity.expiresAt = this.expiresAt;
+        emailAuthEntity.isExpired = this.isExpired;
+        return emailAuthEntity;
+    }
+
+    @Override
+    public void copyValuesOf(EmailAuthEntity emailAuthEntity) {
+        this.index = emailAuthEntity.index;
+        this.email = emailAuthEntity.email;
+        this.code = emailAuthEntity.code;
+        this.createdAt = emailAuthEntity.createdAt;
+        this.expiresAt = emailAuthEntity.expiresAt;
+        this.isExpired = emailAuthEntity.isExpired;
     }
 }

@@ -1,8 +1,10 @@
 package com.dripsoda.community.entities.qna;
 
+import com.dripsoda.community.interfaces.IEntity;
+
 import java.util.Objects;
 
-public class CategoryEntity {
+public class CategoryEntity implements IEntity<CategoryEntity> {
     public static final String ATTRIBUTE_NAME = "qnaCategory";
     public static final String ATTRIBUTE_NAME_PLURAL = "qnaCategories";
 
@@ -49,5 +51,19 @@ public class CategoryEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public CategoryEntity clone() {
+        CategoryEntity categoryEntity = new CategoryEntity();
+        this.id = categoryEntity.id;
+        this.text = categoryEntity.text;
+        return categoryEntity;
+    }
+
+    @Override
+    public void copyValuesOf(CategoryEntity categoryEntity) {
+        categoryEntity.id = this.id;
+        categoryEntity.text = this.text;
     }
 }

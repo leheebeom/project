@@ -22,8 +22,6 @@ import java.util.Objects;
 
 @Service(value = "com.dripsoda.community.services.AccompanyService")
 public class AccompanyService {
-
-
     private static final Logger logger = LoggerFactory.getLogger(AccompanyService.class);
     private final IAccompanyMapper accompanyMapper;
     private final IMemberMapper memberMapper;
@@ -50,36 +48,6 @@ public class AccompanyService {
         return this.accompanyMapper.selectImageByIndex(index);
     }
 
-    public List<CommentEntity> getAllCommentsForArticle(Integer articleId) {
-        // 해당 게시글(articleId)에 대한 댓글 목록을 조회
-        List<CommentEntity> comments = accompanyMapper.findCommentByArticle(articleId);
-        // 조회된 댓글 목록 반환
-        return comments;
-    }
-
-
-
-    public IResult modifyComment(CommentEntity comment) {
-        CommentEntity oldComment = this.accompanyMapper.selectCommentByIndex(comment.getIndex());
-        if (oldComment == null) {
-            return CommentResult.NOT_FOUND;
-        }
-        if (!comment.getUserEmail().equals(oldComment.getUserEmail())) {
-            return CommentResult.NOT_SIGNED;
-        }
-        comment.setIndex(oldComment.getIndex())
-                .setArticleIndex(oldComment.getArticleIndex())
-                .setCommentParentIndex(oldComment.getCommentParentIndex())
-                .setUserEmail(oldComment.getUserEmail())
-                .setCreatedAt(oldComment.getCreatedAt())
-                .setDeleted(oldComment.getDeleted())
-                .setLikes(oldComment.getLikes())
-                .setModifiedAt(new Date());
-        return this.accompanyMapper.updateComment(comment) > 0
-                ? CommonResult.SUCCESS
-                : CommonResult.FAILURE;
-    }
-
     public void updateViews(int index) {
         accompanyMapper.updateView(index);
     }
@@ -98,7 +66,6 @@ public class AccompanyService {
         return this.accompanyMapper.selectArticlesForSearch(region, lastArticleIndex);
     }
 
-
     public IResult putArticle(ArticleEntity article) {
         return this.accompanyMapper.insertArticle(article) > 0
                 ? CommonResult.SUCCESS
@@ -110,41 +77,6 @@ public class AccompanyService {
         return this.accompanyMapper.deleteArticle(index) > 0
                 ? CommonResult.SUCCESS
                 : CommonResult.FAILURE;
-    }
-
-    public IResult deleteCommentLike(UserEntity user, Integer id, Integer commentId) {
-        ArticleEntity article = this.accompanyMapper.selectArticleByIndex(id);
-        CommentEntity comment = this.accompanyMapper.selectCommentByArticleIndexAndIndex(id, commentId);
-        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
-            return CommentResult.NOT_SIGNED;
-        }
-        if (article == null || article.getIndex() == 0) {
-            return CommentResult.NOT_FOUND;
-        }
-
-        if (comment == null || comment.getIndex() == 0) {
-            return CommentResult.NOT_FOUND;
-        }
-
-        comment.setLikes(comment.getLikes() - 1);
-        int likeInsertResult = this.accompanyMapper.deleteCommentLike(user.getEmail(), id, commentId);
-        if (likeInsertResult > 0) {
-            int updateResult = this.accompanyMapper.updateCommentLikes(comment.getLikes(), comment.getArticleIndex(), comment.getIndex());
-
-            if (updateResult > 0) {
-                logger.info("Comment like deleted successfully");
-                return CommonResult.SUCCESS;
-            } else {
-                logger.error(" updateResult failure");
-                // updateResult 실패 시 CommonResult.FAILURE 반환
-                return CommonResult.FAILURE;
-            }
-        } else {
-            logger.error("likeDeleted failure");
-            // likeInsertResult 실패 시 CommonResult.FAILURE 반환
-            return CommonResult.FAILURE;
-        }
-
     }
 
     @Transactional
@@ -217,47 +149,6 @@ public class AccompanyService {
                 : CommonResult.FAILURE;
     }
 
-    @Transactional
-    public IResult addCommentLike(UserEntity user, Integer id, Integer commentId) {
-        ArticleEntity article = this.accompanyMapper.selectArticleByIndex(id);
-        CommentEntity comment = this.accompanyMapper.selectCommentByArticleIndexAndIndex(id, commentId);
-        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
-            return CommentResult.NOT_SIGNED;
-        }
-        if (article == null || article.getIndex() == 0) {
-            return CommentResult.NOT_FOUND;
-        }
-
-        if (comment == null || comment.getIndex() == 0) {
-            return CommentResult.NOT_FOUND;
-        }
-
-        CommentLikeEntity commentLikeEntity = CommentLikeEntity.build()
-                .setUserEmail(user.getEmail())
-                .setArticleIndex(id)
-                .setCommentIndex(commentId)
-                .setChecked(true);
-        comment.setLikes(comment.getLikes() + 1);
-        int likeInsertResult = this.accompanyMapper.insertCommentLike(commentLikeEntity);
-        if (likeInsertResult > 0) {
-            int updateResult = this.accompanyMapper.updateCommentLikes(comment.getLikes(), comment.getArticleIndex(), comment.getIndex());
-
-            if (updateResult > 0) {
-                logger.info("Comment like added successfully");
-                return CommonResult.SUCCESS;
-            } else {
-                logger.error(" updateResult failure");
-                // updateResult 실패 시 CommonResult.FAILURE 반환
-                return CommonResult.FAILURE;
-            }
-        } else {
-            logger.error("likeInsertResult failure");
-            // likeInsertResult 실패 시 CommonResult.FAILURE 반환
-            return CommonResult.FAILURE;
-        }
-    }
-
-
     public boolean checkRequest(UserEntity requester, int articleIndex) {
         if (requester == null) {
             return false;
@@ -267,10 +158,6 @@ public class AccompanyService {
 
     public CommentEntity getCommentIndex(int index) {
         return this.accompanyMapper.selectCommentByIndex(index);
-    }
-
-    public List<CommentEntity> getCommentsByArticleIndex(Integer articleIndex) {
-        return accompanyMapper.selectCommentsByArticleIndex(articleIndex);
     }
 
     @Transactional
@@ -331,14 +218,114 @@ public class AccompanyService {
         return this.accompanyMapper.insertComment(reply) > 0
                 ? CommonResult.SUCCESS
                 : CommonResult.FAILURE;
+    }
 
+    @Transactional
+    public IResult deleteCommentLike(UserEntity user, Integer id, Integer commentId) {
+        ArticleEntity article = this.accompanyMapper.selectArticleByIndex(id);
+        CommentEntity comment = this.accompanyMapper.selectCommentByArticleIndexAndIndex(id, commentId);
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
+            return CommentResult.NOT_SIGNED;
+        }
+        if (article == null || article.getIndex() == 0) {
+            return CommentResult.NOT_FOUND;
+        }
+
+        if (comment == null || comment.getIndex() == 0) {
+            return CommentResult.NOT_FOUND;
+        }
+
+        comment.setLikes(comment.getLikes() - 1);
+        int likeInsertResult = this.accompanyMapper.deleteCommentLike(user.getEmail(), id, commentId);
+        if (likeInsertResult > 0) {
+            int updateResult = this.accompanyMapper.updateCommentLikes(comment.getLikes(), comment.getArticleIndex(), comment.getIndex());
+
+            if (updateResult > 0) {
+                logger.info("Comment like deleted successfully");
+                return CommonResult.SUCCESS;
+            } else {
+                logger.error(" updateResult failure");
+                // updateResult 실패 시 CommonResult.FAILURE 반환
+                return CommonResult.FAILURE;
+            }
+        } else {
+            logger.error("likeDeleted failure");
+            // likeInsertResult 실패 시 CommonResult.FAILURE 반환
+            return CommonResult.FAILURE;
+        }
 
     }
 
-//    모든 게시판 게시글 불러오기
-//    public List<ArticleSearchDto> getArticlesForAll() {
-//
+    @Transactional
+    public IResult addCommentLike(UserEntity user, Integer id, Integer commentId) {
+        ArticleEntity article = this.accompanyMapper.selectArticleByIndex(id);
+        CommentEntity comment = this.accompanyMapper.selectCommentByArticleIndexAndIndex(id, commentId);
+        if (user == null || Objects.equals(user.getStatusValue(), "SUS")) {
+            return CommentResult.NOT_SIGNED;
+        }
+        if (article == null || article.getIndex() == 0) {
+            return CommentResult.NOT_FOUND;
+        }
+
+        if (comment == null || comment.getIndex() == 0) {
+            return CommentResult.NOT_FOUND;
+        }
+
+        CommentLikeEntity commentLikeEntity = CommentLikeEntity.build()
+                .setUserEmail(user.getEmail())
+                .setArticleIndex(id)
+                .setCommentIndex(commentId)
+                .setChecked(true);
+        comment.setLikes(comment.getLikes() + 1);
+        int likeInsertResult = this.accompanyMapper.insertCommentLike(commentLikeEntity);
+        if (likeInsertResult > 0) {
+            int updateResult = this.accompanyMapper.updateCommentLikes(comment.getLikes(), comment.getArticleIndex(), comment.getIndex());
+
+            if (updateResult > 0) {
+                logger.info("Comment like added successfully");
+                return CommonResult.SUCCESS;
+            } else {
+                logger.error(" updateResult failure");
+                // updateResult 실패 시 CommonResult.FAILURE 반환
+                return CommonResult.FAILURE;
+            }
+        } else {
+            logger.error("likeInsertResult failure");
+            // likeInsertResult 실패 시 CommonResult.FAILURE 반환
+            return CommonResult.FAILURE;
+        }
+    }
+
+    public IResult modifyComment(CommentEntity comment) {
+        CommentEntity oldComment = this.accompanyMapper.selectCommentByIndex(comment.getIndex());
+        if (oldComment == null) {
+            return CommentResult.NOT_FOUND;
+        }
+        if (!comment.getUserEmail().equals(oldComment.getUserEmail())) {
+            return CommentResult.NOT_SIGNED;
+        }
+        comment.setIndex(oldComment.getIndex())
+                .setArticleIndex(oldComment.getArticleIndex())
+                .setCommentParentIndex(oldComment.getCommentParentIndex())
+                .setUserEmail(oldComment.getUserEmail())
+                .setCreatedAt(oldComment.getCreatedAt())
+                .setDeleted(oldComment.getDeleted())
+                .setLikes(oldComment.getLikes())
+                .setModifiedAt(new Date());
+        return this.accompanyMapper.updateComment(comment) > 0
+                ? CommonResult.SUCCESS
+                : CommonResult.FAILURE;
+    }
+
+    //    public List<CommentEntity> getCommentsByArticleIndex(Integer articleIndex) {
+//        return accompanyMapper.selectCommentsByArticleIndex(articleIndex);
 //    }
+    public List<CommentEntity> getAllCommentsForArticle(Integer articleId) {
+        // 해당 게시글(articleId)에 대한 댓글 목록을 조회
+        List<CommentEntity> comments = accompanyMapper.findCommentByArticle(articleId);
+        // 조회된 댓글 목록 반환
+        return comments;
+    }
 
     public List<ArticleCommentDto> getArticleCommentsByArticleIndex(Integer articleIndex) {
         return this.accompanyMapper.selectArticleCommentsByArticleIndex(articleIndex);
@@ -352,10 +339,9 @@ public class AccompanyService {
         return this.accompanyMapper.selectCommentsByUserEmail(userEmail);
     }
 
-    public List<ArticleEntity> getArticlesForAll() {
-        return this.accompanyMapper.selectArticles();
-    }
-
+    //    public List<ArticleEntity> getArticlesForAll() {
+//        return this.accompanyMapper.selectArticles();
+//    }
     public List<ArticleKeywordDto> getArticlesForKeyword(String keyword) {
         return this.accompanyMapper.selectArticlesForKeyword(keyword);
     }
@@ -384,11 +370,6 @@ public class AccompanyService {
         return this.accompanyMapper.SelectCountArticle();
     }
 
-
-    //모든 게시판 최신 게시글 8개 불러오
-//    public  List<ArticleSearchDto> getNewArticlesForAll() {
-//
-//    }
 }
 
 

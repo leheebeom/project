@@ -57,7 +57,6 @@ public class MemberController {
         this.accompanyService = accompanyService;
     }
 
-
     @RequestMapping(value = "userEmailCheck", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public String getUserEmailCheck(UserEntity user) {
@@ -424,7 +423,6 @@ public class MemberController {
         return new ResponseEntity<>(profileUser.getProfileData(), headers, status);
     }
 
-
     @RequestMapping(value = "userMyInfoProfileImage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public String postUserMyInfoProfileImage(@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
@@ -462,7 +460,7 @@ public class MemberController {
         JSONObject responseJson = new JSONObject();
         IResult result;
         try {
-            result = this.memberService.modifyUserProfileNickname(currentUser,newUser);
+            result = this.memberService.modifyUserProfileNickname(currentUser, newUser);
         } catch (RollbackException ex) {
             result = ex.result;
         }
@@ -470,7 +468,6 @@ public class MemberController {
         responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
         return responseJson.toString();
     }
-
 
     @RequestMapping(value = "userMyInfoAuth", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
@@ -509,9 +506,6 @@ public class MemberController {
         return responseJson.toString();
     }
 
-
-
-
     @RequestMapping(value = "userMyInfoDelete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public String deleteUserMyInfoDelete(@SessionAttribute(value = UserEntity.ATTRIBUTE_NAME, required = false) UserEntity user,
@@ -549,7 +543,6 @@ public class MemberController {
         session.removeAttribute(UserEntity.ATTRIBUTE_NAME);
         return responseJson.toString();
     }
-
 
     @RequestMapping(value = "chatMessage/{rid}", method = RequestMethod.GET)
     @ResponseBody
@@ -606,7 +599,6 @@ public class MemberController {
         return modelAndView;
     }
 
-
     @RequestMapping(value = "managerMessage/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public String postManagerMessage(
@@ -646,11 +638,10 @@ public class MemberController {
         modelAndView.addObject(UserEntity.ATTRIBUTE_NAME_PLURAL, this.memberService.getUsers());
         modelAndView.addObject(ArticleEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getArticlesForManager());
         modelAndView.addObject(ChatEntity.ATTRIBUTE_NAME_PLURAL, this.memberService.getChats());
-        modelAndView.addObject(CommentEntity.ATTRIBUTE_NAME_PLURAL,this.accompanyService.getComments());
+        modelAndView.addObject(CommentEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getComments());
         modelAndView.setViewName("member/manager");
         return modelAndView;
     }
-
 
     @RequestMapping(value = "manager/write", method = RequestMethod.GET)
     public ModelAndView getWrite(
@@ -672,7 +663,6 @@ public class MemberController {
         return modelAndView;
     }
 
-
     @RequestMapping(value = "manager/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public String postWrite(
@@ -693,12 +683,10 @@ public class MemberController {
         }
         return responseJson.toString();
     }
+
     //qna게시판은 일반 회원 접근 불가 + coverImage가 없기 때문에 새로 만들어야됨. // 유지 보수 측면에서 동행 게시판과는 다르기 때문에 장점이 될 수 있어서 다른 게시판을 하나 더 생성해야되겠다.
     //qna 게시판의 종류는 - 공지사항, 이벤트, qna 총 3가지 category설정해야됨. 인덱스 값 주고 value 값으로 3가지만 주면 될듯.
 // read의 경우 /member/manage/write가 아니라 /qna/read가 되어야 되기 때문 //
-
-
-
     @RequestMapping(value = "manager/image/{id}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getImage(@PathVariable(value = "id") int id) {
         ImageEntity image = this.accompanyService.getImage(id);
@@ -713,7 +701,6 @@ public class MemberController {
         headers.setContentType(new MediaType(mimeType, mimeSubType, StandardCharsets.UTF_8));
         return new ResponseEntity<>(image.getData(), headers, HttpStatus.OK);
     }
-
 
     @RequestMapping(value = "manager/image", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -816,8 +803,6 @@ public class MemberController {
         responseJson.put(IResult.ATTRIBUTE_NAME, result.name().toLowerCase());
         return responseJson.toString();
     }
-
-
 }
 
 

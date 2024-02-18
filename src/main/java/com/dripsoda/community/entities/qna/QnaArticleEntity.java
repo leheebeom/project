@@ -1,9 +1,11 @@
 package com.dripsoda.community.entities.qna;
 
+import com.dripsoda.community.interfaces.IEntity;
+
 import java.util.Date;
 import java.util.Objects;
 
-public class QnaArticleEntity {
+public class QnaArticleEntity implements IEntity<QnaArticleEntity> {
     public static final String ATTRIBUTE_NAME = "qnaArticle";
     public static final String ATTRIBUTE_NAME_PLURAL = "qnaArticles";
 
@@ -111,6 +113,30 @@ public class QnaArticleEntity {
     @Override
     public int hashCode() {
         return Objects.hash(index);
+    }
+
+    @Override
+    public QnaArticleEntity clone() {
+        QnaArticleEntity qnaArticleEntity = new QnaArticleEntity();
+        this.index = qnaArticleEntity.index;
+        this.categoryId = qnaArticleEntity.categoryId;
+        this.userEmail = qnaArticleEntity.userEmail;
+        this.createdAt = qnaArticleEntity.createdAt;
+        this.title = qnaArticleEntity.title;
+        this.content = qnaArticleEntity.content;
+        this.viewCount = qnaArticleEntity.viewCount;
+        return qnaArticleEntity;
+    }
+
+    @Override
+    public void copyValuesOf(QnaArticleEntity qnaArticleEntity) {
+        qnaArticleEntity.index = this.index;
+        qnaArticleEntity.categoryId = this.categoryId;
+        qnaArticleEntity.userEmail = this.userEmail;
+        qnaArticleEntity.createdAt = this.createdAt;
+        qnaArticleEntity.title = this.title;
+        qnaArticleEntity.content = this.content;
+        qnaArticleEntity.viewCount = this.viewCount;
     }
 }
 

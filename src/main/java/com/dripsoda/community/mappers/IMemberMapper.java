@@ -9,6 +9,8 @@ import java.util.List;
 
 @Mapper
 public interface IMemberMapper {
+    int deleteUser(UserEntity user);
+
     int insertContactAuth(ContactAuthEntity contactAuth);
 
     int insertEmailAuth(EmailAuthEntity emailAuth);
@@ -17,34 +19,8 @@ public interface IMemberMapper {
 
     int insertChat(ChatEntity chat);
 
-//    String updateUserProfileImage(UserEntity newUser);
-
-    ContactAuthEntity selectContactAuthByContactCodeSalt(ContactAuthEntity contactAuth);
-
-    ContactCountryEntity[] selectContactCountries();
-
-    EmailAuthEntity selectEmailAuthByIndex(EmailAuthEntity emailAuth);
-
-    UserEntity selectUserByEmail(UserEntity user);
-
     int insertFeedback(FeedbackEntity feedback);
-    UserEntity selectUserByPassword(UserEntity user);
 
-    UserEntity selectUserByEmailPassword(UserEntity user);
-
-    UserEntity selectUserByNameContact(UserEntity user);
-
-    UserEntity selectUserByAdmin();
-
-    UserEntity selectUserByContact(UserEntity user);
-
-
-    ChatSendUserContactDto selectChatByIndex(@Param(value = "index") int index);
-    List<ChatEntity> selectUserByChat(@Param(value = "email") String email);
-
-    List<ChatEntity> selectUserByChats(@Param(value = "email") String email);
-    List<ChatEntity> selectAdminByChat(@Param(value = "email")String email);
-    List<ChatEntity> selectChats();
     int updateContactAuth(ContactAuthEntity contactAuth);
 
     int updateEmailAuth(EmailAuthEntity emailAuth);
@@ -53,10 +29,35 @@ public interface IMemberMapper {
 
     int updateChat(ChatEntity chat);
 
-    int deleteUser(UserEntity user);
-
-    UserEntity selectProfileImage(@Param(value = "profileId")String profileId);
+    ContactCountryEntity[] selectContactCountries();
 
     List<UserEntity> selectUsersForHome();
 
+    List<ChatEntity> selectUserByChat(@Param(value = "email") String email);
+
+    List<ChatEntity> selectUserByChats(@Param(value = "email") String email);
+
+    List<ChatEntity> selectAdminByChat(@Param(value = "email") String email);
+
+    List<ChatEntity> selectChats();
+
+    ContactAuthEntity selectContactAuthByContactCodeSalt(ContactAuthEntity contactAuth);
+
+    EmailAuthEntity selectEmailAuthByIndex(EmailAuthEntity emailAuth);
+
+    UserEntity selectUserByEmail(UserEntity user);
+
+    UserEntity selectUserByPassword(UserEntity user);
+
+    UserEntity selectUserByEmailPassword(UserEntity user);
+
+    UserEntity selectUserByNameContact(UserEntity user);
+
+    UserEntity selectProfileImage(@Param(value = "profileId") String profileId);
+
+    UserEntity selectUserByAdmin();
+
+    UserEntity selectUserByContact(UserEntity user);
+
+    ChatSendUserContactDto selectChatByIndex(@Param(value = "index") int index);
 }

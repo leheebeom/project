@@ -1,9 +1,11 @@
 package com.dripsoda.community.entities.accompany;
 
+import com.dripsoda.community.interfaces.IEntity;
+
 import java.util.Date;
 import java.util.Objects;
 
-public class ImageEntity {
+public class ImageEntity implements IEntity<ImageEntity> {
     public static final String ATTRIBUTE_NAME = "image";
     public static final String ATTRIBUTE_NAME_PLURAL = "images";
 
@@ -94,5 +96,27 @@ public class ImageEntity {
     @Override
     public int hashCode() {
         return Objects.hash(index);
+    }
+
+    @Override
+    public ImageEntity clone() {
+        ImageEntity imageEntity = new ImageEntity();
+        this.index = imageEntity.index;
+        this.userEmail = imageEntity.userEmail;
+        this.createdAt = imageEntity.createdAt;
+        this.name = imageEntity.name;
+        this.mime = imageEntity.mime;
+        this.data = imageEntity.data;
+        return imageEntity;
+    }
+
+    @Override
+    public void copyValuesOf(ImageEntity imageEntity) {
+        imageEntity.index = this.index;
+        imageEntity.userEmail = this.userEmail;
+        imageEntity.createdAt = this.createdAt;
+        imageEntity.name = this.name;
+        imageEntity.mime = this.mime;
+        imageEntity.data = this.data;
     }
 }

@@ -1,8 +1,10 @@
 package com.dripsoda.community.entities.accompany;
 
+import com.dripsoda.community.interfaces.IEntity;
+
 import java.util.Objects;
 
-public class ContinentEntity {
+public class ContinentEntity implements IEntity<ContinentEntity> {
 
     public static final String ATTRIBUTE_NAME = "accompanyContinent";
     public static final String ATTRIBUTE_NAME_PLURAL = "accompanyContinents";
@@ -52,5 +54,19 @@ public class ContinentEntity {
     @Override
     public int hashCode() {
         return Objects.hash(value);
+    }
+
+    @Override
+    public ContinentEntity clone() {
+        ContinentEntity continentEntity = new ContinentEntity();
+        this.value = continentEntity.value;
+        this.text = continentEntity.text;
+        return continentEntity;
+    }
+
+    @Override
+    public void copyValuesOf(ContinentEntity continentEntity) {
+        continentEntity.value = this.value;
+        continentEntity.text = this.text;
     }
 }
