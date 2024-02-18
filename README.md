@@ -5,13 +5,13 @@
 #### Project nickname : 트립소다 프로젝트
 #### Project execution period : 2023.11.30~2022.02.15 
 
-#### Project URL :  
+#### Project URL :  [Tripsoda Clone](http://dripsoda.co.kr:8080/)
 
 #### Project PPT :  [PPT](https://o365gnu-my.sharepoint.com/:p:/g/personal/2017011008_stu_gnu_ac_kr/EeNRVvR5CMBOqSBGLK8TSd8BVyv9uJ9l0sCGyf0PbWRarg)
 
 ----------------
 
-##  Description
+## 🛠 Description
 
 여행자들 간의 새로운 모험을 소통하고 협업할 수 있는 플랫폼(트립소다)을 소개합니다. 
 
@@ -37,14 +37,20 @@
 > - vanilla js로 spa를 구현하여 페이지 전환 시 서버에서 전체 화면을 새로 내려받지 않고 유저가 필요한 부분만 갱신하도록 구현하였습니다.
 > - 웹 표준을 준수하여 다양한 브라우저와 디바이스에서 접근하여 서비스를 이용할 수 있도록 반응형으로 제작하였습니다.
 
-## Environment
+## 🔧 Environment
 
 Rest API 의 구조에 맞추어 설계하였으며, MVC 패턴으로 개발
 
 > #### 개발 언어 : Java 8
 
-> #### 개발 환경 : Spring Boot 2.6.10, Maven, Thymeleaf, Json, MyBatis
+> #### 개발 환경 : Spring Boot 2.7.3, Maven, Thymeleaf, Json, MyBatis (IntelliJ IDEA)
 
-> #### 데이터 베이스 : Maria DB
+> #### 데이터 베이스 : Maria DB 10.6 (AWS RDS)
 
 > #### 형상 관리 툴 : GitHub
+
+> #### HOSTING : AWS EC2
+
+## 📌 주요 기능 상세페이지
+- [기능 명세서]
+  -  Function PPT : [Function PPT](https://o365gnu-my.sharepoint.com/:p:/g/personal/2017011008_stu_gnu_ac_kr/EeNRVvR5CMBOqSBGLK8TSd8BVyv9uJ9l0sCGyf0PbWRarg)
