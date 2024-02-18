@@ -54,4 +54,4 @@ Rest API 의 구조에 맞추어 설계하였으며, MVC 패턴으로 개발
 
 ## 📌  주요 기능 상세페이지
 - [기능 명세서]
-  -  #### Project PPT : [Function PPT](https://o365gnu-my.sharepoint.com/:p:/g/personal/2017011008_stu_gnu_ac_kr/EQfZYaeN9XxGkkbs4rtPtWsBtTG3QMoqGR9RqOztlwdbXg)
+  -  #### Function PPT : [PPT](https://o365gnu-my.sharepoint.com/:p:/g/personal/2017011008_stu_gnu_ac_kr/EQfZYaeN9XxGkkbs4rtPtWsBtTG3QMoqGR9RqOztlwdbXg)
