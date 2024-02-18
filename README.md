@@ -7,7 +7,7 @@
 
 #### Project URL :  [Tripsoda Clone](https://dripsoda.co.kr:8080/)
 
-#### Project PPT :  [PPT](https://o365gnu-my.sharepoint.com/:p:/g/personal/2017011008_stu_gnu_ac_kr/EeoklxGMNa1KiK4RoLHdfk0B9Aldbbym4-xRmnr1PSqp8Q)
+#### Project PPT :  [PPT](https://o365gnu-my.sharepoint.com/:p:/g/personal/2017011008_stu_gnu_ac_kr/ET0RPEV_JxNFunZ7QYLLyyUB8U3hePKKM5yADDE1DIIE1g)
 
 ----------------
 
