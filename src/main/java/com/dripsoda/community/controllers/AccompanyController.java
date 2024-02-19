@@ -279,8 +279,8 @@ public class AccompanyController {
         modelAndView.addObject("articleId", id);
         //ex 2번 글이면 2번글에 대한 모든 댓글 조회
         modelAndView.addObject(CommentEntity.ATTRIBUTE_NAME_PLURAL, this.accompanyService.getArticleCommentsByArticleIndex(id));
+        modelAndView.addObject(ArticleEntity.ATTRIBUTE_NAME, this.accompanyService.getArticleForUserProfile(id));
         modelAndView.setViewName("accompany/read");
-
         return modelAndView;
     }
 

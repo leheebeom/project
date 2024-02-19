@@ -74,6 +74,7 @@ public interface IAccompanyMapper {
     int SelectCountArticle();
 
     ArticleEntity selectArticleByIndex(@Param(value = "index") int index);
+    ArticleUserMyDto selectArticleForUserProfile(@Param(value = "index")int index);
 
     CommentEntity selectCommentByIndex(@Param(value = "index") int index);
 

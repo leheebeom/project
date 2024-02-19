@@ -62,6 +62,11 @@ public class AccompanyService {
         return this.accompanyMapper.selectArticleByIndex(index);
     }
 
+    public ArticleUserMyDto getArticleForUserProfile(int id) {
+        return this.accompanyMapper.selectArticleForUserProfile(id);
+    }
+
+
     public ArticleSearchDto[] searchArticles(RegionEntity region, int lastArticleIndex) {
         return this.accompanyMapper.selectArticlesForSearch(region, lastArticleIndex);
     }
@@ -155,6 +160,7 @@ public class AccompanyService {
         }
         return this.accompanyMapper.selectRequestByRequesterArticleIndex(requester.getEmail(), articleIndex) != null;
     }
+
 
     public CommentEntity getCommentIndex(int index) {
         return this.accompanyMapper.selectCommentByIndex(index);
