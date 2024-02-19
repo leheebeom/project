@@ -134,7 +134,7 @@
                     <img th:if="${accompanyArticle.getUserProfileId() == 'no' or accompanyArticle.getUserProfileId() == null}"
                     th:src="@{/resources/images/vector_profile_default.svg}" alt="디폴트" class="profile-image">
                     <img th:if="${accompanyArticle.getUserProfileId() != 'no' && accompanyArticle.getUserProfileId() != ''}"
-                    th:src="@{'/member/profile-id?profileI=' + ${accompanyArticle.getUserProfileId()}}" alt="profile" class="profile-image">
+                    th:src="@{'/member/profile-id?profileId=' + ${accompanyArticle.getUserProfileId()}}" alt="profile" class="profile-image">
                 </div>
                 <span class="nickname" id="nickname">닉네임 자리</span>
             </div>
