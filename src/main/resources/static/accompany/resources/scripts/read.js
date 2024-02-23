@@ -168,7 +168,7 @@ modifyButton.addEventListener('click', () => {
 
 
 requestButton.addEventListener('click', () => {
-    if (requestButton.dataset.sigend === 'false') {
+    if (requestButton.dataset.signed === 'false') {
         window.location.href = '../../member/userLogin';
         return;
     }
