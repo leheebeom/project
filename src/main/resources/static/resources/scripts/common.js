@@ -71,8 +71,8 @@ const myButton = window.document.getElementById('myButton');
 //
 // //     const removeOrRecreateForm = () => {
 //         const screenWidth = window.innerWidth;
-const form = document.getElementById('searchForm');
-const formContainer = document.getElementById('searchFormContainer');
+// const form = document.getElementById('searchForm');
+// const formContainer = document.getElementById('searchFormContainer');
 //
 //         // 창 너비가 1200px 미만인 경우 form 요소를 삭제
 //         if (768 < screenWidth  &&  screenWidth < 1200) {
