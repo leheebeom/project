@@ -65,75 +65,99 @@ _writeMenu?.addEventListener('mouseleave', () => {
 const loginButton = window.document.getElementById('loginButton');
 const myButton = window.document.getElementById('myButton');
 
-(() => {
-    const formId = 'searchForm';
-    const formContainerId = 'searchFormContainer';
-
-    const removeOrRecreateForm = () => {
-        const screenWidth = window.innerWidth;
-        const form = document.getElementById('searchForm');
-        const formContainer = document.getElementById('searchFormContainer');
-
-        // 창 너비가 1200px 미만인 경우 form 요소를 삭제
-        if (768 < screenWidth  &&  screenWidth < 1200) {
-            // form 요소가 존재하는지 확인 후 삭제
-            if (form) {
-                form.remove();
-            }
-        } else {
-            // 창 너비가 1200px 이상인 경우 form 요소를 재생성하고, 원래 위치에 삽입
-            if (!form) {
-                const newForm = document.createElement('form');
-                newForm.className = 'search-form';
-                newForm.method = 'get';
-                newForm.id = formId;
-
-                const label = document.createElement('label');
-                label.className = 'input-container';
-
-                const span = document.createElement('span');
-                span.hidden = true;
-                span.textContent = '여행 qna을 검색해보세요!';
-
-                const i = document.createElement('i');
-                i.className = 'icon fa-solid fa-magnifying-glass';
-
-                const input = document.createElement('input');
-                input.className = 'input';
-                input.maxLength = 50;
-                input.name = 'keyword';
-                input.placeholder = '동행 게시글을 검색해보세요!';
-                input.type = 'text';
-
-                label.appendChild(span);
-                label.appendChild(i);
-                label.appendChild(input);
-
-                newForm.appendChild(label);
-
-                // 원래 위치에 form 요소를 삽입
-                formContainer.appendChild(newForm);
-            }
-        }
-    };
-
-    // 함수를 창 크기 조절 이벤트에 연결
-    window.addEventListener('resize', removeOrRecreateForm);
-    // 초기에도 함수 호출
-    removeOrRecreateForm();
-})();
+// (() => {
+//     const formId = 'searchForm';
+//     const formContainerId = 'searchFormContainer';
+//
+// //     const removeOrRecreateForm = () => {
+//         const screenWidth = window.innerWidth;
+const form = document.getElementById('searchForm');
+const formContainer = document.getElementById('searchFormContainer');
+//
+//         // 창 너비가 1200px 미만인 경우 form 요소를 삭제
+//         if (768 < screenWidth  &&  screenWidth < 1200) {
+//             // form 요소가 존재하는지 확인 후 삭제
+//             if (form) {
+//                 form.remove();
+//             }
+//         } else {
+//             // 창 너비가 1200px 이상인 경우 form 요소를 재생성하고, 원래 위치에 삽입
+//             if (!form) {
+//                 const newForm = document.createElement('form');
+//                 newForm.className = 'search-form';
+//                 newForm.method = 'get';
+//                 newForm.id = formId;
+//
+//                 const label = document.createElement('label');
+//                 label.className = 'input-container';
+//
+//                 const span = document.createElement('span');
+//                 span.hidden = true;
+//                 span.textContent = '여행 qna을 검색해보세요!';
+//
+//                 const i = document.createElement('i');
+//                 i.className = 'icon fa-solid fa-magnifying-glass';
+//
+//                 const input = document.createElement('input');
+//                 input.className = 'input';
+//                 input.maxLength = 50;
+//                 input.name = 'keyword';
+//                 input.placeholder = '동행 게시글을 검색해보세요!';
+//                 input.type = 'text';
+//
+//                 label.appendChild(span);
+//                 label.appendChild(i);
+//                 label.appendChild(input);
+//
+//                 newForm.appendChild(label);
+//
+//                 // 원래 위치에 form 요소를 삽입
+//                 formContainer.appendChild(newForm);
+//             }
+//         }
+//     };
+//
+//     // 함수를 창 크기 조절 이벤트에 연결
+//     window.addEventListener('resize', removeOrRecreateForm);
+//     // 초기에도 함수 호출
+//     removeOrRecreateForm();
+// })();
 
 const menuToggle = window.document.getElementById('menuToggle');
 const _buttonMenu = window.document.getElementById('_buttonMenu');
 
-menuToggle?.addEventListener('click', () =>{
-   if(_buttonMenu?.classList.contains('visible')) {
-       -_buttonMenu?.classList.remove('visible');
-   } else {
-       _buttonMenu?.classList.add('visible');
-   }
+menuToggle?.addEventListener('click', () => {
+    if (_buttonMenu?.classList.contains('visible')) {
+        -_buttonMenu?.classList.remove('visible');
+    } else {
+        _buttonMenu?.classList.add('visible');
+    }
+});
+const iconContainer = window.document.getElementById('iconContainer');
+const searchIcon = window.document.getElementById('searchIcon');
+const searchFormContainer = window.document.getElementById('searchFormContainer');
+searchIcon?.addEventListener('click', () => {
+    if (searchFormContainer?.classList.contains('visible')) {
+        searchFormContainer?.classList.remove('visible');
+    } else {
+        searchFormContainer?.classList.add('visible');
+    }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
 
+    const handleResize = () => {
+        const screenWidth = window.innerWidth; // resize 이벤트가 발생할 때마다 screenWidth를 다시 설정합니다.
+        if (screenWidth > 768) {
+            searchIcon.style.display = "none";
+        } else {
+            searchIcon.style.display = "block";
+        }
+    };
 
+    // resize 이벤트를 처리합니다.
+    window.addEventListener("resize", handleResize);
 
+    // 초기 로딩 시에도 실행하여 적절한 초기 표시 상태를 설정합니다.
+    handleResize();
+});
